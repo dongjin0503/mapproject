@@ -7,6 +7,6 @@
 <title>Insert title here</title>
 </head>
 <body>
-z\ㅋㅋㅊㅋㅊㅌㅊㄴㅇㅁㄴㅇㅋㅊㅋㄴㅊㅋㄴㅇㄴㅇㅁㄴㅇㄴㅊㅌㅊㅋ 형이 하시죠 깃담당
+가야제 가야제
 </body>
 </html>
