@@ -49,5 +49,14 @@ public class FreeBoardDAO {
 	    return jdbc.queryForObject(sql, Integer.class);
 	}
 	
+
+	public void likeCountPlus(int postId) {
+		String sql = "update freeboard set like_count=like_count+1 where post_id=?";
+		jdbc.update(sql,postId);
+	}
+	public void likeCountMinus(int postId) {
+		String sql = "update freeboard set like_count=like_count-1 where post_id=?";
+		jdbc.update(sql,postId);
+	}
 	
 }

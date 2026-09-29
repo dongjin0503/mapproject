@@ -267,11 +267,12 @@ body {
 			<div class="board-tools">
 
 				<div class="search-box">
+				
 					<form action="#">
 						<input type="text" placeholder="게시글 검색">
 					</form>
 				</div>
-
+				
 				<div class="write-box">
 					<input type="button" class="write-btn" value="글쓰기"
 						onclick="location.href='/FreeBoard/write'">
@@ -371,6 +372,7 @@ body {
 				if (needNext)
 					addLink(">", endNavi + 1, false);
 			</script>
+			<span>총 게시물 수: ${recordTotalCount }</span>
 		</div>
 
 	</div>

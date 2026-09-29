@@ -56,6 +56,47 @@ body {
 	font-weight: bold;
 }
 
+/* 카테고리 선택 (radio) */
+.categoryGroup {
+	position: relative;
+	display: flex;
+	gap: 8px;
+	margin: 12px 0 0;
+}
+
+.categoryGroup input[type="radio"] {
+	position: absolute;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.categoryGroup label {
+	padding: 8px 18px;
+	border: 1px solid #aab3c4;
+	border-radius: 20px;
+	background: white;
+	color: #39465c;
+	font-size: 13px;
+	cursor: pointer;
+	user-select: none;
+}
+
+.categoryGroup label:hover {
+	border-color: #1c2535;
+}
+
+/* 선택된 카테고리 */
+.categoryGroup input[type="radio"]:checked+label {
+	background: #1c2535;
+	color: white;
+	border-color: #1c2535;
+}
+
+/* 키보드로 이동할 때 표시 */
+.categoryGroup input[type="radio"]:focus-visible+label {
+	outline: 2px solid #2457d6;
+}
+
 /* 글 내용 */
 .content {
 	padding: 25px 10px;
@@ -150,7 +191,7 @@ body {
 }
 
 /* 작성자 */
-.commentPlace input[name="writer"] {
+.commentPlace input[name="memberId"] {
 	width: 150px;
 	height: 40px;
 	padding: 0 10px;
@@ -240,39 +281,56 @@ body {
 <body>
 <div class="container">
 	<form action="/FreeBoard/updateContent" method="post">
-		<input type="hidden" name="postId" value="${post.postId }"> <input
-			type="hidden" name="cpage" value="${cpage}">
+		<input type="hidden" name="postId" value="${post.postId}">
+		<input type="hidden" name="cpage" value="${cpage}">
 			<div class="header">
-				<input id="titleText" name="title" type="text" value="${post.title}"
-					readonly>
+				<input id="titleText" name="title" type="text"
+					value="<c:out value='${post.title}'/>" readonly>
 			</div>
 			<div class="detail">
-				<span>번호: ${post.postId}</span> <span>카테고리:
-					${post.contentCategory }</span> <span>작성자: ${post.memberId }</span> <span>조회수:
-					${post.viewCount }</span> <span>추천수: ${post.likeCount }</span> <span>작성일:
-					${post.createdAt }</span>
+				<span>번호: ${post.postId}</span>
+				<span>카테고리: <c:out value="${post.contentCategory}"/></span>
+				<span>작성자: <c:out value="${post.memberId}"/></span>
+				<span>조회수: ${post.viewCount}</span>
+				<span>추천수: ${post.likeCount}</span>
+				<span>작성일: ${post.createdAt}</span>
 			</div>
-			<input type="hidden" id="categoryType" name="contentCategory"
-				value="${post.contentCategory}">
-			<div class="updateCategory" id="updateCategory"
-				style="display: none;">
-				<input type="button" id="fbtn" value="자유"> <input
-					type="button" id="qbtn" value="질문"> <input type="button"
-					id="ibtn" value="정보">
+			
+			<input type="button" id="likeCount" value="추천">
+							<br><p id="p1">
+							
+							<script>
+								$("#likeCount").on("click",function(){
+									$.ajax({
+										url:"/FreeBoard/likecount",
+										data: {
+										    id: $("#id").val()
+										}
+									}).done(function(resp){
+										
+										$("#p1").html(resp);
+										
+									})
+								})
+							</script>
+
+			<!-- 수정 모드에서만 보이는 카테고리 선택 (현재 카테고리가 자동 선택됨) -->
+			<div class="categoryGroup" id="updateCategory" style="display: none;">
+				<input type="radio" name="contentCategory" id="cat-free" value="자유"
+					${post.contentCategory == '자유' ? 'checked' : ''}>
+				<label for="cat-free">자유</label>
+
+				<input type="radio" name="contentCategory" id="cat-question" value="질문"
+					${post.contentCategory == '질문' ? 'checked' : ''}>
+				<label for="cat-question">질문</label>
+
+				<input type="radio" name="contentCategory" id="cat-info" value="정보"
+					${post.contentCategory == '정보' ? 'checked' : ''}>
+				<label for="cat-info">정보</label>
 			</div>
-			<script>
-				$("#fbtn").on("click", function() {
-					$("#categoryType").val("자유");
-				});
-				$("#qbtn").on("click", function() {
-					$("#categoryType").val("질문");
-				});
-				$("#ibtn").on("click", function() {
-					$("#categoryType").val("정보");
-				});
-			</script>
+
 			<div class="content">
-				<textarea id="textArea" name="content" readonly>${post.content }</textarea>
+				<textarea id="textArea" name="content" readonly><c:out value="${post.content}"/></textarea>
 			</div>
 			<div class="fileContent">
 				<c:forEach var="i" items="${fileList}">
@@ -282,33 +340,32 @@ body {
 				</c:forEach>
 			</div>
 			<hr>
+			
 			<c:choose>
 				<c:when test="${post.memberId != loginId}">
 					<div class="footer">
-						<a href="/FreeBoard/freeboard?cpage=${cpage }">목록으로</a>
+						<a href="/FreeBoard/freeboard?cpage=${cpage}">목록으로</a>
 					</div>
 				</c:when>
 				<c:otherwise>
 					<div class="footer">
-						<a href="/FreeBoard/freeboard?cpage=${cpage }">목록으로</a> <input
-							id="updatebtn" type="button" value="수정"> <input
-							id="updateOkbtn" type="submit" value="수정완료"
-							style="display: none;"> <input id="updateCancelbtn"
-							type="button" value="수정취소" style="display: none;"> <input
-							id="deletebtn" type="button" value="삭제">
+						<a href="/FreeBoard/freeboard?cpage=${cpage}">목록으로</a>
+						<input id="updatebtn" type="button" value="수정">
+						<input id="updateOkbtn" type="submit" value="수정완료" style="display: none;">
+						<input id="updateCancelbtn" type="button" value="수정취소" style="display: none;">
+						<input id="deletebtn" type="button" value="삭제">
 					</div>
 					<script>
-						const originTitle = document
-								.getElementById("titleText").value;
-						const originContent = document
-								.getElementById("textArea").value;
-						const originCategory = document
-								.getElementById("categoryType").value;
+						const originTitle = document.getElementById("titleText").value;
+						const originContent = document.getElementById("textArea").value;
+						// 현재 선택된 카테고리 (세 가지 외의 값이면 null)
+						const checkedCategory = document.querySelector('input[name="contentCategory"]:checked');
+						const originCategory = checkedCategory ? checkedCategory.value : null;
 
 						document.getElementById("updatebtn").onclick = function() {
 							document.getElementById("titleText").readOnly = false;
 							document.getElementById("textArea").readOnly = false;
-							document.getElementById("updateCategory").style.display = "block";
+							document.getElementById("updateCategory").style.display = "flex";
 							document.getElementById("deletebtn").style.display = "none";
 							document.getElementById("updatebtn").style.display = "none";
 							document.getElementById("updateOkbtn").style.display = "inline-block";
@@ -325,7 +382,10 @@ body {
 							document.getElementById("updateCancelbtn").style.display = "none";
 							document.getElementById("titleText").value = originTitle;
 							document.getElementById("textArea").value = originContent;
-							document.getElementById("categoryType").value = originCategory; // 바꿨던 카테고리도 원래대로
+							// 바꿨던 카테고리도 원래대로
+							if (originCategory !== null) {
+								document.querySelector('input[name="contentCategory"][value="' + originCategory + '"]').checked = true;
+							}
 						};
 
 						document.getElementById("deletebtn").onclick = function() {
@@ -341,16 +401,17 @@ body {
 
 
 	<form action="/reply/addReply" method="post">
-		<input type="hidden" name="cpage" value="${cpage }"> <input
-			type="hidden" name="postId" value="${post.postId}">
+		<input type="hidden" name="cpage" value="${cpage}">
+		<input type="hidden" name="postId" value="${post.postId}">
 		<hr>
 
-		<div class="commentHeader">댓글 ${commentCount }</div>
+		<div class="commentHeader">댓글 ${commentCount}</div>
 		<br>
 		<div class="commentPlace">
-			<textArea name="content" placeholder="댓글을 입력하세요 (최대 1000바이트)"></textArea>
-			<span>작성자: </span> <input type="text" name="memberId" readonly
-				value="${loginId}"> <input type="submit" value="댓글 등록">
+			<textarea name="content" placeholder="댓글을 입력하세요 (최대 1000바이트)"></textarea>
+			<span>작성자: </span>
+			<input type="text" name="memberId" readonly value="<c:out value='${loginId}'/>">
+			<input type="submit" value="댓글 등록">
 		</div>
 	</form>
 
@@ -360,47 +421,39 @@ body {
 		<form action="/reply/updateReply" method="post">
 			<!-- 폼이 foreach안에있어야 댓글마다 수정form이 각각 생긴다 -->
 			<input type="hidden" name="replyId" value="${reply.replyId}">
-			<input type="hidden" name="cpage" value="${cpage }"> <input
-				type="hidden" name="postId" value="${post.postId}">
+			<input type="hidden" name="cpage" value="${cpage}">
+			<input type="hidden" name="postId" value="${post.postId}">
 
 
 			<div class="replyList">
 				<div class="reply">
 
 					<div class="replyInfo">
-						<span class="replyMemberId">${reply.memberId}</span> <span
-							class="replyCreatedAt">${reply.createdAt}</span>
+						<span class="replyWriter"><c:out value="${reply.memberId}"/></span>
+						<span class="replyDate">${reply.createdAt}</span>
 						<c:if test="${reply.memberId == loginId}">
 							<input id="replyUpbtn${reply.replyId}" type="button" value="수정">
 							<input id="replyUpOkbtn${reply.replyId}" type="submit"
 								value="수정완료" style="display: none;">
 							<input id="replyUpCancelbtn${reply.replyId}" type="button"
 								value="수정취소" style="display: none;">
-							<a
-								href="/reply/deleteReply?replyId=${reply.replyId}&postId=${post.postId}&cpage=${cpage}">
-								<input id="replyDelbtn${reply.replyId}" type="button" value="삭제">
-							</a>
+							<input id="replyDelbtn${reply.replyId}" type="button" value="삭제">
 						</c:if>
 					</div>
-					
-					<textArea id="comment${reply.replyId}" name="content"
-						class="replyContent" readonly>${reply.content}</textArea>
+
+					<textarea id="comment${reply.replyId}" name="content"
+						class="replyContents" readonly><c:out value="${reply.content}"/></textarea>
 
 					<c:if test="${reply.memberId == loginId}">
 						<script>
 							(function() {
 								const id = "${reply.replyId}";
-								const box = document.getElementById("comment"
-										+ id);
+								const box = document.getElementById("comment" + id);
 								const origin = box.value;
-								const up = document.getElementById("replyUpbtn"
-										+ id);
-								const ok = document
-										.getElementById("replyUpOkbtn" + id);
-								const cancel = document
-										.getElementById("replyUpCancelbtn" + id);
-								const del = document
-										.getElementById("replyDelbtn" + id);
+								const up = document.getElementById("replyUpbtn" + id);
+								const ok = document.getElementById("replyUpOkbtn" + id);
+								const cancel = document.getElementById("replyUpCancelbtn" + id);
+								const del = document.getElementById("replyDelbtn" + id);
 
 								up.onclick = function() {
 									up.style.display = "none";
@@ -416,6 +469,12 @@ body {
 									cancel.style.display = "none";
 									box.readOnly = true;
 									box.value = origin;
+								};
+								del.onclick = function() {
+									if (confirm("댓글을 삭제하시겠습니까?")) {
+										location.href = "/reply/deleteReply?replyId=" + id
+												+ "&postId=${post.postId}&cpage=${cpage}";
+									}
 								};
 							})();
 						</script>
