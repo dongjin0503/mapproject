@@ -7,6 +7,6 @@
 <title>Insert title here</title>
 </head>
 <body>
-
+<a href="/FreeBoard/freeboard">게시판</a>
 </body>
 </html>
