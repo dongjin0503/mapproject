@@ -11,11 +11,11 @@ public class ReplyDTO {
 	private int parentReplyId;
 	private String content;
 	private int likeCount;
-	private Timestamp createAt;
+	private Timestamp createdAt;
 	
 	public ReplyDTO() {};
 	public ReplyDTO(int replyId, int postId, String memberId, int parentReplyId, String content, int likeCount,
-			Timestamp createAt) {
+			Timestamp createdAt) {
 		super();
 		this.replyId = replyId;
 		this.postId = postId;
@@ -23,7 +23,7 @@ public class ReplyDTO {
 		this.parentReplyId = parentReplyId;
 		this.content = content;
 		this.likeCount = likeCount;
-		this.createAt = createAt;
+		this.createdAt = createdAt;
 	}
 	public int getReplyId() {
 		return replyId;
@@ -61,11 +61,11 @@ public class ReplyDTO {
 	public void setLikeCount(int likeCount) {
 		this.likeCount = likeCount;
 	}
-	public Timestamp getCreateAt() {
-		return createAt;
+	public Timestamp getCreatedAt() {
+		return createdAt;
 	}
-	public void setCreateAt(Timestamp createAt) {
-		this.createAt = createAt;
+	public void setCreatedAt(Timestamp createdAt) {
+		this.createdAt = createdAt;
 	}
 	
 	

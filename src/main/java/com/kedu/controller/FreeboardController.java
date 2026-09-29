@@ -1,13 +1,13 @@
 package com.kedu.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.kedu.dao.FreeBoardDAO;
+import com.kedu.dao.ReplyDAO;
 import com.kedu.dto.FreeBoardDTO;
 
 @Controller
@@ -17,12 +17,29 @@ public class FreeboardController {
 	@Autowired
 	private FreeBoardDAO dao;
 	
+	@Autowired
+	private ReplyDAO rdao;
+	
 	@RequestMapping("/freeboard")
-	public String boardList(Model model) throws Exception{
-		List<FreeBoardDTO> lists =  dao.boardList();
-		model.addAttribute("list",lists);
-		
-		return "/FreeBoard/freeboard";
+	public String boardList(@RequestParam(defaultValue = "1") int cpage, Model model) throws Exception {
+	    int recordCountPerPage = 10;
+	    int naviCountPerPage = 5;
+
+	    int recordTotalCount = dao.getTotalCount();
+	    int pageTotalCount = Math.max(1, (int) Math.ceil(recordTotalCount / (double) recordCountPerPage));
+	    if (cpage < 1) cpage = 1;
+	    if (cpage > pageTotalCount) cpage = pageTotalCount;
+
+	    int startRow = cpage * recordCountPerPage - (recordCountPerPage - 1);
+	    int endRow = cpage * recordCountPerPage;
+
+	    model.addAttribute("list", dao.boardList(startRow, endRow));
+	    model.addAttribute("recordTotalCount", recordTotalCount);
+	    model.addAttribute("recordCountPerPage", recordCountPerPage);
+	    model.addAttribute("naviCountPerPage", naviCountPerPage);
+	    model.addAttribute("cpage", cpage);
+
+	    return "/FreeBoard/freeboard";
 	}
 	
 	@RequestMapping("/write")
@@ -39,9 +56,11 @@ public class FreeboardController {
 	}
 	
 	@RequestMapping("/detail")
-	public String detail(int postId, Model model) throws Exception{
-		FreeBoardDTO dto = dao.detail(postId);
-		model.addAttribute("post",dto);
+	public String detail(int postId, Model model, int cpage) throws Exception{
+		model.addAttribute("post", dao.detail(postId));
+	    model.addAttribute("replyList", rdao.selectByPostId(postId));
+	    model.addAttribute("commentCount", rdao.countByPostId(postId));
+	    model.addAttribute("cpage", cpage);
 		
 		return "/FreeBoard/detail";
 	}
@@ -56,6 +75,8 @@ public class FreeboardController {
 	@RequestMapping("/deleteContent")
 	public String deleteContent(int postId, int cpage) {
 		
+		rdao.deleteByPostId(postId);
+	    
 		dao.deleteContent(postId);
 		
 		return "redirect:/FreeBoard/freeboard?cpage="+cpage;

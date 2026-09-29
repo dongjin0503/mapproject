@@ -263,7 +263,6 @@ body {
 					value="정보">
 			</div>
 
-
 			<!-- 3. 검색 및 글쓰기 -->
 			<div class="board-tools">
 
@@ -283,7 +282,6 @@ body {
 			<!-- 4. 게시글 목록 -->
 			<div class="board-list">
 				<table>
-
 					<tr>
 						<th>번호</th>
 						<th>카테고리</th>
@@ -295,27 +293,84 @@ body {
 					<c:choose>
 						<c:when test="${empty list}">
 							<tr>
-								<div>표시할 내용이 없습니다.</div>
+								<td colspan="6">표시할 내용이 없습니다.</td>
 							</tr>
 						</c:when>
 						<c:otherwise>
 							<c:forEach var="i" items="${list}">
 								<tr>
-									<td>${i.postId }</td>
-									<td>카테고리</td>
+									<td>${i.postId}</td>
+									<td>${i.contentCategory}</td>
 									<td class="title"><a
-										href="/FreeBoard/detail?postId=${i.postId}"> ${i.title}</a></td>
-									<td>${i.memberId }</td>
-									<td>${i.viewCount }</td>
-									<td>${i.createAt}</td>
+										href="/FreeBoard/detail?postId=${i.postId}&cpage=${cpage}">${i.title}</a>
+									</td>
+									<td>${i.memberId}</td>
+									<td>${i.viewCount}</td>
+									<td>${i.createdAt}</td>
 								</tr>
 							</c:forEach>
 						</c:otherwise>
 					</c:choose>
 				</table>
-				<!-- 5. 페이지네이션 -->
-				<div class="nav" id="navigation">${navi }</div>
 			</div>
+
+			<!-- 페이지네이션 -->
+			<div class="pagination" id="navigation"></div>
+			<script>
+				const recordTotalCount = $
+				{
+					recordTotalCount
+				};
+				const recordCountPerPage = $
+				{
+					recordCountPerPage
+				};
+				const naviCountPerPage = $
+				{
+					naviCountPerPage
+				};
+				const currentPage = $
+				{
+					cpage
+				};
+
+				const pageTotalCount = Math.ceil(recordTotalCount
+						/ recordCountPerPage);
+
+				const startNavi = Math.floor((currentPage - 1)
+						/ naviCountPerPage)
+						* naviCountPerPage + 1;
+				let endNavi = startNavi + naviCountPerPage - 1;
+				if (endNavi > pageTotalCount) {
+					endNavi = pageTotalCount;
+				}
+
+				const needPrev = startNavi > 1;
+				const needNext = endNavi < pageTotalCount;
+
+				const navi = document.getElementById("navigation");
+
+				function addLink(text, page, active) {
+					const a = document.createElement("a");
+					a
+							.setAttribute("href", "/FreeBoard/freeboard?cpage="
+									+ page);
+					a.textContent = text;
+					if (active)
+						a.classList.add("active");
+					navi.append(a);
+				}
+
+				if (needPrev)
+					addLink("<", startNavi - 1, false);
+
+				for (let i = startNavi; i <= endNavi; i++) {
+					addLink(i, i, i === currentPage);
+				}
+
+				if (needNext)
+					addLink(">", endNavi + 1, false);
+			</script>
 		</div>
 
 	</div>

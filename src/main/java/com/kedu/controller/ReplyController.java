@@ -19,14 +19,22 @@ public class ReplyController {
 		
 		dao.addReply(dto);
 		
-		return "redirect:/FreeBoard/detail?postId=?"+dto.getPostId();
+		return "redirect:/FreeBoard/detail?postId="+dto.getPostId();
 	}
 	
 	@RequestMapping("/updateReply")
 	public String updateReply(ReplyDTO dto) throws Exception{
 		
-		dao.updateReply();
-		return "redirect:/FreeBoard/detail?postId=?"+dto.getPostId();
+		dao.updateReply(dto);
+		return "redirect:/FreeBoard/detail?postId="+dto.getPostId();
+	}
+	
+	@RequestMapping("/deleteReply")
+	public String deleteReply(int replyId, int postId) throws Exception{
+		
+		dao.deleteReply(replyId);
+		
+		return "redirect:/FreeBoard/detail?postId="+postId;
 	}
 
 }

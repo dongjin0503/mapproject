@@ -10,14 +10,14 @@ public class FreeBoardDTO {
 	private String content;
 	private int viewCount;
 	private int likeCount;
-	private Timestamp createAt;
+	private Timestamp createdAt;
 	
 	
 	
 	public FreeBoardDTO() {};
 	
 	public FreeBoardDTO(int postId, String memberId, String title, String contentCategory, String content,
-			int viewCount, int likeCount, Timestamp createAt) {
+			int viewCount, int likeCount, Timestamp createdAt) {
 		this.postId = postId;
 		this.memberId = memberId;
 		this.title = title;
@@ -25,7 +25,7 @@ public class FreeBoardDTO {
 		this.content = content;
 		this.viewCount = viewCount;
 		this.likeCount = likeCount;
-		this.createAt = createAt;
+		this.createdAt = createdAt;
 	}
 	public int getPostId() {
 		return postId;
@@ -69,11 +69,11 @@ public class FreeBoardDTO {
 	public void setLikeCount(int likeCount) {
 		this.likeCount = likeCount;
 	}
-	public Timestamp getCreateAt() {
-		return createAt;
+	public Timestamp getCreatedAt() {
+		return createdAt;
 	}
-	public void setCreateAt(Timestamp createAt) {
-		this.createAt = createAt;
+	public void setCreatedAt(Timestamp createdAt) {
+		this.createdAt = createdAt;
 	}
 	
 	

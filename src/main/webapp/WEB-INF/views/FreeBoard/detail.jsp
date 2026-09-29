@@ -6,7 +6,7 @@
 <head>
 <meta charset="UTF-8">
 <title>자유게시판 - 글 열람</title>
-
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <style>
 * {
 	box-sizing: border-box;
@@ -63,7 +63,7 @@ body {
 	font-size: 15px;
 }
 
-.content textarea {
+.content textArea {
 	width: 100%;
 	height: 300px;
 	overflow-y: auto;
@@ -102,7 +102,7 @@ body {
 	background-color: #222;
 }
 
-#titletext {
+#titleText {
 	border: none;
 	font-size: 30px;
 	font-weight: bold;
@@ -129,7 +129,7 @@ body {
 }
 
 /* 댓글 입력창 */
-.commentPlace textarea {
+.commentPlace textArea {
 	flex: 1;
 	width: 100%;
 	height: 80px;
@@ -145,7 +145,7 @@ body {
 }
 
 /* 댓글 입력창 클릭했을 때 */
-.commentPlace textarea:focus {
+.commentPlace textArea:focus {
 	border-color: #333;
 }
 
@@ -238,46 +238,47 @@ body {
 </head>
 
 <body>
-	<form action="/FreeBoard/UpdateContent">
-		<input type="hidden" name="postId" value="${post.postId }">
-		  
-		<input type="hidden" name="cpage" value="${cpage}">
-		<div class="container">
+<div class="container">
+	<form action="/FreeBoard/updateContent" method="post">
+		<input type="hidden" name="postId" value="${post.postId }"> <input
+			type="hidden" name="cpage" value="${cpage}">
 			<div class="header">
-				<input id="titleText" name="title" type="text"
-					value="${post.title}" readonly>
+				<input id="titleText" name="title" type="text" value="${post.title}"
+					readonly>
 			</div>
 			<div class="detail">
-				<span>번호: ${post.postId}</span>
-				<span>작성일: ${post.contentCategory }</span>
-				<span>작성자: ${post.memberId }</span>
-				<span>조회수: ${post.viewCount }</span>
-				<span>조회수: ${post.likeCount }</span>
-				<span>조회수: ${post.createAt }</span>
+				<span>번호: ${post.postId}</span> <span>카테고리:
+					${post.contentCategory }</span> <span>작성자: ${post.memberId }</span> <span>조회수:
+					${post.viewCount }</span> <span>추천수: ${post.likeCount }</span> <span>작성일:
+					${post.createdAt }</span>
 			</div>
-			<input type="hidden" id="categoryType" name="contentCategory" value="자유">
-			<div class="updateCategory">
-				<input type="button" id="fbtn" value="자유">
-				<input type="button" id="qbtn" value="질문">
-				<input type="button" id="ibtn" value="정보">
+			<input type="hidden" id="categoryType" name="contentCategory"
+				value="${post.contentCategory}">
+			<div class="updateCategory" id="updateCategory"
+				style="display: none;">
+				<input type="button" id="fbtn" value="자유"> <input
+					type="button" id="qbtn" value="질문"> <input type="button"
+					id="ibtn" value="정보">
 			</div>
 			<script>
-			$("#fbtn").on("click", function(){
-				$("#categoryType").val("자유");
-			});
-			$("#qbtn").on("click", function(){
-				$("#categoryType").val("질문");
-			});
-			$("#ibtn").on("click", function(){
-				$("#categoryType").val("정보");
-			});
+				$("#fbtn").on("click", function() {
+					$("#categoryType").val("자유");
+				});
+				$("#qbtn").on("click", function() {
+					$("#categoryType").val("질문");
+				});
+				$("#ibtn").on("click", function() {
+					$("#categoryType").val("정보");
+				});
 			</script>
 			<div class="content">
-				<textarea id="textarea" name="content" readonly>${post.content }</textarea>
+				<textarea id="textArea" name="content" readonly>${post.content }</textarea>
 			</div>
 			<div class="fileContent">
 				<c:forEach var="i" items="${fileList}">
-					<a href="/files/download?sysname=${i.sysname }&oriname=${i.oriname}">${i.oriname }</a><br>
+					<a
+						href="/files/download?sysname=${i.sysname }&oriname=${i.oriname}">${i.oriname }</a>
+					<br>
 				</c:forEach>
 			</div>
 			<hr>
@@ -289,108 +290,140 @@ body {
 				</c:when>
 				<c:otherwise>
 					<div class="footer">
-						<a href="/FreeBoard/freeboard?cpage=${cpage }">목록으로</a>
-						<input id="updatebtn" type="button" value="수정">
-						<input id="updateokbtn" type="submit" value="수정완료"
-							style="display: none;"> <input id="updatecancelbtn"
-							type="button" value="수정취소" style="display: none;">
-						<input id="deletebtn" type="button" value="삭제">
+						<a href="/FreeBoard/freeboard?cpage=${cpage }">목록으로</a> <input
+							id="updatebtn" type="button" value="수정"> <input
+							id="updateOkbtn" type="submit" value="수정완료"
+							style="display: none;"> <input id="updateCancelbtn"
+							type="button" value="수정취소" style="display: none;"> <input
+							id="deletebtn" type="button" value="삭제">
 					</div>
 					<script>
-						let titletext = document.getElementById("titletext").value;
-						let textarea = document.getElementById("textarea").value;
+						const originTitle = document
+								.getElementById("titleText").value;
+						const originContent = document
+								.getElementById("textArea").value;
+						const originCategory = document
+								.getElementById("categoryType").value;
+
 						document.getElementById("updatebtn").onclick = function() {
-							document.getElementById("titletext").readOnly = false;
-							document.getElementById("textarea").readOnly = false;
+							document.getElementById("titleText").readOnly = false;
+							document.getElementById("textArea").readOnly = false;
+							document.getElementById("updateCategory").style.display = "block";
 							document.getElementById("deletebtn").style.display = "none";
 							document.getElementById("updatebtn").style.display = "none";
-							document.getElementById("updateokbtn").style.display = "inline-block";
-							document.getElementById("updatecancelbtn").style.display = "inline-block";
-						}
+							document.getElementById("updateOkbtn").style.display = "inline-block";
+							document.getElementById("updateCancelbtn").style.display = "inline-block";
+						};
 
-						document.getElementById("updatecancelbtn").onclick = function() {
-							document.getElementById("titletext").readOnly = true;
-							document.getElementById("textarea").readOnly = true;
+						document.getElementById("updateCancelbtn").onclick = function() {
+							document.getElementById("titleText").readOnly = true;
+							document.getElementById("textArea").readOnly = true;
+							document.getElementById("updateCategory").style.display = "none";
 							document.getElementById("deletebtn").style.display = "inline-block";
 							document.getElementById("updatebtn").style.display = "inline-block";
-							document.getElementById("updateokbtn").style.display = "none";
-							document.getElementById("updatecancelbtn").style.display = "none";
-							document.getElementById("titletext").value = titletext;
-							document.getElementById("textarea").value = textarea;
-						}
+							document.getElementById("updateOkbtn").style.display = "none";
+							document.getElementById("updateCancelbtn").style.display = "none";
+							document.getElementById("titleText").value = originTitle;
+							document.getElementById("textArea").value = originContent;
+							document.getElementById("categoryType").value = originCategory; // 바꿨던 카테고리도 원래대로
+						};
+
 						document.getElementById("deletebtn").onclick = function() {
 							if (confirm("정말 삭제하시겠습니까?")) {
 								location.href = "/FreeBoard/deleteContent?postId=${post.postId}&cpage=${cpage}";
 							}
-						}
+						};
 					</script>
 				</c:otherwise>
 			</c:choose>
 	</form>
-	<form action="/reply/addReply">
-		<input type="hidden" name="cpage" value="${cpage }">
-		<input type="hidden" name="postId" value="${post.postId}">
+
+
+
+	<form action="/reply/addReply" method="post">
+		<input type="hidden" name="cpage" value="${cpage }"> <input
+			type="hidden" name="postId" value="${post.postId}">
 		<hr>
 
-		*******<div class="commentHeader">댓글 ${commentCount }</div>
+		<div class="commentHeader">댓글 ${commentCount }</div>
 		<br>
 		<div class="commentPlace">
-			<textarea name="content" placeholder="댓글을 입력하세요 (최대 1000바이트)"></textarea>
-			<input type="text" name="memberId" readonly value="작성자: ${loginId}">
-			<input type="submit" value="댓글 등록">
+			<textArea name="content" placeholder="댓글을 입력하세요 (최대 1000바이트)"></textArea>
+			<span>작성자: </span> <input type="text" name="memberId" readonly
+				value="${loginId}"> <input type="submit" value="댓글 등록">
 		</div>
 	</form>
 
+
+
 	<c:forEach var="reply" items="${replyList}">
-		<form action="/reply/updateReply">
+		<form action="/reply/updateReply" method="post">
 			<!-- 폼이 foreach안에있어야 댓글마다 수정form이 각각 생긴다 -->
-			<input type="hidden" name="seq" value="${reply.seq}"> <input
-				type="hidden" name="cpage" value="${cpage }"> <input
+			<input type="hidden" name="replyId" value="${reply.replyId}">
+			<input type="hidden" name="cpage" value="${cpage }"> <input
 				type="hidden" name="postId" value="${post.postId}">
+
+
 			<div class="replyList">
 				<div class="reply">
 
 					<div class="replyInfo">
-						<span class="replyWriter">${reply.writer}</span> <span
-							class="replyDate">${reply.write_date}</span>
-						<c:if test="${reply.writer == loginId}">
-							<input id="commentUpbtn${reply.seq}" type="button" value="수정">
-							<input id="commentUpokbtn${reply.seq}" type="submit" value="수정완료"
-								style="display: none;">
-							<input id="commentUpcancelbtn${reply.seq}" type="button"
+						<span class="replyMemberId">${reply.memberId}</span> <span
+							class="replyCreatedAt">${reply.createdAt}</span>
+						<c:if test="${reply.memberId == loginId}">
+							<input id="replyUpbtn${reply.replyId}" type="button" value="수정">
+							<input id="replyUpOkbtn${reply.replyId}" type="submit"
+								value="수정완료" style="display: none;">
+							<input id="replyUpCancelbtn${reply.replyId}" type="button"
 								value="수정취소" style="display: none;">
 							<a
-								href="/reply/delete?seq=${reply.seq}&parent_seq=${readContent.seq}&cpage=${cpage}">
-								<input id="commentDelbtn${reply.seq}" type="button" value="삭제">
+								href="/reply/deleteReply?replyId=${reply.replyId}&postId=${post.postId}&cpage=${cpage}">
+								<input id="replyDelbtn${reply.replyId}" type="button" value="삭제">
 							</a>
 						</c:if>
 					</div>
-					<textarea id="comment${reply.seq}" name="content"
-						class="replyContents" readonly>${reply.contents}</textarea>
-					<script>
-						let comment${reply.seq} = document.getElementById("comment${reply.seq}").value;
-						document.getElementById("commentUpbtn${reply.seq}").onclick = function() {
-							document.getElementById("commentUpbtn${reply.seq}").style.display = "none";
-							document.getElementById("commentDelbtn${reply.seq}").style.display = "none";
-							document.getElementById("commentUpokbtn${reply.seq}").style.display = "inline-block";
-							document.getElementById("commentUpcancelbtn${reply.seq}").style.display = "inline-block";
-							document.getElementById("comment${reply.seq}").readOnly = false;
-							
-						}
-						document.getElementById("commentUpcancelbtn${reply.seq}").onclick = function(){
-							document.getElementById("commentUpbtn${reply.seq}").style.display = "inline-block";
-							document.getElementById("commentDelbtn${reply.seq}").style.display = "inline-block";
-							document.getElementById("commentUpokbtn${reply.seq}").style.display = "none";
-							document.getElementById("commentUpcancelbtn${reply.seq}").style.display = "none";
-							document.getElementById("comment${reply.seq}").readOnly = true;
-							document.getElementById("comment${reply.seq}").value = comment${reply.seq};
-						}
-					</script>
+					
+					<textArea id="comment${reply.replyId}" name="content"
+						class="replyContent" readonly>${reply.content}</textArea>
+
+					<c:if test="${reply.memberId == loginId}">
+						<script>
+							(function() {
+								const id = "${reply.replyId}";
+								const box = document.getElementById("comment"
+										+ id);
+								const origin = box.value;
+								const up = document.getElementById("replyUpbtn"
+										+ id);
+								const ok = document
+										.getElementById("replyUpOkbtn" + id);
+								const cancel = document
+										.getElementById("replyUpCancelbtn" + id);
+								const del = document
+										.getElementById("replyDelbtn" + id);
+
+								up.onclick = function() {
+									up.style.display = "none";
+									del.style.display = "none";
+									ok.style.display = "inline-block";
+									cancel.style.display = "inline-block";
+									box.readOnly = false;
+								};
+								cancel.onclick = function() {
+									up.style.display = "inline-block";
+									del.style.display = "inline-block";
+									ok.style.display = "none";
+									cancel.style.display = "none";
+									box.readOnly = true;
+									box.value = origin;
+								};
+							})();
+						</script>
+					</c:if>
 				</div>
 			</div>
 		</form>
 	</c:forEach>
-
-
+</div>
 </body>
 </html>
