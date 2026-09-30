@@ -20,15 +20,14 @@ public class FreeBoardLikeDAO {
 		}
 	}
 
-	public void likeCountMinus(int postId, String memberId) {
+	public int likeCountMinus(int postId, String memberId) {
 		String sql = "delete from freeboard_like where post_id=? and member_id=?";
-		jdbc.update(sql, postId,memberId);
+		return jdbc.update(sql, postId,memberId);
 	}
 
-	public void likeCountPlus(int postId, String memberId) {
-		String sql = "insert into freeeboard_like(like_id,post_id,member_id)"
+	public int likeCountPlus(int postId, String memberId) {
+		String sql = "insert into freeboard_like(like_id,post_id,member_id)"
 				+ "values(seq_freeboard_like.nextval,?,?)";
-		jdbc.update(sql, postId, memberId);	
+		return jdbc.update(sql, postId, memberId);
 	}
-
 }

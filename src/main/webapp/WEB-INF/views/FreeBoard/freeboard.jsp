@@ -268,8 +268,9 @@ body {
 
 				<div class="search-box">
 				
-					<form action="#">
-						<input type="text" placeholder="게시글 검색">
+					<form action="/FreeBoard/freeboard">
+						<input type="text" name="search" value="<c:out value='${search}'/>" placeholder="제목으로 게시글 검색">
+						<input type="submit" value="검색">
 					</form>
 				</div>
 				
@@ -316,46 +317,30 @@ body {
 			</div>
 
 			<!-- 페이지네이션 -->
-			<div class="pagination" id="navigation"></div>
+			<div class="pagination" id="navigation" data-search="<c:out value='${search}'/>"></div>
 			<script>
-				const recordTotalCount = $
-				{
-					recordTotalCount
-				};
-				const recordCountPerPage = $
-				{
-					recordCountPerPage
-				};
-				const naviCountPerPage = $
-				{
-					naviCountPerPage
-				};
-				const currentPage = $
-				{
-					cpage
-				};
+				let recordTotalCount = ${recordTotalCount};
+				let recordCountPerPage = ${recordCountPerPage};
+				let naviCountPerPage = ${naviCountPerPage};
+				let currentPage = ${cpage};
 
-				const pageTotalCount = Math.ceil(recordTotalCount
-						/ recordCountPerPage);
+				let pageTotalCount = Math.ceil(recordTotalCount / recordCountPerPage);
 
-				const startNavi = Math.floor((currentPage - 1)
-						/ naviCountPerPage)
-						* naviCountPerPage + 1;
+				let startNavi = Math.floor((currentPage - 1)/ naviCountPerPage) * naviCountPerPage + 1;
 				let endNavi = startNavi + naviCountPerPage - 1;
 				if (endNavi > pageTotalCount) {
 					endNavi = pageTotalCount;
 				}
 
-				const needPrev = startNavi > 1;
-				const needNext = endNavi < pageTotalCount;
+				let needPrev = startNavi > 1;
+				let needNext = endNavi < pageTotalCount;
 
-				const navi = document.getElementById("navigation");
+				let navi = document.getElementById("navigation");
+				let searchWord = navi.dataset.search;
 
 				function addLink(text, page, active) {
-					const a = document.createElement("a");
-					a
-							.setAttribute("href", "/FreeBoard/freeboard?cpage="
-									+ page);
+					let a = document.createElement("a");
+					a.setAttribute("href", "/FreeBoard/freeboard?cpage=" + page + "&search=" + encodeURIComponent(searchWord));
 					a.textContent = text;
 					if (active)
 						a.classList.add("active");
@@ -374,7 +359,6 @@ body {
 			</script>
 			<span>총 게시물 수: ${recordTotalCount }</span>
 		</div>
-
 	</div>
 
 </body>

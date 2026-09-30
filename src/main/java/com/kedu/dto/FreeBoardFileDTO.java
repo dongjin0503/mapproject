@@ -4,26 +4,30 @@ import java.sql.Timestamp;
 
 public class FreeBoardFileDTO {
 
-	private int seq;
+	private int fileId;
+	private int postId;
 	private String oriname;
 	private String sysname;
-	private Timestamp regdate;
-	private int parent_seq;
 	
 	public FreeBoardFileDTO() {}
-	public FreeBoardFileDTO(int seq, String oriname, String sysname, Timestamp regdate, int parent_seq) {
+	public FreeBoardFileDTO(int fileId, int postId, String oriname, String sysname) {
 		super();
-		this.seq = seq;
+		this.fileId = fileId;
+		this.postId = postId;
 		this.oriname = oriname;
 		this.sysname = sysname;
-		this.regdate = regdate;
-		this.parent_seq = parent_seq;
 	}
-	public int getSeq() {
-		return seq;
+	public int getFileId() {
+		return fileId;
 	}
-	public void setSeq(int seq) {
-		this.seq = seq;
+	public void setFileId(int fileId) {
+		this.fileId = fileId;
+	}
+	public int getPostId() {
+		return postId;
+	}
+	public void setPostId(int postId) {
+		this.postId = postId;
 	}
 	public String getOriname() {
 		return oriname;
@@ -37,16 +41,6 @@ public class FreeBoardFileDTO {
 	public void setSysname(String sysname) {
 		this.sysname = sysname;
 	}
-	public Timestamp getRegdate() {
-		return regdate;
-	}
-	public void setRegdate(Timestamp regdate) {
-		this.regdate = regdate;
-	}
-	public int getParent_seq() {
-		return parent_seq;
-	}
-	public void setParent_seq(int parent_seq) {
-		this.parent_seq = parent_seq;
-	}
+
+	
 }

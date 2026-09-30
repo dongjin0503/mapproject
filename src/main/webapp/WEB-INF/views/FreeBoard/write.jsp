@@ -50,8 +50,7 @@
 <body>
 	<form action="/FreeBoard/writeup" method="post"
 		enctype="multipart/form-data">
-		<input type="hidden" id="categoryType" name="contentCategory"
-			value="자유">
+		<!-- <input type="hidden" id="categoryType" name="contentCategory" value="자유"> -->
 		<div class="container">
 
 			<div class="header">
@@ -66,12 +65,9 @@
 				<input type="text" name="title" placeholder="제목을 입력하세요 (최대 300바이트)">
 			</div>
 			<div class="categoryGroup">
-				<input type="radio" name="contentCategory" id="cat-free" value="자유"
-					checked> <label for="cat-free">자유</label> <input
-					type="radio" name="contentCategory" id="cat-question" value="질문">
-				<label for="cat-question">질문</label> <input type="radio"
-					name="contentCategory" id="cat-info" value="정보"> <label
-					for="cat-info">정보</label>
+				<input type="radio" name="contentCategory" id="cat-free" value="자유" checked><label for="cat-free">자유</label>
+				<input type="radio" name="contentCategory" id="cat-question" value="질문"><label for="cat-question">질문</label>
+				<input type="radio" name="contentCategory" id="cat-info" value="정보"> <label for="cat-info">정보</label>
 			</div>
 
 			<div class="content">
@@ -81,8 +77,8 @@
 
 			<fieldset id="fileBox">
 				<legend>파일 업로드</legend>
-				<br> <input type="file" name="files"> <input id="add"
-					type="button" value="추가 파일 업로드">
+				<br> <input type="file" name="files">
+				<input id="add" type="button" value="추가 파일 업로드">
 			</fieldset>
 
 			<script>
