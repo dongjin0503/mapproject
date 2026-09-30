@@ -7,6 +7,9 @@
 <meta charset="UTF-8">
 <title>자유게시판 - 글 열람</title>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/lang/summernote-ko-KR.min.js"></script>
 <style>
 * {
 	box-sizing: border-box;
@@ -341,12 +344,13 @@ body {
     			</div>
 			</div>
 			<script>
+			$('#textArea').summernote({ height: 400, lang: 'ko-KR' });
+			$('#textArea').summernote('disable');
 				const originFileHtml = document.getElementById("updateFile").innerHTML;
 				function addFileInput() {
     				$("#updateFile").append('<br><input type="file" name="files">');
 				}
-				document.getElementById("updateFile").style.display = "block";
-				document.querySelectorAll(".fileDelChk").forEach(function(e) { e.style.display = "inline"; });
+				
 			</script>
 			<c:choose>
 				<c:when test="${post.memberId != loginId}">
@@ -358,26 +362,20 @@ body {
 					<div class="footer">
 						<a href="/FreeBoard/freeboard?cpage=${cpage}">목록으로</a>
 						<input id="updatebtn" type="button" value="수정">
-						<input id="updateOkbtn" type="submit" value="수정완료"
-							style="display: none;">
-						<input id="updateCancelbtn" type="button" value="수정취소"
-							style="display: none;">
+						<input id="updateOkbtn" type="submit" value="수정완료" style="display: none;">
+						<input id="updateCancelbtn" type="button" value="수정취소" style="display: none;">
 						<input id="deletebtn" type="button" value="삭제">
 					</div>
 					<script>
-						const originTitle = document
-								.getElementById("titleText").value;
-						const originContent = document
-								.getElementById("textArea").value;
+						const originTitle = document.getElementById("titleText").value;
+						const originContent = document.getElementById("textArea").value;
 						// 현재 선택된 카테고리 (세 가지 외의 값이면 null)
-						const checkedCategory = document
-								.querySelector('input[name="contentCategory"]:checked');
-						const originCategory = checkedCategory ? checkedCategory.value
-								: null;
+						const checkedCategory = document.querySelector('input[name="contentCategory"]:checked');
+						const originCategory = checkedCategory ? checkedCategory.value: null;
 
 						document.getElementById("updatebtn").onclick = function() {
 							document.getElementById("titleText").readOnly = false;
-							document.getElementById("textArea").readOnly = false;
+							$('#textArea').summernote('enable');
 							document.getElementById("updateCategory").style.display = "flex";
 							document.getElementById("deletebtn").style.display = "none";
 							document.getElementById("updatebtn").style.display = "none";
@@ -389,14 +387,14 @@ body {
 
 						document.getElementById("updateCancelbtn").onclick = function() {
 							document.getElementById("titleText").readOnly = true;
-							document.getElementById("textArea").readOnly = true;
+							$('#textArea').summernote('disable');
 							document.getElementById("updateCategory").style.display = "none";
 							document.getElementById("deletebtn").style.display = "inline-block";
 							document.getElementById("updatebtn").style.display = "inline-block";
 							document.getElementById("updateOkbtn").style.display = "none";
 							document.getElementById("updateCancelbtn").style.display = "none";
 							document.getElementById("titleText").value = originTitle;
-							document.getElementById("textArea").value = originContent;
+							$('#textArea').summernote('code', originContent);
 							document.getElementById("updateFile").style.display = "none";
 							document.getElementById("updateFile").innerHTML = originFileHtml;
 							document.querySelectorAll(".fileDelChk").forEach(function(e) {
@@ -423,7 +421,8 @@ body {
 				</c:otherwise>
 			</c:choose>
 	</form>
-
+	
+	
 	<form action="/reply/addReply" method="post">
 		<input type="hidden" name="cpage" value="${cpage}">
 		<input type="hidden" name="postId" value="${post.postId}">
@@ -433,14 +432,12 @@ body {
 		<br>
 		<div class="commentPlace">
 			<textarea name="content" placeholder="댓글을 입력하세요 (최대 1000바이트)"></textarea>
-			<span>작성자: </span>
+			<span>작성자: ${loginId }</span>
 			<input type="text" name="memberId" readonly
 					value="<c:out value='${loginId}'/>">
 			<input type="submit" value="댓글 등록">
 		</div>
 	</form>
-
-
 	<c:forEach var="reply" items="${replyList}">
 		<form action="/reply/updateReply" method="post">
 			<!-- 폼이 foreach안에있어야 댓글마다 수정form이 각각 생긴다 -->
@@ -448,7 +445,7 @@ body {
 			<input type="hidden" name="cpage" value="${cpage}">
 			<input type="hidden" name="postId" value="${post.postId}">
 			<div class="replyList">
-				<div class="reply">
+				<div class="reply" style="${reply.parentReplyId != 0 ? 'margin-left: 40px;' : ''}">
 
 					<div class="replyInfo">
 						<span class="replyWriter"><c:out value="${reply.memberId}" /></span>
@@ -462,26 +459,37 @@ body {
 							<input id="replyDelbtn${reply.replyId}" type="button" value="삭제">
 						</c:if>
 					</div>
-
-					<textarea id="comment${reply.replyId}" name="content"
-							class="replyContents" readonly><c:out
-								value="${reply.content}" /></textarea>
-
+					<textarea id="comment${reply.replyId}" name="content" class="replyContents" readonly><c:out value="${reply.content}" /></textarea>
+					
+						<!-- 대댓글달기 -->
+					<%-- <input id="reReplybtn" type="button" value="대댓글 달기">
+					<div class="commentPlace">
+						<input type="hidden" name="postId" value="${post.postId }">
+						<input type="hidden" name="parentReplyId" value="${reply.replyId }">
+						<textarea name="content" placeholder="대댓글을 입력하세요 (최대 1000바이트)"></textarea>
+						<span>작성자: ${loginId }</span>
+						<input type="text" name="memberId" readonly value="<c:out value='${loginId}'/>">
+						<input type="submit" value="대댓글 등록">
+					</div>
+					<script>
+						document.getElementById("reReplybtn").onclick = function(){
+							
+						}	
+					</script> --%>
+					<c:if test="${reply.parentReplyId == 0 && not empty loginId}">
+    					<input type="button" value="답글" style="margin-top: 8px;" onclick="openRecomment(this, ${reply.replyId})">
+					</c:if>
+					
 					<c:if test="${reply.memberId == loginId}">
 						<script>
 							(function() {
 								const id = "${reply.replyId}";
-								const box = document.getElementById("comment"
-										+ id);
+								const box = document.getElementById("comment" + id);
 								const origin = box.value;
-								const up = document.getElementById("replyUpbtn"
-										+ id);
-								const ok = document
-										.getElementById("replyUpOkbtn" + id);
-								const cancel = document
-										.getElementById("replyUpCancelbtn" + id);
-								const del = document
-										.getElementById("replyDelbtn" + id);
+								const up = document.getElementById("replyUpbtn" + id);
+								const ok = document.getElementById("replyUpOkbtn" + id);
+								const cancel = document.getElementById("replyUpCancelbtn" + id);
+								const del = document.getElementById("replyDelbtn" + id);
 
 								up.onclick = function() {
 									up.style.display = "none";
@@ -518,6 +526,29 @@ body {
 			<input type="hidden" name="cpage" value="${cpage}">
 			<input type="hidden" name="replyId" value="">
 		</form>
+		<form id="recommentForm" action="/reply/addReply" method="post" style="display: none;">
+    		<input type="hidden" name="postId" value="${post.postId}">
+    		<input type="hidden" name="cpage" value="${cpage}">
+   			<input type="hidden" name="parentReplyId" value="">
+   			<input type="hidden" name="memberId" value="<c:out value='${loginId}'/>">
+    		<div class="commentPlace" style="margin-left: 40px;">
+        		<textarea name="content" placeholder="답글을 입력하세요"></textarea>
+       			<input type="submit" value="답글 등록">
+       			<input type="button" id="recommentCancel" value="취소">
+    		</div>
+		</form>
+		<script>
+    		function openRecomment(btn, parentId) {
+        		const f = document.getElementById("recommentForm");
+        		f.elements["parentReplyId"].value = parentId;
+        		f.elements["content"].value = "";
+        		btn.closest("form").after(f);
+        		f.style.display = "block";
+    		}
+    		document.getElementById("recommentCancel").onclick = function() {
+        		document.getElementById("recommentForm").style.display = "none";
+    		};
+</script>
 </div>
 </body>
 </html>

@@ -5,7 +5,11 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/lang/summernote-ko-KR.min.js"></script>
 <style>
 .categoryGroup {
 	display: flex;
@@ -52,15 +56,12 @@
 		enctype="multipart/form-data">
 		<!-- <input type="hidden" id="categoryType" name="contentCategory" value="자유"> -->
 		<div class="container">
-
 			<div class="header">
 				<h2>게시글 작성</h2>
 			</div>
-
 			<div class="writer">
 				<input type="text" name="memberId" value="${loginId }" readonly>
 			</div>
-
 			<div class="title">
 				<input type="text" name="title" placeholder="제목을 입력하세요 (최대 300바이트)">
 			</div>
@@ -69,18 +70,25 @@
 				<input type="radio" name="contentCategory" id="cat-question" value="질문"><label for="cat-question">질문</label>
 				<input type="radio" name="contentCategory" id="cat-info" value="정보"> <label for="cat-info">정보</label>
 			</div>
-
 			<div class="content">
-				<textarea name="content" placeholder="내용을 입력하세요 (최대 4000바이트)"></textarea>
+				<textarea name="content" id="content" placeholder="내용을 입력하세요 (최대 4000바이트)"></textarea>
 			</div>
-
-
+			
+			<!-- 본문 textarea를 summernote 에디터로 바꾸기 -->
+			<script>
+			$(function () {
+			    $('#content').summernote({
+			        height: 400,
+			        lang: 'ko-KR',
+			        placeholder: '내용을 입력하세요'
+			    });
+			});
+			</script>
 			<fieldset id="fileBox">
 				<legend>파일 업로드</legend>
 				<br> <input type="file" name="files">
 				<input id="add" type="button" value="추가 파일 업로드">
 			</fieldset>
-
 			<script>
 				$("#add").click(
 						function() {
@@ -92,9 +100,7 @@
 				<a href="/FreeBoard/freeboard?cpage=1"><input type="button"
 					value="취소"></a> <input id="listup" type="submit" value="작성완료">
 			</div>
-
 		</div>
 	</form>
-
 </body>
 </html>
