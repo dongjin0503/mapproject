@@ -81,6 +81,9 @@ public class MemberController {
 	@RequestMapping("mypage")
 	public String mypage (HttpSession session, Model model) {
 		String id = (String) session.getAttribute("loginId") ;
+	    if (id == null) {                                 
+	        return "redirect:/member/login";               
+	    }
 		MemberDTO dto = dao.selectMember(id);
 		model.addAttribute("member",dto) ;
 		return "member/mypage";
@@ -122,9 +125,7 @@ public class MemberController {
 	@ResponseBody
 	@RequestMapping("/ajax/findid")
 	public String findId(String name , String phone) {
-		System.out.println("µµÂø");
-		System.out.println(name);
-		System.out.println(phone);
+		
 		MemberDTO dto = dao.findId(name, phone);
 		
 		if (dto == null) {
@@ -168,6 +169,37 @@ public class MemberController {
 	    session.removeAttribute("resetId");
 	    return true;
 	}
+	
+	
+	@RequestMapping("/edit")
+	public String editPage(HttpSession session, Model model) {
+		String id = (String) session.getAttribute("loginId");
+		if (id == null) {
+			return "redirect:/member/login";
+		}
+		model.addAttribute("member", dao.selectMember(id));
+		return "member/edit";
+	}
+
+	@RequestMapping("/update")
+	public String update(HttpSession session , MemberDTO dto , String newPw) {
+		
+		String id = (String) session.getAttribute("loginId");
+		
+		if (id == null) {
+			return "redirect:/member/login";
+		}
+		
+		dto.setId(id);
+		dao.update(dto);
+		
+		if (newPw != null && !newPw.isEmpty()) {
+			dao.updatepw(id, getSHA512(newPw));
+			
+		}
+		return "redirect:/member/mypage";
+	}
+	
 	
 	
 }

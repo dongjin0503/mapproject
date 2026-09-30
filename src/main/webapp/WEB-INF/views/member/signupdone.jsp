@@ -132,9 +132,7 @@ button:hover { background: var(--fill); }
 </head>
 <body>
 
-	<div class="logo-bar">
-		<a class="logo" href="/"><img src="/images/logo.png" alt="짠내맵"></a>
-	</div>
+	<jsp:include page="/WEB-INF/views/common/header.jsp" />
 
 	<div class="wrap">
 

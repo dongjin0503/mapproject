@@ -297,12 +297,12 @@ button:hover { background: var(--fill); }
 	<div> 성별</div>
 	<div class="gender">
     <label>
-        <input name = "gender" type="radio"  value="M">
+        <input name = "gender" type="radio"  value="남성">
         <span>남성</span>
     </label>
 
     <label>
-        <input name = "gender" type="radio"  value="F">
+        <input name = "gender" type="radio"  value="여성">
         <span>여성</span>
     </label> 
    

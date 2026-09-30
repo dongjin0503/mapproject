@@ -26,7 +26,6 @@ public class MemberDAO {
 	}
 
 	public boolean login(MemberDTO dto) {
-		System.out.println("·Î±×ÀÎ µµÂø");
 		String sql = "select count(*) from member where member_id = ? and password =?";
 		
 		int result = jdbc.queryForObject(sql, Integer.class, dto.getId(), dto.getPw());
@@ -34,14 +33,15 @@ public class MemberDAO {
 		return result > 0;
 	}
 
-	public void update(MemberDTO dto, String loginId) {
-		String sql = "update member set name , phone, email, zipcode , address1 , address2 , birth_date ";
+	public void update(MemberDTO dto) {
+		String sql = "update member set name = ?  , phone = ? , email = ?, "
+				+ "zipcode = ? , address1 = ? , address2 = ? , birth_date  = ? ,username = ? where member_id = ?";
 		jdbc.update(sql, dto.getName(), dto.getPhone(), dto.getEmail(), dto.getZipcode(), dto.getAddress1(),
-				dto.getAddress2(), dto.getBirth_date());
+				dto.getAddress2(), dto.getBirth_date(), dto.getUsername() , dto.getId());
 	}
 
 	public MemberDTO selectMember(String id) {
-		String sql = "select *from member where member_id = ?";
+		String sql = "select member_id as id, username, password as pw, name, phone, email, zipcode, address1, address2, birth_date, gender, regdate from member where member_id = ?";
 		return jdbc.queryForObject(sql, new BeanPropertyRowMapper<>(MemberDTO.class), id);
 
 	}
