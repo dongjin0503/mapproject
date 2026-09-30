@@ -45,19 +45,29 @@ public class MemberController {
 			dto.setPw(secret);
 			dao.signup(dto);
 			
-			return "home";
+			return "redirect:/member/signupdone";
 		}
 	
+	@RequestMapping("signupdone")
+	public String signupdone() {
+		return "member/signupdone";
+	}
 	@RequestMapping("/login")
-	public String login(MemberDTO dto , HttpSession session) {
+	public String login(Model model , MemberDTO dto , HttpSession session) {
+		if (dto.getId() == null) {          
+			return "member/login";          
+		}  
 		String secret = getSHA512(dto.getPw());
 		dto.setPw(secret);
 		boolean result = dao.login(dto);
 		if(result) {
 			session.setAttribute("loginId", dto.getId()) ;
-			
+		return "redirect:/";	
+		} else {
+			model.addAttribute("msg","아이디 또는 비밀번호가 올바르지 않습니다.");
+			return "member/login";
 		}
-		return "redirect:/";
+		
 	}
 	
 	@RequestMapping("/logout")
@@ -98,6 +108,68 @@ public class MemberController {
 	public boolean nickname (String username) {
 		return dao.namecheck(username);
 	}
+	
+	@RequestMapping("/findid")
+	public String findIdPage() {
+		return "member/findid";
+	}
+	
+	@RequestMapping("/findpw")
+	public String findPwPage() {
+		return "member/findpw";
+	}
+	
+	@ResponseBody
+	@RequestMapping("/ajax/findid")
+	public String findId(String name , String phone) {
+		System.out.println("도착");
+		System.out.println(name);
+		System.out.println(phone);
+		MemberDTO dto = dao.findId(name, phone);
+		
+		if (dto == null) {
+			return "";
+		}
+		
+		String id = dto.getId();
+		int show  =3 ;
+		if (id.length() <= 3) {
+			show = 1;
+		}
+		String masked = id.substring(0,show);
+		for (int i = show ; i < id.length(); i ++) {
+			masked += "*";
+		}
+		return masked;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/ajax/checkpw")
+	public boolean checkForReset(String id, String name, String phone, HttpSession session) {
+	    boolean ok = dao.matchmember(id, name, phone);
+	    if (ok) {
+	        session.setAttribute("resetId", id);
+	    }
+	    return ok;
+	}
+
+	@ResponseBody
+	@RequestMapping("/ajax/resetpw")
+	public boolean resetPw(String pw, HttpSession session) {
+	    String id = (String) session.getAttribute("resetId");
+	    if (id == null) {
+	        return false;
+	    }
+	    if (pw == null || !pw.matches("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!-/:-@\\[-`{-~])[A-Za-z\\d!-/:-@\\[-`{-~]{8,16}$")) {
+	        return false;
+	    }
+
+	    dao.updatepw(id, getSHA512(pw));
+	    session.removeAttribute("resetId");
+	    return true;
+	}
+	
+	
 }
 	
 	

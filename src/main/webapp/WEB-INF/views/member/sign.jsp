@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
    pageEncoding="UTF-8"%>
-   <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
  
 <!DOCTYPE html>
 <html>
@@ -246,9 +246,9 @@ button:hover { background: var(--fill); }
 	<form action = "/member/signup" method = "post" onsubmit = "return signupCheck()">
 	<div class="wrap">
     <div class="steps">
-    <div class="step on"><span class="num">1</span><span>약관 동의</span></div>
+    <div id ="step1" class="step"><span class="num">1</span><span>약관 동의</span></div>
     <div class="bar"></div>
-    <div class="step on"><span class="num">2</span><span>정보 입력</span></div>
+    <div id = "step2" class="step" ><span class="num">2</span><span>정보 입력</span></div>
     <div class="bar"></div>
     <div class="step"><span class="num">3</span><span>가입 완료</span></div>
     </div>
@@ -308,7 +308,7 @@ button:hover { background: var(--fill); }
    
     </div>
 	 <div class ="btn-area">
-    <button type ="button"> 이전</button> 
+    <button type="button" onclick="location.href='/member/login'"> 이전</button> 
     <button> 가입하기 </button>
     </div> 
 	</div>
@@ -321,7 +321,7 @@ button:hover { background: var(--fill); }
   <label class="agree"><input type="checkbox" class="agree-req"><span>만 14세 이상 (필수)</span></label>
   <label class="agree"><input type="checkbox"><span>마케팅 정보 수신 (선택)</span></label>
 </div>
-    <a href="#">이전 단계로</a>
+    <a href="/member/login">이전 단계로</a>
     </div>
     <div class="side-box">
     모든 <b>*</b> 항목은 필수 입력이며, 아이디·닉네임 중복확인을 완료해야 가입하기 버튼이 활성화됩니다.
@@ -349,7 +349,36 @@ button:hover { background: var(--fill); }
 	let zipcode      = document.getElementById("zipcode");
 	let address1     = document.getElementById("address1");
 	let address2     = document.getElementById("address2");
+	
+	// ========== 약관 동의하면 상단 1, 2단계 칠하기 ==========
+	let step1 = document.getElementById("step1");
+	let step2 = document.getElementById("step2");
+	let agreeReq = document.querySelectorAll(".agree-req");
 
+	function checkAgree() {
+	    if(document.querySelectorAll(".agree-req:not(:checked)").length == 0) {
+	        step1.classList.add("on");
+	        
+	    } else {
+	        step1.classList.remove("on");
+	     
+	    }
+	}
+	
+	for(let i = 0; i < agreeReq.length; i++) {
+	    agreeReq[i].onchange = checkAgree;
+	}
+	
+	// 아이디 입력을 시작하면 2단계 켜기
+	function checkStep2() {
+	    if(id.value != "" && step1.classList.contains("on")) {
+	        step2.classList.add("on");
+	    } else {
+	        step2.classList.remove("on");
+	    }
+	}
+	id.addEventListener("input", checkStep2);
+	
 	// ========== 정규식 (placeholder 기준) ==========
 	const reg = {
 	    id       : /^[A-Za-z0-9]{4,16}$/,                       // 4~16자 영문/숫자

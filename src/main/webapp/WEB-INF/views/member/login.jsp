@@ -115,27 +115,34 @@ input, button { font-family: inherit; }
 }
 .sub-links a { color: inherit; text-decoration: none; }
 .sub-links a:hover { color: var(--accent); text-decoration: underline; }
+.msg {
+  font-size: 11.5px;
+  text-align: center;
+  color: #b91c1c;
+}
 </style>
 
 
 <body>
-
+	
 	<div class="logo-bar">
 	<a class="logo" href="/"><img src="/images/logo.png" alt="짠내맵"></a>
 	</div>
 	
-	<form action ="/member/login">
+	<form action ="/member/login" method="post">
 	<div class="login-wrap">
 	<div class = "container">
 	<div class ="title" > 로그인 </div>
 	<div class = "fields">
 	<input name = "id" type ="text" placeholder="아이디"> 
-	<input name = "pw" type ="password" placeholder=" 비밀번호"> 
+	<input name = "pw" type ="password" placeholder=" 비밀번호">
+	<div class="msg">${msg}</div> 
 	<button class = "login-btn"> 로그인 </button>
 	<button type ="button"  class="sub-btn" onclick="location.href='/member/sign'"> 회원가입 </button> 
 	<div class ="sub-links">
-	<a href ="#">아이디 찾기</a>
-	<a href ="#">비밀번호 찾기</a>
+	<a href="#" onclick="window.open('/member/findid', 'findPopup', 'width=420,height=520'); return false;">아이디 찾기</a>
+	<a href="#" onclick="window.open('/member/findpw', 'findPopup', 'width=420,height=520'); return false;">비밀번호 찾기</a>
+
 	</div>
 	</div>
 	</div>

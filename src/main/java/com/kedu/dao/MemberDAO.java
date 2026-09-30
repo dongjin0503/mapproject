@@ -1,5 +1,7 @@
 package com.kedu.dao;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -64,4 +66,29 @@ public class MemberDAO {
 		return result > 0;
 		
 	}
+	public MemberDTO findId(String name, String phone) {
+		String sql = "select member_id as id from member where name =? and phone = ?";
+		List<MemberDTO> list = jdbc.query(sql, new BeanPropertyRowMapper<>(MemberDTO.class),name , phone);
+		
+		if(list.isEmpty()) {
+			return null;
+		} else {
+			return list.get(0);
+		}		
+	}
+	public boolean matchmember(String id , String name, String phone) {
+		String sql = "select count(*) from member where member_id = ?  and name = ? and phone = ?" ;
+		int result = jdbc.queryForObject(sql, Integer.class ,id , name , phone);
+		
+		return result > 0 ; 
+		
+	}
+	
+	public int updatepw(String id , String pw) {
+		String sql = "update member set password = ? where member_id = ?";
+		return jdbc.update(sql  ,pw , id);
+	}
+	
+	
+	
 }
