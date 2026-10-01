@@ -65,151 +65,144 @@ public class PartyController {
 	public String create() {
 		return "party/create";
 	}
-	
+
 	@RequestMapping("/apply")
 	public String apply(int partyId, Model model) {
 		PartyDTO party = partyDAO.findById(partyId);
-		
-		if(party == null) {
+
+		if (party == null) {
 			return "redirect:/party/list";
 		}
-		
+
 		model.addAttribute("party", party);
 		return "party/apply";
 	}
-	
+
 	@RequestMapping(value = "/createSubmit", method = RequestMethod.POST)
-	public String createSubmit(
-		PartyDTO dto,
-		@RequestParam("meetDateText") String meetDateText,
-		HttpSession session, Model model) {
+	public String createSubmit(PartyDTO dto, @RequestParam("meetDateText") String meetDateText, HttpSession session,
+			Model model) {
 		String loginId = "tester"; // 테스트용 지우기
-		
-		/* String loginId = (String) session.getAttribute("loginId");
-		if(loginId == null) {
-			return "redirect:/";
-		} */
-		
+
+		/*
+		 * String loginId = (String) session.getAttribute("loginId"); if(loginId ==
+		 * null) { return "redirect:/"; }
+		 */
+
 		dto.setHostId(loginId);
-		
+
 		LocalDateTime meetDate = LocalDateTime.parse(meetDateText);
 		dto.setMeetDate(Timestamp.valueOf(meetDate));
 
-		String message ="";
-		
-		if(dto.getTitle() == null || dto.getTitle().trim().isEmpty()) {
+		String message = "";
+
+		if (dto.getTitle() == null || dto.getTitle().trim().isEmpty()) {
 			message += "모임 제목을 입력해 주세요.\n";
-		}else {
+		} else {
 			dto.setTitle(dto.getTitle().trim());
 		}
-		
-		if(dto.getMinPeople() < 2
-				|| dto.getMaxPeople() < dto.getMinPeople()) {
+
+		if (dto.getMinPeople() < 2 || dto.getMaxPeople() < dto.getMinPeople()) {
 			message += "모임의 최소 인원은 2명이며, 최대 인원은 최소 인원 이상이어야 합니다.\n";
-		
+
 		}
-		
-		if(dto.getMinAge() != null && dto.getMaxAge() != null 
-				&& dto.getMinAge() > dto.getMaxAge()) {
+
+		if (dto.getMinAge() != null && dto.getMaxAge() != null && dto.getMinAge() > dto.getMaxAge()) {
 			message += "최대 나이는 최소 나이 이상이어야 합니다.\n";
-			
+
 		}
-		
-		if(!meetDate.isAfter(LocalDateTime.now())) {
+
+		if (!meetDate.isAfter(LocalDateTime.now())) {
 			message += "모임 날짜는 현재 시간 이후로 선택해 주세요.\n";
 		}
-		
-		if(!message.isEmpty()) {
+
+		if (!message.isEmpty()) {
 			model.addAttribute("message", message);
-			model.addAttribute("party",dto);
+			model.addAttribute("party", dto);
 			model.addAttribute("meetDateText", meetDateText);
 			return "party/create";
 		}
-		
+
 		int partyId = partyDAO.createParty(dto);
-		
+
 		return "redirect:/party/detail?partyId=" + partyId;
 	}
-	
+
 	@RequestMapping(value = "/applySubmit", method = RequestMethod.POST)
-	public String applySubmit(
-			@RequestParam("partyId") int partyId, 
+	public String applySubmit(@RequestParam("partyId") int partyId,
 			@RequestParam(value = "answer", defaultValue = "") String answer,
-			Model model) {
-		
-		String applicantId = "sample_applicant"; //테스트용 지우기
-		
+			@RequestParam(value = "agree", defaultValue = "") String agree, Model model) {
+
+		String applicantId = "sample_applicant"; // 테스트용 지우기
+
 		try {
+			if (!"Y".equals(agree)) {
+				throw new IllegalArgumentException("모임 규칙 및 노쇼 방지 안내에 동의해주세요.");
+			}
 			partyDAO.apply(partyId, applicantId, answer);
 			return "redirect:/party/detail?partyId=" + partyId;
-			
+
 		} catch (IllegalArgumentException e) {
 			PartyDTO dto = partyDAO.findById(partyId);
-			
+
 			if (dto == null) {
 				return "redirect:/party/list";
 			}
 			model.addAttribute("party", dto);
 			model.addAttribute("message", e.getMessage());
 			model.addAttribute("answer", answer);
-			
+
 			return "party/apply";
 		}
 	}
-	
+
 	@RequestMapping("/applications")
 	public String applications(int partyId, Model model) {
 		PartyDTO dto = partyDAO.findById(partyId);
-		
-		if(dto == null) {
+
+		if (dto == null) {
 			return "redirect:/party/list";
 		}
-		
-		String loginId = "tester"; //테스트용 지우기
-		
-		if(!loginId.equals(dto.getHostId())) {
+
+		String loginId = "tester"; // 테스트용 지우기
+
+		if (!loginId.equals(dto.getHostId())) {
 			return "redirect:/party/list";
 		}
-		
-		List<PartyApplicationDTO> applications =
-				partyDAO.findPendingApplications(partyId);
-		
+
+		List<PartyApplicationDTO> applications = partyDAO.findPendingApplications(partyId);
+
 		model.addAttribute("party", dto);
 		model.addAttribute("applications", applications);
-		
+
 		return "party/applications";
 	}
-	
+
 	@RequestMapping(value = "/approve", method = RequestMethod.POST)
-	public String approve(
-			@RequestParam("partyId") int partyId,
-			@RequestParam("applicationId") int applicationId,
+	public String approve(@RequestParam("partyId") int partyId, @RequestParam("applicationId") int applicationId,
 			RedirectAttributes redirectAttributes) {
-		
+
 		String hostId = "tester"; // 테스트용 지우기
-		
+
 		try {
 			partyDAO.approve(partyId, applicationId, hostId);
 			redirectAttributes.addFlashAttribute("message", "승인했습니다.");
-		}catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException e) {
 			redirectAttributes.addFlashAttribute("message", e.getMessage());
 		}
-		
+
 		return "redirect:/party/applications?partyId=" + partyId;
 	}
-		
+
 	@RequestMapping(value = "/reject", method = RequestMethod.POST)
-	public String reject(
-			@RequestParam("partyId")int partyId,
-			@RequestParam("applicationId")int applicationId,
+	public String reject(@RequestParam("partyId") int partyId, @RequestParam("applicationId") int applicationId,
 			RedirectAttributes redirectAttributes) {
-		
-		String hostId = "tester"; //테스트용 지우기
-		
+
+		String hostId = "tester"; // 테스트용 지우기
+
 		try {
 			partyDAO.reject(partyId, applicationId, hostId);
 			redirectAttributes.addFlashAttribute("message", "거절했습니다.");
-		} catch(IllegalArgumentException e) {
+		} catch (IllegalArgumentException e) {
 			redirectAttributes.addFlashAttribute("message", e.getMessage());
 		}
 		return "redirect:/party/applications?partyId=" + partyId;

@@ -169,6 +169,7 @@ public class PartyDAO {
 		} else {
 			throw new IllegalArgumentException("참여 방식이 올바르지 않습니다.");
 		}
+		
 	}
 
 	public List<PartyApplicationDTO> findPendingApplications(int partyId) {
