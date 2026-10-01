@@ -98,6 +98,7 @@
 </style>
 </head>
 <body>
+<jsp:include page="/WEB-INF/views/common/header.jsp" />
 	<div class="container">
 		<button type="button" id="create-btn"
 			onclick="location.href='/party/create'">모임 만들기</button>

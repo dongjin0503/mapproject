@@ -72,6 +72,7 @@ p {
 </style>
 </head>
 <body>
+<jsp:include page="/WEB-INF/views/common/header.jsp" />
 	<form action="/party/createSubmit" method="post">
 		<h1>모임 만들기</h1>
 		<label for="title">모임 제목</label> <input type="text" id="title"

@@ -90,9 +90,23 @@
 	font-size: 15px;
 	cursor: pointer;
 }
+.empty-message {
+    padding: 50px 20px;
+    background-color: #f7f7f7;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.empty-message p {
+    margin: 0;
+    color: #777;
+    font-size: 15px;
+}
 </style>
 </head>
 <body>
+<jsp:include page="/WEB-INF/views/common/header.jsp" />
 	<div class="container">
 		<h1>${party.title} 신청관리</h1>
 		<p class="result-message">${message}</p>
@@ -120,7 +134,9 @@
 
 		</C:forEach>
 		<C:if test="${empty applications}">
+		<div class="empty-message">
 			<p>승인 대기 중인 신청이 없습니다.</p>
+			</div>
 		</C:if>
 
 		<button type="button" id="back-btn"

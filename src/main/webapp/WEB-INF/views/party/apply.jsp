@@ -134,8 +134,7 @@ form h1 {
 </style>
 </head>
 <body>
-
-
+<jsp:include page="/WEB-INF/views/common/header.jsp" />
 	<form action="/party/applySubmit" method="post">
 		<h1>모임 신청</h1>
 		<div class="party-info">

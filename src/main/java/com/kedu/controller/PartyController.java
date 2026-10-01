@@ -1,7 +1,9 @@
 package com.kedu.controller;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
@@ -16,7 +18,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.google.gson.Gson;
+import com.kedu.dao.MemberDAO;
 import com.kedu.dao.PartyDAO;
+import com.kedu.dto.MemberDTO;
 import com.kedu.dto.PartyApplicationDTO;
 import com.kedu.dto.PartyDTO;
 
@@ -26,6 +30,9 @@ public class PartyController {
 
 	@Autowired
 	private PartyDAO partyDAO;
+	
+	@Autowired
+	private MemberDAO memberDAO;
 
 	@Autowired
 	private Gson gson;
@@ -81,12 +88,11 @@ public class PartyController {
 	@RequestMapping(value = "/createSubmit", method = RequestMethod.POST)
 	public String createSubmit(PartyDTO dto, @RequestParam("meetDateText") String meetDateText, HttpSession session,
 			Model model) {
-		String loginId = "tester"; // 테스트용 지우기
 
-		/*
-		 * String loginId = (String) session.getAttribute("loginId"); if(loginId ==
-		 * null) { return "redirect:/"; }
-		 */
+		String loginId = (String) session.getAttribute("loginId");
+		if (loginId == null) {
+			return "redirect:/member/login";
+		}
 
 		dto.setHostId(loginId);
 
@@ -130,15 +136,50 @@ public class PartyController {
 	@RequestMapping(value = "/applySubmit", method = RequestMethod.POST)
 	public String applySubmit(@RequestParam("partyId") int partyId,
 			@RequestParam(value = "answer", defaultValue = "") String answer,
-			@RequestParam(value = "agree", defaultValue = "") String agree, Model model) {
+			@RequestParam(value = "agree", defaultValue = "") String agree, HttpSession session, Model model) {
 
-		String applicantId = "sample_applicant"; // 테스트용 지우기
+		String loginId = (String) session.getAttribute("loginId");
+
+		if (loginId == null) {
+			return "redirect:/member/login";
+		}
 
 		try {
 			if (!"Y".equals(agree)) {
 				throw new IllegalArgumentException("모임 규칙 및 노쇼 방지 안내에 동의해주세요.");
 			}
-			partyDAO.apply(partyId, applicantId, answer);
+			
+			PartyDTO dto = partyDAO.findById(partyId);
+			
+			if(dto == null) {
+				return "redirect:/party/list";
+			}
+			
+			MemberDTO member = memberDAO.selectMember(loginId);
+			
+			if("male".equals(dto.getGenderRule())
+				&& !"남성".equals(member.getGender())) {
+					throw new IllegalArgumentException("남성만 참여할 수 있는 모임입니다.");
+				}
+			
+			if("female".equals(dto.getGenderRule())
+			&& !"여성".equals(member.getGender())) {
+			 throw new IllegalArgumentException("여성만 참여할 수 있는 모임입니다.");
+			}
+			
+			int age = Period.between(member.getBirth_date().toLocalDate(),
+					LocalDate.now()
+					).getYears();
+				
+					if(dto.getMinAge() !=null && age < dto.getMinAge()) {
+					throw new IllegalArgumentException("최소" + dto.getMinAge() + "세부터 참여할 수 있습니다.");	
+			}
+					
+					if(dto.getMaxAge() !=null && age > dto.getMaxAge()) {
+						throw new IllegalArgumentException("최대" + dto.getMaxAge() + "세까지 참여할 수 있습니다.");
+					}
+			
+			partyDAO.apply(partyId, loginId, answer);
 			return "redirect:/party/detail?partyId=" + partyId;
 
 		} catch (IllegalArgumentException e) {
@@ -156,15 +197,19 @@ public class PartyController {
 	}
 
 	@RequestMapping("/applications")
-	public String applications(int partyId, Model model) {
+	public String applications(int partyId, HttpSession session, Model model) {
 		PartyDTO dto = partyDAO.findById(partyId);
 
 		if (dto == null) {
 			return "redirect:/party/list";
 		}
 
-		String loginId = "tester"; // 테스트용 지우기
+		String loginId = (String) session.getAttribute("loginId");
 
+		if (loginId == null) {
+		    return "redirect:/member/login";
+		}
+		
 		if (!loginId.equals(dto.getHostId())) {
 			return "redirect:/party/list";
 		}
@@ -179,12 +224,17 @@ public class PartyController {
 
 	@RequestMapping(value = "/approve", method = RequestMethod.POST)
 	public String approve(@RequestParam("partyId") int partyId, @RequestParam("applicationId") int applicationId,
+			HttpSession session,
 			RedirectAttributes redirectAttributes) {
 
-		String hostId = "tester"; // 테스트용 지우기
+		String loginId = (String) session.getAttribute("loginId");
+
+		if (loginId == null) {
+		    return "redirect:/member/login";
+		}
 
 		try {
-			partyDAO.approve(partyId, applicationId, hostId);
+			partyDAO.approve(partyId, applicationId, loginId);
 			redirectAttributes.addFlashAttribute("message", "승인했습니다.");
 		} catch (IllegalArgumentException e) {
 			redirectAttributes.addFlashAttribute("message", e.getMessage());
@@ -195,12 +245,17 @@ public class PartyController {
 
 	@RequestMapping(value = "/reject", method = RequestMethod.POST)
 	public String reject(@RequestParam("partyId") int partyId, @RequestParam("applicationId") int applicationId,
+			HttpSession session,
 			RedirectAttributes redirectAttributes) {
 
-		String hostId = "tester"; // 테스트용 지우기
+		String loginId = (String) session.getAttribute("loginId");
+
+		if (loginId == null) {
+		    return "redirect:/member/login";
+		}
 
 		try {
-			partyDAO.reject(partyId, applicationId, hostId);
+			partyDAO.reject(partyId, applicationId, loginId);
 			redirectAttributes.addFlashAttribute("message", "거절했습니다.");
 		} catch (IllegalArgumentException e) {
 			redirectAttributes.addFlashAttribute("message", e.getMessage());

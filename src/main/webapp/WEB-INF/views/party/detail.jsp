@@ -2,6 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@taglib prefix="C" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -107,6 +108,20 @@
 	margin: 30px 0;
 }
 
+#manage-btn {
+	width: 170px;
+	height: 45px;
+	padding: 12px 20px;
+	margin: 0 20px;
+	background-color: black;
+	color: white;
+	border: 1px solid black;
+	border-radius: 5px;
+	font-size: 15px;
+	cursor: pointer;
+	vertical-align: middle;
+}
+
 #apply-btn {
 	width: 170px;
 	height: 45px;
@@ -136,6 +151,7 @@
 </style>
 </head>
 <body>
+	<jsp:include page="/WEB-INF/views/common/header.jsp" />
 	<div class="container">
 		<div class="party-image">모임 이미지</div>
 
@@ -173,7 +189,9 @@
 			<h2>참여 조건</h2>
 
 			<C:if test="${not empty party.genderRule}">
-				<p>참여 성별: ${party.genderRule}</p>
+				<p>참여 성별: ${party.genderRule == 'male' ? '남자만' :
+          party.genderRule == 'female' ? '여자만' : '제한 없음'}
+				</p>
 			</C:if>
 			<C:if test="${party.minAge != null}">
 				<p>최소 나이: ${party.minAge}세</p>
@@ -186,10 +204,17 @@
 			</C:if>
 		</section>
 		<div class="party-buttons">
-			<button type="button" id="apply-btn"
-				onclick="location.href='/party/apply?partyId=${party.partyId}'">
-				신청하기</button>
+			<C:if
+				test="${not empty sessionScope.loginId and sessionScope.loginId == party.hostId}">
+				<button type="button" id="manage-btn"
+					onclick="location.href='/party/applications?partyId=${party.partyId}'">신청관리</button>
+			</C:if>
 
+			<C:if test="${sessionScope.loginId != party.hostId}">
+				<button type="button" id="apply-btn"
+					onclick="location.href='/party/apply?partyId=${party.partyId}'">
+					신청하기</button>
+			</C:if>
 			<button type="button" id="list-btn"
 				onclick="location.href='/party/list'">목록으로 돌아가기</button>
 		</div>
