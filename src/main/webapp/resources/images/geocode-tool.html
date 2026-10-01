@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>착한가격업소 CSV → 좌표 + SQL 변환 도구</title>
+<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=300c61e334f2ebb5afb0f5b4937b967a&libraries=services"></script>
+<style>
+  body { font-family: "Malgun Gothic", Arial, sans-serif; max-width: 760px; margin: 30px auto; padding: 0 16px; color: #374151; }
+  h1 { font-size: 20px; }
+  .box { border: 1.5px solid #9ca3af; border-radius: 6px; padding: 16px; margin-bottom: 14px; }
+  button { height: 36px; padding: 0 16px; border: 1.5px solid #4b5563; border-radius: 4px; background: #fff; cursor: pointer; font-size: 13px; }
+  button.primary { background: #111827; color: #fff; border-color: #111827; }
+  button:disabled { opacity: .4; cursor: default; }
+  progress { width: 100%; height: 18px; }
+  #log { font-size: 12px; background: #f3f4f6; border-radius: 4px; padding: 10px; height: 160px; overflow: auto; white-space: pre-wrap; }
+  .num { font-weight: 700; color: #111827; }
+</style>
+</head>
+<body>
+<h1>착한가격업소 CSV → 좌표 + SQL 변환 도구</h1>
+
+<div class="box">
+  <b>1. CSV 파일 선택</b><br><br>
+  <input type="file" id="file" accept=".csv">
+</div>
+
+<div class="box">
+  <b>2. 변환 시작</b> (주소 → 위도·경도, 약 몇십 분 걸려요. 창을 닫지 마세요!)<br><br>
+  <button class="primary" id="btnStart" disabled>시작 / 이어서 하기</button>
+  <button id="btnStop" disabled>중지</button>
+  <button id="btnRetry" disabled>실패한 것만 다시 시도</button>
+  <button id="btnReset" disabled>저장된 진행상황 지우기</button>
+  <br><br>
+  <progress id="bar" value="0" max="1"></progress>
+  <div>
+    진행 <span class="num" id="done">0</span> / <span class="num" id="total">0</span> ·
+    성공 <span class="num" id="ok">0</span> ·
+    실패 <span class="num" id="fail">0</span>
+  </div>
+</div>
+
+<div class="box">
+  <b>3. 결과 파일 내려받기</b> (중간에도 받을 수 있어요)<br><br>
+  <button id="btnSql" disabled>SQL 파일 받기 (가게 + 서비스)</button>
+  <button id="btnFail" disabled>실패 목록 받기</button>
+</div>
+
+<div id="log"></div>
+
+<script>
+// ==CORE_START==
+// ---------- CSV 읽기 (따옴표 안의 쉼표/줄바꿈 처리) ----------
+function parseCSV(text) {
+    var rows = [];
+    var row = [];
+    var cur = "";
+    var inQuote = false;
+    for (var i = 0; i < text.length; i++) {
+        var ch = text[i];
+        if (inQuote) {
+            if (ch === '"') {
+                if (text[i + 1] === '"') { cur += '"'; i++; }
+                else { inQuote = false; }
+            } else {
+                cur += ch;
+            }
+        } else {
+            if (ch === '"') { inQuote = true; }
+            else if (ch === ",") { row.push(cur); cur = ""; }
+            else if (ch === "\n") { row.push(cur); rows.push(row); row = []; cur = ""; }
+            else if (ch === "\r") { /* 무시 */ }
+            else { cur += ch; }
+        }
+    }
+    if (cur !== "" || row.length > 0) { row.push(cur); rows.push(row); }
+    return rows;
+}
+
+// ---------- 주소 정리 ----------
+// 1차: (연건동) 같은 괄호, 쉼표 뒤(2층 등), 끝의 점을 제거
+function cleanAddress(a) {
+    var s = (a || "");
+    s = s.replace(/\([^)]*\)/g, " ");
+    s = s.replace(/\(.*$/, "");
+    s = s.split(",")[0];
+    s = s.replace(/\s+/g, " ").trim();
+    s = s.replace(/[.\s]+$/, "");
+    return s;
+}
+
+// 2차: "...로 162-11 현대프라자 114호" 처럼 번지 뒤에 붙은 건물명을 잘라냄
+function shortAddress(a) {
+    var s = cleanAddress(a);
+    var t = s.split(" ");
+    for (var i = 1; i < t.length; i++) {
+        if (/^\d+(-\d+)?$/.test(t[i]) && /[로길]$/.test(t[i - 1])) {
+            return t.slice(0, i + 1).join(" ");
+        }
+        if (/[로길]\d+(-\d+)?$/.test(t[i])) {
+            return t.slice(0, i + 1).join(" ");
+        }
+    }
+    return s;
+}
+
+// ---------- 가격 정리 ----------
+// 숫자 -> 그대로 / 범위(25000~45000) -> 앞 숫자 / 무료 -> 0
+// 삭제·미취급 같은 글자 -> null(그 메뉴는 건너뜀)
+function parsePrice(p) {
+    var s = (p || "").trim();
+    if (s === "") return "EMPTY";
+    s = s.replace(/,/g, "").replace(/원/g, "");
+    if (/무료/.test(s)) return 0;
+    if (/삭제|미취급|없음/.test(s)) return null;
+    var m = s.match(/\d+/);
+    if (m) return parseInt(m[0], 10);
+    return null;
+}
+
+function sqlStr(s) {
+    return "'" + String(s).replace(/'/g, "''") + "'";
+}
+
+// CSV 한 줄 -> 가게 정보 + 서비스(메뉴) 목록
+function rowToStore(r) {
+    var phone = (r[4] || "").trim();
+    var store = {
+        category: (r[2] || "").trim(),
+        name: (r[3] || "").trim(),
+        phone: phone,
+        address: (r[5] || "").trim(),
+        services: []
+    };
+    for (var k = 0; k < 4; k++) {
+        var menu = (r[6 + k * 2] || "").trim();
+        var price = parsePrice(r[7 + k * 2]);
+        if (menu === "") { continue; }
+        if (price === null) { continue; }
+        if (price === "EMPTY") { price = null; }
+        store.services.push({ name: menu, price: price });
+    }
+    return store;
+}
+
+// 결과 -> INSERT 문 두 덩어리
+// geo[i] = [위도, 경도] (성공) / null (실패),  i = 데이터 행 번호(0부터)
+function buildSQL(stores, geo) {
+    var sqlStore = ["SET DEFINE OFF;"];
+    var sqlService = ["SET DEFINE OFF;"];
+    var storeId = 0;
+    var serviceId = 0;
+    var failed = [];
+    for (var i = 0; i < stores.length; i++) {
+        var st = stores[i];
+        var g = geo[i];
+        if (!g) { failed.push(st); continue; }
+        storeId++;
+        var phoneSql = "NULL";
+        if (st.phone !== "") { phoneSql = sqlStr(st.phone); }
+        sqlStore.push(
+            "INSERT INTO GOOD_STORE (STORE_ID, CATEGORY, STORE_NAME, PHONE, ADDRESS, LATITUDE, LONGITUDE) VALUES ("
+            + storeId + ", " + sqlStr(st.category) + ", " + sqlStr(st.name) + ", " + phoneSql + ", "
+            + sqlStr(st.address) + ", " + g[0] + ", " + g[1] + ");");
+        for (var j = 0; j < st.services.length; j++) {
+            serviceId++;
+            var sv = st.services[j];
+            var priceSql = "NULL";
+            if (sv.price !== null) { priceSql = String(sv.price); }
+            sqlService.push(
+                "INSERT INTO STORE_SERVICE (SERVICE_ID, STORE_ID, SERVICE_NAME, PRICE) VALUES ("
+                + serviceId + ", " + storeId + ", " + sqlStr(sv.name) + ", " + priceSql + ");");
+        }
+    }
+    sqlStore.push("COMMIT;");
+    sqlService.push("COMMIT;");
+    return {
+        sql: sqlStore.join("\n") + "\n\n" + sqlService.join("\n") + "\n",
+        stores: storeId,
+        services: serviceId,
+        failed: failed
+    };
+}
+// ==CORE_END==
+
+// ---------- 화면 동작 ----------
+var stores = [];
+var geo = {};          // 행번호 -> [위도, 경도] 또는 null
+var cacheKey = "";
+var running = false;
+var stopFlag = false;
+var geocoder = new kakao.maps.services.Geocoder();
+
+function log(msg) {
+    var el = document.getElementById("log");
+    el.textContent += msg + "\n";
+    el.scrollTop = el.scrollHeight;
+}
+
+function updateCounts() {
+    var done = 0, ok = 0, fail = 0;
+    for (var i = 0; i < stores.length; i++) {
+        if (geo[i] === undefined) continue;
+        done++;
+        if (geo[i]) ok++; else fail++;
+    }
+    document.getElementById("done").textContent = done;
+    document.getElementById("total").textContent = stores.length;
+    document.getElementById("ok").textContent = ok;
+    document.getElementById("fail").textContent = fail;
+    var bar = document.getElementById("bar");
+    bar.max = stores.length || 1;
+    bar.value = done;
+}
+
+function saveCache() {
+    try { localStorage.setItem(cacheKey, JSON.stringify(geo)); } catch (e) { }
+}
+
+document.getElementById("file").addEventListener("change", function (e) {
+    var f = e.target.files[0];
+    if (!f) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+        var text = new TextDecoder("euc-kr").decode(reader.result);   // CP949 -> 글자
+        var rows = parseCSV(text);
+        rows.shift();                                                  // 첫 줄(제목) 제거
+        stores = [];
+        for (var i = 0; i < rows.length; i++) {
+            if (rows[i].length < 6) continue;
+            stores.push(rowToStore(rows[i]));
+        }
+        cacheKey = "geo:" + f.name + ":" + f.size;
+        geo = {};
+        try {
+            var saved = localStorage.getItem(cacheKey);
+            if (saved) { geo = JSON.parse(saved); log("이전 진행상황을 불러왔어요."); }
+        } catch (err) { }
+        log("CSV 읽기 완료: " + stores.length + "개 가게");
+        updateCounts();
+        document.getElementById("btnStart").disabled = false;
+        document.getElementById("btnReset").disabled = false;
+        document.getElementById("btnRetry").disabled = false;
+        document.getElementById("btnSql").disabled = false;
+        document.getElementById("btnFail").disabled = false;
+    };
+    reader.readAsArrayBuffer(f);
+});
+
+var errStreak = 0;      // 연속 오류 횟수 (카카오 오류가 계속되면 자동 중지)
+var lastErr = "";
+var shown = 0;
+
+function searchOne(addr, tries, cb) {
+    geocoder.addressSearch(addr, function (result, status) {
+        if (status === kakao.maps.services.Status.OK && result.length > 0) {
+            errStreak = 0;
+            cb("ok", [result[0].y, result[0].x]);
+        } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
+            errStreak = 0;
+            cb("none", null);                       // 진짜로 주소를 못 찾음
+        } else {
+            // ERROR 등: 요청이 너무 빠르거나 키/도메인 문제 -> 잠깐 쉬고 다시
+            lastErr = String(status);
+            if (tries > 0) {
+                setTimeout(function () { searchOne(addr, tries - 1, cb); }, 1000);
+            } else {
+                errStreak++;
+                cb("error", null);
+            }
+        }
+    });
+}
+
+function geocodeRow(i, done) {
+    var addr1 = cleanAddress(stores[i].address);
+    searchOne(addr1, 3, function (r1, pos) {
+        if (r1 === "ok") { done("ok", pos); return; }
+        if (r1 === "error") { done("error", null); return; }
+        var addr2 = shortAddress(stores[i].address);
+        if (addr2 === addr1) { done("none", null); return; }
+        searchOne(addr2, 3, function (r2, pos2) {
+            done(r2, pos2);
+        });
+    });
+}
+
+function run() {
+    if (running) return;
+    running = true;
+    stopFlag = false;
+    document.getElementById("btnStart").disabled = true;
+    document.getElementById("btnStop").disabled = false;
+
+    errStreak = 0;
+    var next = 0;
+    var active = 0;
+    var WORKERS = 2;
+    var sinceSave = 0;
+
+    function pump() {
+        if (stopFlag) {
+            if (active === 0) {
+                if (errStreak >= 8) {
+                    finish("카카오 오류가 계속 나서 멈췄어요. (오류 내용: " + lastErr + ")\n→ 주소창이 http://127.0.0.1:5500 또는 http://localhost 인지, 카카오 개발자 사이트에 그 주소가 등록돼 있는지 확인하세요. 잠시 후 '이어서 하기'를 누르면 됩니다.");
+                } else {
+                    finish("중지했어요. (진행상황은 저장됨)");
+                }
+            }
+            return;
+        }
+        while (active < WORKERS && next < stores.length) {
+            var i = next++;
+            if (geo[i] !== undefined) continue;     // 이미 한 행은 건너뜀
+            active++;
+            (function (idx) {
+                geocodeRow(idx, function (state, pos) {
+                    active--;
+                    if (state === "error") {
+                        // 오류는 '실패'로 저장하지 않음 (나중에 이어서 하면 다시 시도)
+                        if (errStreak >= 8) { stopFlag = true; }
+                    } else {
+                        geo[idx] = pos;               // ok면 좌표, none이면 null
+                        if (state === "none" && shown < 5) {
+                            shown++;
+                            log("못 찾은 주소 예시: " + stores[idx].address);
+                        }
+                        sinceSave++;
+                        if (sinceSave >= 50) { saveCache(); sinceSave = 0; updateCounts(); }
+                    }
+                    setTimeout(pump, 250);
+                });
+            })(i);
+        }
+        if (next >= stores.length && active === 0) {
+            finish("모두 끝났어요!");
+        }
+    }
+
+    function finish(msg) {
+        saveCache();
+        updateCounts();
+        running = false;
+        document.getElementById("btnStart").disabled = false;
+        document.getElementById("btnStop").disabled = true;
+        log(msg);
+    }
+
+    log("변환 시작...");
+    pump();
+}
+
+function download(name, text) {
+    var blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    a.click();
+}
+
+document.getElementById("btnStart").addEventListener("click", run);
+document.getElementById("btnStop").addEventListener("click", function () { stopFlag = true; });
+document.getElementById("btnRetry").addEventListener("click", function () {
+    var n = 0;
+    for (var i = 0; i < stores.length; i++) {
+        if (geo[i] === null) { delete geo[i]; n++; }
+    }
+    saveCache();
+    updateCounts();
+    log("실패했던 " + n + "개를 다시 시도 대기로 돌렸어요. '시작 / 이어서 하기'를 누르세요.");
+});
+document.getElementById("btnReset").addEventListener("click", function () {
+    if (!confirm("저장된 진행상황을 지울까요?")) return;
+    try { localStorage.removeItem(cacheKey); } catch (e) { }
+    geo = {};
+    updateCounts();
+    log("진행상황을 지웠어요.");
+});
+document.getElementById("btnSql").addEventListener("click", function () {
+    var r = buildSQL(stores, geo);
+    download("insert_good_store.sql", r.sql);
+    log("SQL 저장: 가게 " + r.stores + "개, 서비스 " + r.services + "개 (실패 " + r.failed.length + "개 제외)");
+});
+document.getElementById("btnFail").addEventListener("click", function () {
+    var r = buildSQL(stores, geo);
+    var lines = ["업종,업소명,주소"];
+    for (var i = 0; i < r.failed.length; i++) {
+        var f = r.failed[i];
+        lines.push([f.category, f.name, f.address].map(function (v) { return '"' + v.replace(/"/g, '""') + '"'; }).join(","));
+    }
+    download("geocode_failed.csv", "﻿" + lines.join("\n"));
+});
+</script>
+</body>
+</html>
