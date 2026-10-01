@@ -76,7 +76,7 @@
     <a class="sh-logo" href="/"><img src="/images/logo.png" alt="짠내맵"></a>   <%-- ★ 이미지 로고 --%>
     <nav class="sh-nav">
       <a href="#">지도</a>
-      <a href="#">파티원모집</a>
+      <a href="/party/list">파티원모집</a>
       <a href="#">챌린지</a>
       <a href="#">가계부</a>
       <a href="#">자유게시판</a>
