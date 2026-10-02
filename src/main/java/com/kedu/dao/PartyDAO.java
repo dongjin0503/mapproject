@@ -18,21 +18,27 @@ public class PartyDAO {
 	private JdbcTemplate jdbcTemplate;
 
 	public List<PartyDTO> findAll(int offset) {
-		String sql = "select p.PARTY_ID, p.STORE_ID, p.TITLE, p.MEET_DATE, "
-				+ "s.STORE_NAME, REGEXP_SUBSTR(s.ADDRESS, '^[^ ]+시 [^ ]+구') as address " + "FROM PARTY p "
-				+ "left join GOOD_STORE s on p.STORE_ID = s.STORE_ID " + "order by p.PARTY_ID desc "
-				+ "offset ? rows fetch next 9 rows only";
+	    String sql =
+	        "SELECT * FROM ( " +
+	        "  SELECT t.*, ROWNUM rn FROM ( " +
+	        "    SELECT p.PARTY_ID, p.STORE_ID, p.TITLE, p.MEET_DATE, s.STORE_NAME, " +
+	        "           REGEXP_SUBSTR(s.ADDRESS, '^[^ ]+시 [^ ]+구') AS address " +
+	        "    FROM PARTY p " +
+	        "    LEFT JOIN GOOD_STORE s ON p.STORE_ID = s.STORE_ID " +
+	        "    ORDER BY p.PARTY_ID DESC " +
+	        "  ) t WHERE ROWNUM <= ? " +
+	        ") WHERE rn > ?";
 
-		return jdbcTemplate.query(sql, (rs, rowNum) -> {
-			PartyDTO party = new PartyDTO();
-			party.setPartyId(rs.getInt("PARTY_ID"));
-			party.setStoreId(rs.getInt("STORE_ID"));
-			party.setAddress(rs.getString("ADDRESS"));
-			party.setStoreName(rs.getString("STORE_NAME"));
-			party.setTitle(rs.getString("TITLE"));
-			party.setMeetDate(rs.getTimestamp("MEET_DATE"));
-			return party;
-		}, offset);
+	    return jdbcTemplate.query(sql, (rs, rowNum) -> {
+	        PartyDTO party = new PartyDTO();
+	        party.setPartyId(rs.getInt("PARTY_ID"));
+	        party.setStoreId(rs.getInt("STORE_ID"));
+	        party.setTitle(rs.getString("TITLE"));
+	        party.setMeetDate(rs.getTimestamp("MEET_DATE"));
+	        party.setStoreName(rs.getString("STORE_NAME"));
+	        party.setAddress(rs.getString("ADDRESS"));
+	        return party;
+	    }, offset + 9, offset);
 	}
 
 	public PartyDTO findById(int partyId) {

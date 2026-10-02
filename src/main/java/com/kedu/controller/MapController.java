@@ -27,8 +27,8 @@ public class MapController {
 	
 	@ResponseBody
 	@RequestMapping("ajax/store")
-	public List<Good_StoreDTO> store(double swLat, double swLng, double neLat, double neLng) {
-		return  dao.listByBounds(swLat, swLng, neLat, neLng);
+	public List<Good_StoreDTO> store(double swLat, double swLng, double neLat, double neLng , String category) {
+		return  dao.listByBounds(swLat, swLng, neLat, neLng , category);
 		 
 	}
 	
