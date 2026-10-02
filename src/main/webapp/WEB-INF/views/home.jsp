@@ -6,24 +6,25 @@
 <meta charset="UTF-8">
 <title>짠내맵</title>
 <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=300c61e334f2ebb5afb0f5b4937b967a"></script>
-</head>
-	<Style>
+<style>
 	#map {
-	width: 1200px;
-	height : 800px;
+		width: 1200px;
+		height: 800px;
 	}
-	</Style>
+</style>
+</head>
 <body>
+	<a href="/FreeBoard/freeboard">게시판</a>
 
-	<div id = "map">dassa </div>
-	
+	<div id="map"></div>
+
 	<script>
 		var container = document.getElementById("map");
 		var options = {
-				center : new kakao.maps.LatLng(37.5665,126.9780),
-				level: 5		
+			center: new kakao.maps.LatLng(37.5665, 126.9780),
+			level: 5
 		};
 		var map = new kakao.maps.Map(container, options);
 	</script>
 </body>
-</html>
+</html>	

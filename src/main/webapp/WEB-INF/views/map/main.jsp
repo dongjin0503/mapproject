@@ -129,86 +129,108 @@
 	</div>
 	
 	<script>
-		
-		
-		var container = document.getElementById("map");
-		var options = {
-				center : new kakao.maps.LatLng(37.5665,126.9780),
-				level: 5		
-		};
-		var map = new kakao.maps.Map(container, options);
-		kakao.maps.event.addListener(map, "idle", loadStores);
-		var infowindow = new kakao.maps.InfoWindow({}); 	
-		var markers = [];
-		
-		function loadStores(){
-			var b = map.getBounds();
-			var sw = b.getSouthWest();
-			var ne = b.getNorthEast();
-		
-			$.ajax({
-				url : "/map/ajax/store",
-				data : {swLat : sw.getLat() , swLng : sw.getLng(),  
-						neLat : ne.getLat() , neLng : ne.getLng()},
-				dataType : "json"
-			}).done(function(rest){
-			for (var i =0 ; i < markers.length ; i++) {
-				markers[i].setMap(null);
-			}
-			markers = []
+			var ctx  ="${pageContext.request.contextPath}";
 			
-			for (var j = 0 ; j < rest.length ; j++) {
-				let s = rest[j];
+			function esc(str) {
+				return $("<div>").test(str == null ? "" : str).html();	
+			}
+			
+			var map = new kakao.maps.Map(document.getElementById("map"),{
 				
-				let marker = new kakao.maps.Marker({
-					map : map,
-					position : new kakao.maps.LatLng(s.latitude, s.longitude),
-					title : s.store_name
-				})
-				markers.push(marker);
-				kakao.maps.event.addListener(marker, "click" , function(){
-					console.log(s.store_name);
-					
-					$.ajax({
-						url : "/map/ajax/service",
-						data : {storeId : s.store_id},
-						dataType : "json"
-					}).done(function(menus){
-						
-						var phone = "전화 번호가 등록되어 있지 않습니다."
-						if(s.phone != null) {
-							phone = s.phone;
-						}
-						var html = "<div style='padding:10px; min-width:240px; max-height:250px; overflow-y:auto;'>";
-							
-						html += "<b>" + s.store_name + "</b><br>";
-						html += s.category + "<br>" ;
-						html += s.address + "<br>" ;
-						html += phone + "<br><br>";
-						
-						for (var k = 0; k < menus.length; k++) {
-							var price = "가격 정보가 등록되지 않았습니다";
-							if (menus[k].price != null) {
-								price = menus[k].price + "원";	
-							}
-							html += menus[k].service_name + " : " + price + "<br>";
-							
-						}
-						html += "</div>";
-						
-						infowindow.setContent(html);
-						infowindow.open(map,marker);
-						
-					})
-				})
-			}	
+				center : new kakao.maps.LatLng(37.5665, 126.9780),
+				
+				level : 5
+			})
+			
+		var infowindow = new kakao.maps.InfoWindow({ removable : true });
+			
+			var markers = [];
+			
+			var reqSeq = 0;
+			
+			kakao.maps.event.addListener(map, "idle" , loadStores);
+			
+			kakao.maps.event.addListener(map, "click" , function(){
+			infowindow.close();
+			closeAllPopups();
+				
 			});
-		}
-		
-	
-		
-		
-		
+			
+			var filters = { category : [] , price : null};
+			
+			var priceLabel = {
+					"5000" : "5천원 이하", "10000" : "1만원 이하",
+					"20000" : "2만원 이하 " , "30000" : "3만원 이하"
+					
+			};
+			
+			$(".pill[data-pop]").on("click" , function(e) {
+				e.stopPropagation() ;
+			})
+			
+			var $pop =  $("#" + $(this).data("pop"));
+			
+			var willOpen = !$pop.is (":visible");
+			
+			closeAllPopips();
+			
+			if(willOpen) {
+				syncInputs();
+				$pop.show();
+				$(this).addClass("open");
+			}
+			
+			$(".popup").on("click" , function (e) {
+				e.stopPropagation();
+			})
+			
+			$(document).on ("click", closeAllPopups);
+			
+			function closeAllPopups() {
+				$(".popup").hide();
+				$(".pill").removeClass("open");
+			}
+			
+			
+			function syncInputs() {
+				
+				$("input [name=category]").each(function () {
+					this.checked = fillters.category.indexOf(this.value) !== -1;
+				});
+				
+				$("input[name=price]").each(function () {
+					this.checked = (this.value === filters.price);
+				});
+			}
+			
+			$(".btn-apply").on("click", function(){
+				var type = $(this).data("for");
+				
+				if (type ==="category") {
+					
+					fillters.category = $("input[name=category] : checked")
+					.map(function() { return this.value;}).get();
+				} else if (type ==="price") {
+					fillters.price = $("input[name=price]:checked").val() || null;
+				}
+				
+				colseAllPopups();
+				refresh();
+			})
+			
+			$("btn-reset").on("cilck", function (){
+				
+				var type = $(this).data("for");
+				
+				$("input[name=" + type + "]").prop("checked", false);
+				
+				if (type === "category") filters.category = [];
+				else if (type === "price") filters.price = null;
+				
+				closeAllPopups();
+				refresh();
+			})
+			)
 	</script>
 </body>
 </html>
