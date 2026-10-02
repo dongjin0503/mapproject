@@ -16,10 +16,16 @@ public class Good_StoreDAO {
 	@Autowired
 	private JdbcTemplate jdbc;
 
-	public List<Good_StoreDTO> listByBounds(double swLat, double swLng, double neLat, double neLng) {
+	public List<Good_StoreDTO> listByBounds(double swLat, double swLng, double neLat, double neLng , String category) {
 		// 
-		String sql = "select * from (select * from good_store where latitude between ? and ? and longitude between ? and ?) where rownum <= 1000";
-		return jdbc.query(sql, new BeanPropertyRowMapper<>(Good_StoreDTO.class), swLat, swLng, neLat, neLng);
+		if (category == null || category.equals("")) {
+			String sql = "select * from (select * from good_store where latitude between ? and ? and longitude between ? and ?) where rownum <= 1000";
+		
+		return jdbc.query(sql, new BeanPropertyRowMapper<>(Good_StoreDTO.class), swLat, neLat, swLng, neLng );
+		}
+	String sql = "select * from (select * from good_store where latitude between ? and ? and longitude between ? and ? and category = ?) where rownum <= 1000";
+	
+	return jdbc.query(sql, new BeanPropertyRowMapper<>(Good_StoreDTO.class) , swLat , neLat , swLng , neLng , category);
 	}
 
 	public List<Store_ServiceDTO> listService(int storeId) {
