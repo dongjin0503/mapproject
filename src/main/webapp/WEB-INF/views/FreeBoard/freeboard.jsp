@@ -5,7 +5,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>짠내맵 - 자유게시판</title>
+<title>freeboard</title>
 
 <style>
 * {
@@ -229,26 +229,19 @@ body {
 <body>
 
 	<div class="container">
-
 		<!-- 1. 공통 헤더 -->
 		<div class="header">
-
 			<div class="header-left">
-
 				<div class="logo">짠내맵</div>
-
 				<div class="nav">
 					<a href="#">지도</a> <a href="#">파티원모집</a> <a href="#">챌린지</a> <a
 						href="#">가계부</a> <a href="#" class="active">자유게시판</a> <a href="#">Q&A게시판</a>
 				</div>
-
 			</div>
-
 			<div class="header-right">
 				<button class="logout-btn">로그아웃</button>
 				<div class="profile"></div>
 			</div>
-
 		</div>
 
 

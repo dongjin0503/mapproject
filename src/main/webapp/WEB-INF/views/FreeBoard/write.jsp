@@ -74,7 +74,7 @@
 				<textarea name="content" id="content" placeholder="내용을 입력하세요 (최대 4000바이트)"></textarea>
 			</div>
 			
-			<!-- 본문 textarea를 summernote 에디터로 바꾸기 -->
+			<!-- 본문 textarea를 summernote-lite 에디터로 바꾸기 -->
 			<script>
 			$(function () {
 			    $('#content').summernote({
