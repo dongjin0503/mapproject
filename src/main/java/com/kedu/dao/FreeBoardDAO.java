@@ -16,8 +16,7 @@ public class FreeBoardDAO {
 	private JdbcTemplate jdbc;
 
 	public List<FreeBoardDTO> boardList(int start, int end, String search) {
-	    String sql = "select * from (" + "  select row_number() over(order by post_id desc) rn, f.* from freeboard f where title like ?"
-	            + ") where rn between ? and ?";
+	    String sql = "  select row_number() over(order by post_id desc) rn, f.*, (select count(*) from reply r where r.post_id = f.post_id) reply_count from freeboard f where title like ?";
 	    return jdbc.query(sql, new BeanPropertyRowMapper<>(FreeBoardDTO.class), "%" + search + "%", start, end);
 	}
 

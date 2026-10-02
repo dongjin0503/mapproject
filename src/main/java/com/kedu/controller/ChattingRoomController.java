@@ -26,11 +26,8 @@ public class ChattingRoomController {
 	@RequestMapping("/chat")
     public String chatPage(int partyId, Model model) throws Exception {
 		
-		
 		List<ChattingRoomDTO> chatList = dao.selectByPartyId(partyId);		// partyId로 채팅방 채팅기록 가져오기
-		
 		List<String> memberList = dao.selectMemberList(partyId);		//파티참여 인원 아이디 가져오기
-		
 		
 		String title = dao.selectTitle(partyId);				// partyId로 파티테이블에서 파티제목가져오기
 		int partyMem = dao.selectMemberCount(partyId);
@@ -40,7 +37,7 @@ public class ChattingRoomController {
 		model.addAttribute("chatList",chatList);
 		model.addAttribute("partyMember",partyMem);
 		model.addAttribute("partyId",partyId);
-		
+
 		
         return "/ChattingRoom/chatroom";
     }
@@ -57,14 +54,4 @@ public class ChattingRoomController {
 		
 		return dto;
 	}
-	
-//	@RequestMapping("/search")
-//	public String search(ChattingRoomDTO dto) throws Exception{
-//		
-//		dao.search(dto);
-//		return "/";
-//	}
-	
-
-
 }

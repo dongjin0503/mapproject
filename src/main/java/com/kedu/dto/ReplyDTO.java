@@ -13,6 +13,8 @@ public class ReplyDTO {
 	private int likeCount;
 	private Timestamp createdAt;
 	
+	private int replyCount;
+	
 	public ReplyDTO() {};
 	public ReplyDTO(int replyId, int postId, String memberId, int parentReplyId, String content, int likeCount,
 			Timestamp createdAt) {
@@ -24,6 +26,13 @@ public class ReplyDTO {
 		this.content = content;
 		this.likeCount = likeCount;
 		this.createdAt = createdAt;
+	}
+	
+	public int getReplyCount() {
+		return replyCount;
+	}
+	public void setReplyCount(int replyCount) {
+		this.replyCount = replyCount;
 	}
 	public int getReplyId() {
 		return replyId;

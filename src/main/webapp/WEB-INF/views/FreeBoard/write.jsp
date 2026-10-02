@@ -4,13 +4,154 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>자유게시판 - 글쓰기</title>
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/lang/summernote-ko-KR.min.js"></script>
 <style>
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	padding: 40px 0;
+	font-family: "Noto Sans KR", "Malgun Gothic", Arial, sans-serif;
+	color: #1c2535;
+	background: #f7f8fa;
+}
+
+/* 글쓰기 카드 */
+.container {
+	width: 900px;
+	max-width: calc(100% - 40px);
+	margin: 0 auto;
+	padding: 28px 35px;
+	background: white;
+	border: 1px solid #d5dce7;
+	border-radius: 10px;
+	box-shadow: 0 2px 10px rgba(28, 37, 53, 0.05);
+}
+
+.header {
+	padding-bottom: 16px;
+	border-bottom: 2px solid #1c2535;
+}
+
+.header h2 {
+	margin: 0;
+	font-size: 22px;
+}
+
+/* 작성자 */
+.writer {
+	margin-top: 16px;
+}
+
+.writer input {
+	width: 200px;
+	height: 36px;
+	padding: 0 12px;
+	border: 1px solid #d5dce7;
+	border-radius: 6px;
+	background: #f3f5f9;
+	color: #8995a9;
+	font-size: 13px;
+}
+
+/* 제목 */
+.title {
+	margin-top: 12px;
+}
+
+.title input {
+	width: 100%;
+	height: 46px;
+	padding: 0 14px;
+	border: 1px solid #d5dce7;
+	border-radius: 6px;
+	font-size: 18px;
+	font-weight: bold;
+}
+
+.title input:focus {
+	outline: none;
+	border-color: #1c2535;
+}
+
+/* 카테고리: 숨긴 radio의 기준 위치가 없어서 추가 */
+.categoryGroup {
+	position: relative;
+	margin: 16px 0;
+}
+
+/* 파일 업로드 */
+#fileBox {
+	margin-top: 20px;
+	padding: 14px 16px;
+	border: 1px solid #d5dce7;
+	border-radius: 8px;
+	font-size: 13px;
+	color: #39465c;
+}
+
+#fileBox legend {
+	padding: 0 8px;
+	font-weight: bold;
+}
+
+#add {
+	margin-left: 8px;
+	padding: 6px 12px;
+	border: 1px solid #d5dce7;
+	border-radius: 6px;
+	background: white;
+	font-size: 12px;
+	cursor: pointer;
+}
+
+#add:hover {
+	border-color: #1c2535;
+}
+
+/* 하단 버튼 */
+.footer {
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+	margin-top: 24px;
+}
+
+.footer a {
+	text-decoration: none;
+}
+
+.footer input {
+	height: 40px;
+	padding: 0 24px;
+	border-radius: 6px;
+	font-size: 14px;
+	cursor: pointer;
+}
+
+.footer input[type=button] {
+	border: 1px solid #d5dce7;
+	background: white;
+	color: #39465c;
+}
+
+#listup {
+	border: none;
+	background: #1c2535;
+	color: white;
+	font-weight: bold;
+}
+
+#listup:hover {
+	background: #2d3a52;
+}
 .categoryGroup {
 	display: flex;
 	gap: 8px;

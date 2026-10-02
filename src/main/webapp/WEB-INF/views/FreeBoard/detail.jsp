@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -17,30 +18,49 @@
 
 body {
 	margin: 0;
-	background-color: #f5f5f5;
-	font-family: Arial, sans-serif;
-	color: #333;
+	padding-bottom: 40px;
+	background-color: #f7f8fa;
+	font-family: "Noto Sans KR", "Malgun Gothic", Arial, sans-serif;
+	color: #1c2535;
+}
+
+input, textarea, button {
+	font-family: inherit;
 }
 
 .container {
 	width: 900px;
-	margin: 65px auto 20px;
-	padding: 25px 35px 18px;
+	max-width: calc(100% - 40px);
+	margin: 40px auto 20px;
+	padding: 28px 35px 24px;
 	background-color: white;
-	border: 1px solid #e5e5e5;
-	border-radius: 5px;
-	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+	border: 1px solid #d5dce7;
+	border-radius: 10px;
+	box-shadow: 0 2px 10px rgba(28, 37, 53, 0.05);
 }
 
 .header {
-	padding-bottom: 20px;
-	border-bottom: 2px solid #333;
+	padding-bottom: 16px;
+	border-bottom: 2px solid #1c2535;
 }
 
-.header h2 {
-	margin: 0;
-	font-size: 24px;
+/* 제목: 평소엔 글자만, 수정 모드(readonly 해제)에선 입력창처럼 */
+#titleText {
+	width: 100%;
+	padding: 4px 0;
+	border: none;
+	outline: none;
+	background: transparent;
+	font-size: 28px;
 	font-weight: bold;
+	color: #1c2535;
+}
+
+#titleText:not([readonly]) {
+	padding: 6px 12px;
+	border: 1px solid #d5dce7;
+	border-radius: 6px;
+	background: white;
 }
 
 /* 게시글 정보 */
@@ -48,15 +68,37 @@ body {
 	display: flex;
 	align-items: center;
 	gap: 25px;
-	padding: 15px 5px;
-	border-bottom: 1px solid #ddd;
+	padding: 14px 5px;
+	border-bottom: 1px solid #e8ecf3;
 	font-size: 13px;
-	color: #666;
+	color: #8995a9;
 }
 
 .detail span {
 	white-space: nowrap;
 	font-weight: bold;
+}
+
+/* 추천 버튼 + 숫자 */
+#likeCount {
+	margin-top: 14px;
+	padding: 7px 18px;
+	border: 1px solid #d5dce7;
+	border-radius: 20px;
+	background: white;
+	font-size: 13px;
+	cursor: pointer;
+}
+
+#likeCount:hover {
+	border-color: #1c2535;
+}
+
+#p1 {
+	display: inline-block;
+	margin: 0 0 0 8px;
+	font-weight: bold;
+	color: #2457d6;
 }
 
 /* 카테고리 선택 (radio) */
@@ -75,7 +117,7 @@ body {
 
 .categoryGroup label {
 	padding: 8px 18px;
-	border: 1px solid #aab3c4;
+	border: 1px solid #d5dce7;
 	border-radius: 20px;
 	background: white;
 	color: #39465c;
@@ -88,68 +130,98 @@ body {
 	border-color: #1c2535;
 }
 
-/* 선택된 카테고리 */
 .categoryGroup input[type="radio"]:checked+label {
 	background: #1c2535;
 	color: white;
 	border-color: #1c2535;
 }
 
-/* 키보드로 이동할 때 표시 */
 .categoryGroup input[type="radio"]:focus-visible+label {
 	outline: 2px solid #2457d6;
 }
 
 /* 글 내용 */
 .content {
-	padding: 25px 10px;
-	border-bottom: 1px solid #ddd;
+	padding: 20px 0;
+	border-bottom: 1px solid #e8ecf3;
 	font-size: 15px;
 }
 
-.content textArea {
+.content > textarea {
 	width: 100%;
 	height: 300px;
 	overflow-y: auto;
 	padding: 15px;
-	border: 1px solid #ddd;
-	border-radius: 5px;
-	background-color: #fafafa;
+	border: 1px solid #d5dce7;
+	border-radius: 6px;
+	background-color: #fafbfe;
 	font-size: 14px;
-	color: #333;
+	color: #1c2535;
 	line-height: 1.7;
 	resize: none;
 	outline: none;
 }
 
-/* 하단 버튼 */
+/* 첨부파일 */
+.fileContent {
+	padding: 10px 4px;
+	font-size: 13px;
+}
+
+.fileContent a {
+	color: #2457d6;
+	text-decoration: none;
+}
+
+.fileContent a:hover {
+	text-decoration: underline;
+}
+
+/* 하단 버튼 (목록으로/수정/수정완료/수정취소/삭제) */
 .footer {
 	display: flex;
 	justify-content: center;
+	gap: 8px;
 	margin-top: 20px;
 }
 
-.footer a {
+.footer a,
+.footer input {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	width: 100px;
 	height: 40px;
-	border-radius: 5px;
-	background-color: #333;
+	border: none;
+	border-radius: 6px;
+	background-color: #1c2535;
 	color: white;
 	font-size: 14px;
 	text-decoration: none;
+	cursor: pointer;
 }
 
-.footer a:hover {
-	background-color: #222;
+.footer a:hover,
+.footer input:hover {
+	background-color: #2d3a52;
 }
 
-#titleText {
+#deletebtn {
+	background-color: #c0392b;
+}
+
+#deletebtn:hover {
+	background-color: #a93226;
+}
+
+#updateCancelbtn {
+	background-color: #8995a9;
+}
+
+/* 댓글 */
+hr {
 	border: none;
-	font-size: 30px;
-	font-weight: bold;
+	margin: 0;
 }
 
 .commentHeader {
@@ -157,7 +229,7 @@ body {
 	padding-bottom: 10px;
 	font-size: 18px;
 	font-weight: bold;
-	border-bottom: 2px solid #333;
+	border-bottom: 2px solid #1c2535;
 }
 
 /* 댓글 작성 영역 */
@@ -167,30 +239,28 @@ body {
 	gap: 10px;
 	margin-top: 15px;
 	padding: 15px 10px;
-	background-color: #fafafa;
-	border: 1px solid #ddd;
-	border-radius: 5px;
+	background-color: #fafbfe;
+	border: 1px solid #d5dce7;
+	border-radius: 6px;
 }
 
-/* 댓글 입력창 */
-.commentPlace textArea {
+.commentPlace textarea {
 	flex: 1;
 	width: 100%;
 	height: 80px;
 	padding: 12px 15px;
-	border: 1px solid #ccc;
-	border-radius: 5px;
+	border: 1px solid #d5dce7;
+	border-radius: 6px;
 	background-color: white;
 	font-size: 14px;
-	color: #333;
+	color: #1c2535;
 	line-height: 1.5;
 	resize: none;
 	outline: none;
 }
 
-/* 댓글 입력창 클릭했을 때 */
-.commentPlace textArea:focus {
-	border-color: #333;
+.commentPlace textarea:focus {
+	border-color: #1c2535;
 }
 
 /* 작성자 */
@@ -198,83 +268,101 @@ body {
 	width: 150px;
 	height: 40px;
 	padding: 0 10px;
-	border: 1px solid #ddd;
-	border-radius: 5px;
-	background-color: #eee;
-	color: #666;
+	border: 1px solid #d5dce7;
+	border-radius: 6px;
+	background-color: #f3f5f9;
+	color: #8995a9;
 	font-size: 13px;
 }
 
-/* 댓글 등록 버튼 */
+/* 댓글/답글 등록 버튼 */
 .commentPlace input[type="submit"] {
 	width: 90px;
 	height: 40px;
 	border: none;
-	border-radius: 5px;
-	background-color: #333;
+	border-radius: 6px;
+	background-color: #1c2535;
 	color: white;
 	font-size: 13px;
 	cursor: pointer;
 }
+
+.commentPlace input[type="submit"]:hover {
+	background-color: #2d3a52;
+}
+
+#recommentCancel {
+	width: 70px;
+	height: 40px;
+	border: 1px solid #d5dce7;
+	border-radius: 6px;
+	background: white;
+	color: #39465c;
+	cursor: pointer;
+}
+
 /* 댓글 목록 */
 .replyList {
 	margin-top: 20px;
 }
 
-/* 댓글 하나 */
 .reply {
 	padding: 15px 10px;
-	border-bottom: 1px solid #ddd;
+	border-bottom: 1px solid #e8ecf3;
 }
 
-/* 댓글 작성자 + 작성일 */
+/* 댓글 작성자 + 작성일 + 버튼 */
 .replyInfo {
 	display: flex;
 	align-items: center;
-	gap: 15px;
+	gap: 10px;
 	margin-bottom: 8px;
 	font-size: 13px;
 }
 
-.replyInfo input {
-	border: 0.2px solid black;
-	background-color: white;
-	cursor: pointer;
-	margin-left: auto;
-}
-
-.replyInfo input+input {
-	margin-left: 5px;
-}
-
-/* 작성자 */
 .replyWriter {
 	font-weight: bold;
-	color: #333;
+	color: #1c2535;
 }
 
-/* 작성일 */
 .replyDate {
-	color: #999;
+	margin-right: auto;
+	color: #8995a9;
+}
+
+.replyInfo input,
+.reply > input[type="button"] {
+	padding: 4px 12px;
+	border: 1px solid #d5dce7;
+	border-radius: 5px;
+	background-color: white;
+	color: #39465c;
+	font-size: 12px;
+	cursor: pointer;
+}
+
+.replyInfo input:hover,
+.reply > input[type="button"]:hover {
+	border-color: #1c2535;
 }
 
 /* 댓글 내용 */
 .replyContents {
 	width: 100%;
-	height: 100px;
+	height: 70px;
 	padding: 10px;
 	font-size: 14px;
 	line-height: 1.6;
-	color: #555;
-	border: 1px solid #ddd;
-	border-radius: 5px;
-	background-color: #fafafa;
+	color: #39465c;
+	border: 1px solid #e8ecf3;
+	border-radius: 6px;
+	background-color: #fafbfe;
 	resize: none;
 	outline: none;
 }
 
 .replyContents:focus {
-	border-color: #333;
+	border-color: #1c2535;
 	background-color: white;
 }
 </style>
@@ -290,10 +378,11 @@ body {
 				<input id="titleText" name="title" type="text" value="<c:out value='${post.title}'/>" readonly>
 			</div>
 			<div class="detail">
-				<span>번호: ${post.postId}</span> <span>카테고리: <c:out
-						value="${post.contentCategory}" /></span> <span>작성자: <c:out
-						value="${post.memberId}" /></span> <span>조회수: ${post.viewCount}</span> <span>추천수:
-					${post.likeCount}</span> <span>작성일: ${post.createdAt}</span>
+				<span>번호: ${post.postId}</span>
+				<span>카테고리: <c:out value="${post.contentCategory}" /></span>
+				<span>작성자: <c:out value="${post.memberId}" /></span>
+				<span>조회수: ${post.viewCount}</span>
+				<span>작성일: <fmt:formatDate value="${post.createdAt}" pattern="yyyy.MM.dd HH:mm"/></span>
 			</div>
 
 				<input type="button" id="likeCount" value="추천">
@@ -335,7 +424,7 @@ body {
 			<div class="fileContent">
     		<c:forEach var="i" items="${fileList}">
       			<label class="fileDelChk" style="display: none;"><input type="checkbox" name="deleteFileId" value="${i.fileId}"> 삭제</label>
-        		<a href="/FreeBoardFile/download?sysname=${i.sysname }&oriname=${i.oriname}">${i.oriname }</a>
+        		<a href="/FreeBoardFile/download?sysname=${i.sysname }&oriname=${i.oriname}"><c:out value="${i.oriname}"/></a>
         		<br>
     		</c:forEach>
     			<div id="updateFile" style="display: none;">
@@ -432,7 +521,6 @@ body {
 		<br>
 		<div class="commentPlace">
 			<textarea name="content" placeholder="댓글을 입력하세요 (최대 1000바이트)"></textarea>
-			<span>작성자: ${loginId }</span>
 			<input type="text" name="memberId" readonly
 					value="<c:out value='${loginId}'/>">
 			<input type="submit" value="댓글 등록">
@@ -449,7 +537,7 @@ body {
 
 					<div class="replyInfo">
 						<span class="replyWriter"><c:out value="${reply.memberId}" /></span>
-						<span class="replyDate">${reply.createdAt}</span>
+						<span class="replyDate"><fmt:formatDate value="${reply.createdAt}" pattern="yyyy.MM.dd HH:mm"/></span>
 						<c:if test="${reply.memberId == loginId}">
 							<input id="replyUpbtn${reply.replyId}" type="button" value="수정">
 							<input id="replyUpOkbtn${reply.replyId}" type="submit"

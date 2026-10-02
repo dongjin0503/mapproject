@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -14,14 +15,15 @@
 
 body {
 	margin: 0;
-	font-family: Arial, sans-serif;
+	font-family: "Noto Sans KR", "Malgun Gothic", Arial, sans-serif;
 	color: #1c2535;
-	background-color: #ffffff;
+	background-color: #f7f8fa;
 }
 
 /* 전체 컨테이너 */
 .container {
 	width: 1200px;
+	max-width: calc(100% - 40px);
 	margin: auto;
 }
 
@@ -31,7 +33,7 @@ body {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	border-bottom: 1px solid #aab3c4;
+	border-bottom: 1px solid #d5dce7;
 }
 
 .header-left {
@@ -41,8 +43,11 @@ body {
 }
 
 .logo {
-	font-size: 20px;
+	font-size: 18px;
 	font-weight: bold;
+	padding: 6px 12px;
+	border: 1px solid #1c2535;
+	border-radius: 6px;
 }
 
 .nav {
@@ -55,6 +60,11 @@ body {
 	color: #1c2535;
 	font-weight: bold;
 	padding: 25px 0;
+	border-bottom: 2px solid transparent;
+}
+
+.nav a:hover {
+	color: #2457d6;
 }
 
 .nav .active {
@@ -70,15 +80,15 @@ body {
 .logout-btn {
 	padding: 8px 18px;
 	background: white;
-	border: 1px solid #aab3c4;
-	border-radius: 5px;
+	border: 1px solid #d5dce7;
+	border-radius: 6px;
 	cursor: pointer;
 }
 
 .profile {
 	width: 32px;
 	height: 32px;
-	border: 1px solid #aab3c4;
+	border: 1px solid #d5dce7;
 	background: #f0f3f8;
 	border-radius: 50%;
 }
@@ -92,19 +102,24 @@ body {
 .category {
 	display: flex;
 	gap: 8px;
-	margin-bottom: 15px;
+	margin-bottom: 16px;
 }
 
-.category button {
-	padding: 8px 18px;
-	border: 1px solid #aab3c4;
+.category input[type=button] {
+	padding: 8px 20px;
+	border: 1px solid #d5dce7;
 	border-radius: 20px;
 	background: white;
 	color: #39465c;
+	font-size: 13px;
 	cursor: pointer;
 }
 
-.category .active {
+.category input[type=button]:hover {
+	border-color: #1c2535;
+}
+
+.category input[type=button].active {
 	background: #1c2535;
 	color: white;
 	border-color: #1c2535;
@@ -115,113 +130,180 @@ body {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	margin-bottom: 10px;
+	margin-bottom: 14px;
 }
 
-.search-box input {
-	width: 260px;
-	height: 36px;
-	padding: 10px;
-	border: 1px solid #aab3c4;
-	border-radius: 5px;
+.search-box form {
+	display: flex;
+	gap: 6px;
+}
+
+.search-box input[type=text] {
+	width: 280px;
+	height: 38px;
+	padding: 0 12px;
+	border: 1px solid #d5dce7;
+	border-radius: 6px;
+	background: white;
+	font-size: 13px;
+}
+
+.search-box input[type=text]:focus {
+	outline: none;
+	border-color: #1c2535;
+}
+
+.search-box input[type=submit] {
+	height: 38px;
+	padding: 0 16px;
+	border: 1px solid #1c2535;
+	border-radius: 6px;
+	background: white;
+	color: #1c2535;
+	font-size: 13px;
+	cursor: pointer;
+}
+
+.search-box input[type=submit]:hover {
+	background: #1c2535;
+	color: white;
 }
 
 .write-btn {
-	padding: 10px 20px;
+	height: 38px;
+	padding: 0 22px;
 	background: #1c2535;
 	color: white;
 	border: none;
-	border-radius: 5px;
+	border-radius: 6px;
+	font-size: 13px;
+	font-weight: bold;
 	cursor: pointer;
+}
+
+.write-btn:hover {
+	background: #2d3a52;
 }
 
 /* 5. 게시글 목록 */
 .board-list {
-	border: 1px solid #aab3c4;
-	border-radius: 5px;
+	background: white;
+	border: 1px solid #d5dce7;
+	border-radius: 10px;
 	overflow: hidden;
+	box-shadow: 0 2px 10px rgba(28, 37, 53, 0.05);
 }
 
-.board-row {
-	display: flex;
-	align-items: center;
-	height: 43px;
-	padding: 0 15px;
-	border-bottom: 1px solid #e0e5ed;
+.board-list table {
+	width: 100%;
+	border-collapse: collapse;
+	table-layout: fixed;
 	font-size: 13px;
 }
 
-.board-row:last-child {
+.board-list th {
+	height: 44px;
+	background: #f3f5f9;
+	color: #5a6678;
+	font-weight: bold;
+	border-bottom: 1px solid #d5dce7;
+}
+
+.board-list th:nth-child(1) { width: 70px; }
+.board-list th:nth-child(2) { width: 90px; }
+.board-list th:nth-child(3) { text-align: left; padding-left: 15px; }
+.board-list th:nth-child(4) { width: 120px; }
+.board-list th:nth-child(5) { width: 80px; }
+.board-list th:nth-child(6) { width: 110px; }
+
+.board-list td {
+	height: 46px;
+	padding: 0 10px;
+	border-bottom: 1px solid #e8ecf3;
+	color: #8995a9;
+	text-align: center;
+}
+
+.board-list tr:last-child td {
 	border-bottom: none;
 }
 
-.board-number {
-	width: 40px;
-	color: #8995a9;
-	flex-shrink: 0;
+.board-list tr:hover td {
+	background: #f9fafc;
 }
 
-.board-title {
-	flex: 1;
-	min-width: 0;
+.board-list td:nth-child(2) {
+	color: #2457d6;
+	font-size: 12px;
 }
 
-.board-title a {
+.board-list td.title {
+	text-align: left;
+	padding-left: 15px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.board-list td.title a {
 	color: #1c2535;
+	font-size: 14px;
 	text-decoration: none;
 }
 
-.board-title a:hover {
-	text-decoration: underline;
-}
-
-.reply-count {
+.board-list td.title a:hover {
 	color: #2457d6;
-	font-weight: bold;
-	margin-left: 5px;
 }
 
-.board-writer {
-	width: 90px;
-	text-align: right;
-	color: #8995a9;
-}
-
-.board-views {
-	width: 75px;
-	text-align: right;
-	color: #8995a9;
-}
-
-.board-date {
-	width: 55px;
-	text-align: right;
-	color: #8995a9;
-}
-
-.notice {
-	background-color: #fafbfe;
+/* 게시글이 없을 때 */
+.board-list td[colspan] {
+	padding: 60px 0;
+	text-align: center;
 }
 
 /* 6. 페이지네이션 */
 .pagination {
 	display: flex;
 	justify-content: center;
-	gap: 8px;
-	margin-top: 25px;
+	gap: 6px;
+	margin-top: 24px;
 }
 
 .pagination a {
-	padding: 7px 12px;
+	min-width: 34px;
+	padding: 7px 10px;
+	text-align: center;
 	border: 1px solid #d5dce7;
-	border-radius: 5px;
+	border-radius: 6px;
+	background: white;
 	text-decoration: none;
 	color: #39465c;
+	font-size: 13px;
+}
+
+.pagination a:hover {
+	border-color: #1c2535;
 }
 
 .pagination .active {
 	background: #1c2535;
 	color: white;
+	border-color: #1c2535;
+}
+
+/* 총 게시물 수 */
+.board-container > span {
+	display: block;
+	margin-top: 12px;
+	text-align: center;
+	color: #8995a9;
+	font-size: 12px;
+}
+.board-list td.title .reply-count {
+	color: #2457d6;
+	font-weight: bold;
+	font-size: 12px;
+	margin-left: 6px;
 }
 </style>
 </head>
@@ -296,12 +378,12 @@ body {
 								<tr>
 									<td>${i.postId}</td>
 									<td>${i.contentCategory}</td>
-									<td class="title"><a
-										href="/FreeBoard/detail?postId=${i.postId}&cpage=${cpage}">${i.title}</a>
+									<td class="title"><a href="/FreeBoard/detail?postId=${i.postId}&cpage=${cpage}"><c:out value="${i.title}"/></a>
+										<c:if test="${i.replyCount > 0}"><span class="reply-count">[${i.replyCount}]</span></c:if>
 									</td>
-									<td>${i.memberId}</td>
+									<td><c:out value="${i.memberId}"/></td>
 									<td>${i.viewCount}</td>
-									<td>${i.createdAt}</td>
+									<td><fmt:formatDate value="${i.createdAt}" pattern="yyyy.MM.dd"/></td>
 								</tr>
 							</c:forEach>
 						</c:otherwise>

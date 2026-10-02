@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -17,6 +18,8 @@
     height: 700px;
     margin: 50px auto;
     position: relative;
+    display: flex;
+    flex-direction: column;
     border: 1px solid #ddd;
     border-radius: 10px;
     background-color: white;
@@ -25,19 +28,18 @@
 
 /* 채팅 헤더 */
 .chatHeader {
-    height: 70px;
     padding: 15px;
     box-sizing: border-box;
-    position: relative;
     border-bottom: 1px solid #ddd;
 }
 
 /* 채팅 내용 */
 .chatBody {
-    height: 500px;
+    flex: 1;
     overflow-y: auto;
     padding: 15px;
     box-sizing: border-box;
+    background: #f3f4f6;
 }
 
 /* 입장 / 퇴장 메시지 */
@@ -50,19 +52,62 @@
 
 /* 내 메시지 */
 .myMessage {
-    text-align: right;
+    display: flex;
+    flex-direction: row-reverse;   /* 말풍선 오른쪽, 시간은 그 왼쪽 */
+    align-items: flex-end;
+    gap: 6px;
     margin: 10px 0;
+}
+.myMessage > div:nth-child(1) {    /* 말풍선 */
+    max-width: 70%;
+    padding: 8px 12px;
+    background: #111827;
+    color: white;
+    border-radius: 12px 12px 0 12px;
+    word-break: break-word;
+    text-align: left;
+}
+.myMessage > div:nth-child(2) {    /* 시간 */
+    font-size: 11px;
+    color: #999;
 }
 
 /* 다른 사람 메시지 */
 .otherMessage {
-    text-align: left;
+    display: grid;
+    grid-template-columns: minmax(0, max-content) max-content;
+    column-gap: 6px;
+    align-items: end;
+    justify-content: start;
+    max-width: 75%;
     margin: 10px 0;
+}
+.otherMessage > div:nth-child(1) { /* 이름 */
+    grid-column: 1 / -1;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 3px;
+}
+.otherMessage > div:nth-child(2) { /* 말풍선 */
+    padding: 8px 12px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 0 12px 12px 12px;
+    word-break: break-word;
+}
+.otherMessage > div:nth-child(3) { /* 시간 */
+    font-size: 11px;
+    color: #999;
 }
 
 /* 햄버거 버튼 */
 #hamburgerbtn {
     float: right;
+    border: none;
+    background: none;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
 }
 
 /* 참여자 사이드바 */
@@ -97,6 +142,19 @@
     margin-top: 15px;
 }
 
+/* 제목 / 인원 */
+.chatHeader > span:first-child { font-weight: bold; font-size: 16px; }
+.chatHeader > span:nth-child(2) { color: #888; font-size: 13px; margin-left: 6px; }
+
+/* 검색창 */
+.searchMessage { display: flex; gap: 6px; margin-top: 10px; clear: both; }
+#searchText { flex: 1; padding: 6px 8px; border: 1px solid #ddd; border-radius: 6px; }
+.searchMessage input[type=button] { padding: 6px 10px; border: 1px solid #ddd; border-radius: 6px; background: white; cursor: pointer; }
+
+/* 메시지 입력 */
+.chatBottom { display: flex; gap: 8px; padding: 12px; box-sizing: border-box; border-top: 1px solid #ddd; }
+#message { flex: 1; height: 50px; resize: none; padding: 8px 10px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; }
+#sendbtn { width: 70px; border: none; border-radius: 8px; background: #111827; color: white; font-weight: bold; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -182,16 +240,16 @@
 				<c:choose>
 					<c:when test="${chat.memberId == loginId}">	<!-- 내 채팅 -->
 						<div class="myMessage">
-							<div>${chat.content}</div>
-							<div>${chat.createdAt}</div>
-						</div>
+							<div><c:out value="${chat.content}"/></div>
+							<div><fmt:formatDate value="${chat.createdAt}" pattern="a h:mm"/></div>
+						</div>			<!-- fmt:formatDate >> Timestamp를 원하는 모양의 문자열로 변경 a(오전/오후) h(12시간제 시) mm(분) -->
 					</c:when>
 
 					<c:otherwise>
 						<div class="otherMessage">			<!-- 다른 사람 채팅 -->
-							<div>${chat.memberId}</div>
-							<div>${chat.content}</div>
-							<div>${chat.createdAt}</div>
+							<div><c:out value="${chat.memberId}"/></div>
+							<div><c:out value="${chat.content}"/></div>
+							<div><fmt:formatDate value="${chat.createdAt}" pattern="a h:mm"/></div>
 						</div>
 					</c:otherwise>
 				</c:choose>
@@ -205,8 +263,8 @@
 	</div>
 	<script>
 	
-	$("#message").on("keydown",function(e){
-		if(e.key == "Enter"){				// 엔터키 누르면 전송버튼 클릭됨
+	$("#message").on("keydown",function(e){		//메시지 두번전송문제 해결
+		if(e.key == "Enter" && !e.shiftKey && !e.isComposing){		// 엔터키 누르면 전송버튼 클릭됨
 			e.preventDefault();				// 폼 안에 있을 경우 폼이 멋대로 제출되는 것을 방지
 			$("#sendbtn").click();
 		}
@@ -217,6 +275,7 @@
 	<script>
 	
 		/* const partyId = 1; // 임시 테스트용 (나중에 DB에서 가져옴) */
+		$("#chat").scrollTop($("#chat")[0].scrollHeight);
 		const partyId = ${partyId};
 		
 		const stompClient = new StompJs.Client({
@@ -233,27 +292,35 @@
 					
 					if(data.messageType == "ENTER") {		// 메세지타입 입장일때
 					    $("#chat").append(
-					        "<div class='enterMessage'>" + data.content + "</div>"
+					        "<div class='enterMessage'>" + esc(data.content) + "</div>"
 					    );
 					} else if(data.messageType == "LEAVE") {		// 메세지타입 퇴장일때
 						    $("#chat").append(
-						        "<div class='leaveMessage'>" + data.content + "</div>"
+						        "<div class='leaveMessage'>" + esc(data.content) + "</div>"
 						    );
 					} else if(data.memberId == "tester") {
 					    $("#chat").append(					// 내 메세지는 <when>뒤로 넣기
-					        "<div class='myMessage'>" + "<div>" + data.content + "</div>" +
-					            "<div>" + data.createdAt + "</div>" + "</div>"
+					        "<div class='myMessage'>" + "<div>" + esc(data.content) + "</div>" +
+					            "<div>" + formatTime(data.createdAt) + "</div>" + "</div>"
 					    );
 					} else {
 					    $("#chat").append(					// 다른사람 메세지는 <otherwise>뒤로 넣기 
 					        "<div class='otherMessage'>" +
-					            "<div>" + data.memberId + "</div>" + "<div>" + data.content + "</div>" +
-					            "<div>" + data.createdAt + "</div>" + "</div>"
+					            "<div>" + esc(data.memberId) + "</div>" + "<div>" + esc(data.content) + "</div>" +
+					            "<div>" + formatTime(data.createdAt) + "</div>" + "</div>"
 					    );
 					}
 					$("#chat").scrollTop($("#chat")[0].scrollHeight);	// 전체 채팅의 높이를 가져와서 스크롤위치 변경
 					
-			});			
+			});	
+				function esc(s) { return $("<div>").text(s).html(); }
+				function formatTime(t) {		// 실시간 메시지 시간표시
+				    const d = new Date(t);
+				    if (isNaN(d)) return t;		// 변환 실패시 거르기
+				    return d.toLocaleTimeString("ko-KR", { hour: "numeric", minute: "2-digit" });
+				}
+			
+			
 			// 입장 메세지
 				stompClient.publish({
 			        destination : "/app/chat",
@@ -291,7 +358,7 @@
 		// 전송 버튼 클릭
 		$("#sendbtn").on("click", function() {
 			
-			let message = ${"#message"}.val();
+			let message = $("#message").val();
 			if(message.trim() ==""){				// 텍스트칸에 공백을 지웠을때 아무것도없으면 전송안됨(not null)
 				return;
 			}
