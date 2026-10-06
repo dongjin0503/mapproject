@@ -135,15 +135,23 @@
 
 	<div class="sh-right">
 		<c:choose>
-			<c:when test="${not empty sessionScope.loginId}">
-				<a class="sh-notification" href="/notification/list" title="알림">
-					<i class="fa-solid fa-bell"></i>
-				</a>
+<c:when test="${not empty sessionScope.loginId}">
 
-				<a class="sh-avatar" href="/member/mypage" title="마이페이지"><i
-					class="fa-solid fa-circle-user"></i></a>
-				<a class="sh-btn" href="/member/logout">로그아웃</a>
-			</c:when>
+	<a class="sh-notification" href="/notification/list" title="알림">
+		<i class="fa-solid fa-bell"></i>
+	</a>
+
+	<a class="sh-avatar" href="/member/mypage" title="마이페이지">
+		<i class="fa-solid fa-circle-user"></i>
+	</a>
+
+	<a class="sh-btn" href="/member/logout">로그아웃</a>
+
+	<c:if test="${param.showAdmin == 'true' and sessionScope.loginId == 'admin'}">
+		<a class="sh-btn" href="/admin/main">관리자 페이지</a>
+	</c:if>
+
+</c:when>
 			<c:otherwise>
 				<a class="sh-btn" href="/member/login">로그인</a>
 			</c:otherwise>
