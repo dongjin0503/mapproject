@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.kedu.dto.PartyApplicationDTO;
 import com.kedu.dto.PartyDTO;
+import com.kedu.dto.SettlementDTO;
 
 @Repository
 public class PartyDAO {
@@ -168,14 +169,10 @@ public class PartyDAO {
 		if ("FCFS".equals(dto.getJoinType())) {
 			insertApplication(partyId, applicantId, answer, "APPROVED");
 			insertMember(partyId, applicantId);
-			
-			notificationDAO.insert(
-				dto.getHostId(), 
-				"PARTY_JOIN",
-				"PARTY", 
-				partyId, 
-				dto.getTitle() + " 모임에 새로운 멤버가 참여했습니다.");
-			
+
+			notificationDAO.insert(dto.getHostId(), "PARTY_JOIN", "PARTY", partyId,
+					dto.getTitle() + " 모임에 새로운 멤버가 참여했습니다.");
+
 		} else if ("APPROVAL".equals(dto.getJoinType())) {
 			insertApplication(partyId, applicantId, answer, "PENDING");
 
@@ -270,13 +267,9 @@ public class PartyDAO {
 			throw new IllegalArgumentException("이미 처리한 신청입니다.");
 		}
 		insertMember(partyId, padto.getApplicantId());
-		
-		notificationDAO.insert(
-		padto.getApplicantId(),
-		"PARTY_APPROVED",
-		"PARTY",
-		partyId,
-		dto.getTitle() + " 모임 참여 신청이 승인되었습니다.");
+
+		notificationDAO.insert(padto.getApplicantId(), "PARTY_APPROVED", "PARTY", partyId,
+				dto.getTitle() + " 모임 참여 신청이 승인되었습니다.");
 	}
 
 	@Transactional
@@ -299,12 +292,8 @@ public class PartyDAO {
 		if (count != 1) {
 			throw new IllegalArgumentException("이미 처리한 신청입니다.");
 		}
-		
-		notificationDAO.insert(
-				padto.getApplicantId(), 
-				"PARTY_REJECTED",
-				"PARTY", 
-				partyId, 
+
+		notificationDAO.insert(padto.getApplicantId(), "PARTY_REJECTED", "PARTY", partyId,
 				dto.getTitle() + " 모임 참여 신청이 거절되었습니다.");
 	}
 
@@ -314,4 +303,128 @@ public class PartyDAO {
 
 		return jdbcTemplate.query(sql, (rs, rowNum) -> rs.getString("USERNAME"), partyId);
 	}
+
+	public List<SettlementDTO> findSettlementMembers(int partyId) {
+
+		String sql = "select pm.MEMBER_ID, m.USERNAME " + "from PARTY_MEMBER pm "
+				+ "join MEMBER m on pm.MEMBER_ID = m.MEMBER_ID " + "where pm.PARTY_ID = ? "
+				+ "order by pm.JOIN_DATE, pm.PARTY_MEMBER_ID";
+
+		return jdbcTemplate.query(sql, (rs, rowNum) -> {
+
+			SettlementDTO settlementDTO = new SettlementDTO();
+
+			settlementDTO.setMemberId(rs.getString("MEMBER_ID"));
+			settlementDTO.setMemberName(rs.getString("USERNAME"));
+
+			return settlementDTO;
+		}, partyId);
+	}
+
+	@Transactional
+	public void kickMember(int partyId, String memberId, String hostId) {
+		PartyDTO dto = findById(partyId);
+
+		if (dto == null) {
+			throw new IllegalArgumentException("존재하지 않는 모임입니다.");
+		}
+
+		if (!hostId.equals(dto.getHostId())) {
+			throw new IllegalArgumentException("모임장만 멤버를 내보낼 수 있습니다.");
+		}
+
+		if (hostId.equals(memberId)) {
+			throw new IllegalArgumentException("모임장은 내보낼 수 없습니다.");
+		}
+
+		if (!isMember(partyId, memberId)) {
+			throw new IllegalArgumentException("참여 중인 멤버가 아닙니다.");
+		}
+
+		String sql = "delete from PARTY_MEMBER " + "where PARTY_ID = ? and MEMBER_ID = ?";
+
+		int result = jdbcTemplate.update(sql, partyId, memberId);
+
+		if (result != 1) {
+			throw new IllegalArgumentException("멤버 내보내기에 실패했습니다.");
+		}
+	}
+
+	public void cancelApplication(int partyId, String applicantId) {
+		String sql = "update PARTY_APPLICATION " + "set STATUS = 'CANCLED' " + "where PARTY_ID = ? "
+				+ "and APPLICANT_ID = ? " + "and STATUS = 'PENDING'";
+
+		int result = jdbcTemplate.update(sql, partyId, applicantId);
+
+		if (result != 1) {
+			throw new IllegalArgumentException("취소할 신청이 없습니다.");
+		}
+
+	}
+
+	public void leaveParty(int partyId, String memberId) {
+
+		PartyDTO party = findById(partyId);
+
+		if (party == null) {
+			throw new IllegalArgumentException("존재하지 않는 모임입니다.");
+		}
+
+		if (party.getHostId().equals(memberId)) {
+			throw new IllegalArgumentException("모임장은 모임에서 나갈 수 없습니다.");
+		}
+
+		if (!isMember(partyId, memberId)) {
+			throw new IllegalArgumentException("참여 중인 모임이 아닙니다.");
+		}
+
+		String sql = "delete from PARTY_MEMBER " + "where PARTY_ID = ? and MEMBER_ID = ?";
+
+		int result = jdbcTemplate.update(sql, partyId, memberId);
+
+		if (result != 1) {
+			throw new IllegalArgumentException("모임 나가기에 실패했습니다.");
+		}
+	}
+
+	public boolean isBookmarked(int partyId, String memberId) {
+
+		String sql = "select count(*) from BOOKMARK " + "where MEMBER_ID = ? " + "and CONTENT_TYPE = 'PARTY' "
+				+ "and CONTENT_ID = ?";
+
+		int count = jdbcTemplate.queryForObject(sql, Integer.class, memberId, partyId);
+
+		return count > 0;
+	}
+
+	public int insertBookmark(int partyId, String memberId) {
+
+		String sql = "insert into BOOKMARK " + "(BOOKMARK_ID, MEMBER_ID, CONTENT_TYPE, CONTENT_ID) "
+				+ "values (BOOKMARK_SEQ.nextval, ?, 'PARTY', ?)";
+
+		return jdbcTemplate.update(sql, memberId, partyId);
+	}
+
+	public int deleteBookmark(int partyId, String memberId) {
+
+		String sql = "delete from BOOKMARK " + "where MEMBER_ID = ? " + "and CONTENT_TYPE = 'PARTY' "
+				+ "and CONTENT_ID = ?";
+
+		return jdbcTemplate.update(sql, memberId, partyId);
+	}
+	
+	public List<Integer> findBookmarkedPartyIds(String memberId) {
+
+		String sql = "select CONTENT_ID "
+				+ "from BOOKMARK "
+				+ "where MEMBER_ID = ? "
+				+ "and CONTENT_TYPE = 'PARTY'";
+
+		return jdbcTemplate.query(
+				sql,
+				(rs, rowNum) -> rs.getInt("CONTENT_ID"),
+				memberId
+		);
+	}
+
 }

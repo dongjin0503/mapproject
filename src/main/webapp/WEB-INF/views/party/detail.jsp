@@ -104,7 +104,10 @@
 }
 
 .party-buttons {
-	text-align: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 20px;
 	margin: 30px 0;
 }
 
@@ -122,7 +125,7 @@
 	vertical-align: middle;
 }
 
-#apply-btn {
+.apply-btn {
 	width: 170px;
 	height: 45px;
 	padding: 12px 20px;
@@ -157,6 +160,10 @@
 
 		<section class="party-summary">
 			<h1>${party.title}</h1>
+
+			<C:if test="${not empty message}">
+				<p>${message}</p>
+			</C:if>
 			<p>
 				모임 날짜:
 				<fmt:formatDate value="${party.meetDate}"
@@ -176,11 +183,34 @@
 
 		<section class="party-members">
 			<h2>참여 확정 멤버</h2>
-			<C:forEach var="memberNames" items="${memberNames}">
-				<span class="member">${memberNames}</span>
+			<C:forEach var="member" items="${members}">
+
+				<div class="member">
+
+					${member.memberName}
+
+					<C:if
+						test="${sessionScope.loginId == party.hostId 
+			and member.memberId != party.hostId}">
+
+						<form action="/party/kick" method="post" style="display: inline;">
+
+							<input type="hidden" name="partyId" value="${party.partyId}">
+
+							<input type="hidden" name="memberId" value="${member.memberId}">
+
+							<button type="submit"
+								onclick="return confirm('이 멤버를 내보내시겠습니까?');">내보내기</button>
+
+						</form>
+
+					</C:if>
+
+				</div>
+
 			</C:forEach>
 
-			<C:if test="${empty memberNames}">
+			<C:if test="${empty members}">
 				<p>아직 참여 확정 멤버가 없습니다.</p>
 			</C:if>
 		</section>
@@ -211,9 +241,43 @@
 			</C:if>
 
 			<C:if test="${sessionScope.loginId != party.hostId}">
-				<button type="button" id="apply-btn"
-					onclick="location.href='/party/apply?partyId=${party.partyId}'">
-					신청하기</button>
+
+				<C:choose>
+
+					<C:when test="${hasPending}">
+
+						<form action="/party/cancelApplication" method="post">
+
+							<input type="hidden" name="partyId" value="${party.partyId}">
+
+							<button type="submit" class="apply-btn"
+								onclick="return confirm('참여 신청을 취소하시겠습니까?');">신청 취소</button>
+
+						</form>
+
+					</C:when>
+
+
+					<C:when test="${isMember}">
+						<form action="/party/leave" method="post">
+							<input type="hidden" name="partyId" value="${party.partyId}">
+
+							<button type="submit" class="apply-btn"
+								onclick="return confirm('정말로 나가시겠습니까?');">모임 나가기</button>
+						</form>
+					</C:when>
+
+
+					<C:otherwise>
+
+						<button type="button" class="apply-btn"
+							onclick="location.href='/party/apply?partyId=${party.partyId}'">
+							신청하기</button>
+
+					</C:otherwise>
+
+				</C:choose>
+
 			</C:if>
 			<button type="button" id="list-btn"
 				onclick="location.href='/party/list'">목록으로 돌아가기</button>
