@@ -20,7 +20,7 @@ public class PartyDTO {
 	private Integer maxAge;
 	private String question;
 	private Timestamp regdate;
-	
+	private String imageSysName;
 
 	public PartyDTO() {
 	}
@@ -28,7 +28,7 @@ public class PartyDTO {
 
 	public PartyDTO(int partyId, String hostId, int storeId, String address, String storeName, String title,
 			String contents, Timestamp meetDate, String joinType, int minPeople, int maxPeople, String genderRule,
-			Integer minAge, Integer maxAge, String question, Timestamp regdate) {
+			Integer minAge, Integer maxAge, String question, Timestamp regdate, String imageSysName) {
 		super();
 		this.partyId = partyId;
 		this.hostId = hostId;
@@ -46,6 +46,7 @@ public class PartyDTO {
 		this.maxAge = maxAge;
 		this.question = question;
 		this.regdate = regdate;
+		this.imageSysName = imageSysName;
 	}
 
 
@@ -206,6 +207,15 @@ public class PartyDTO {
 
 	public void setRegdate(Timestamp regdate) {
 		this.regdate = regdate;
+	}
+	
+
+	public String getImageSysName() {
+		return imageSysName;
+	}
+
+	public void setImageSysName(String imageSysName) {
+		this.imageSysName = imageSysName;
 	}
 	
 }
