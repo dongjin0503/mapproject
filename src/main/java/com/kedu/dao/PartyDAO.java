@@ -426,5 +426,57 @@ public class PartyDAO {
 				memberId
 		);
 	}
+	public int insertPartyImage(
+			int partyId,
+			String oriName,
+			String sysName) {
 
+		String sql =
+				"INSERT INTO PARTY_IMAGE "
+				+ "(IMAGE_ID, PARTY_ID, ORI_NAME, SYS_NAME) "
+				+ "VALUES (PARTY_IMAGE_SEQ.NEXTVAL, ?, ?, ?)";
+
+		return jdbcTemplate.update(
+				sql,
+				partyId,
+				oriName,
+				sysName
+		);
+	}
+	
+	public String findFirstImage(int partyId) {
+
+		String sql = "SELECT SYS_NAME "
+				+ "FROM (SELECT SYS_NAME "
+				+ "FROM PARTY_IMAGE "
+				+ "WHERE PARTY_ID = ? "
+				+ "ORDER BY IMAGE_ID) "
+				+ "WHERE ROWNUM = 1";
+
+		List<String> list = jdbcTemplate.query(
+				sql,
+				(rs, rowNum) -> rs.getString("SYS_NAME"),
+				partyId
+		);
+
+		if (list.isEmpty()) {
+			return null;
+		}
+
+		return list.get(0);
+	}
+	public List<String> findPartyImages(int partyId) {
+
+		String sql = "SELECT SYS_NAME "
+				+ "FROM PARTY_IMAGE "
+				+ "WHERE PARTY_ID = ? "
+				+ "ORDER BY IMAGE_ID";
+
+		return jdbcTemplate.query(
+				sql,
+				(rs, rowNum) -> rs.getString("SYS_NAME"),
+				partyId
+		);
+	}
+	
 }

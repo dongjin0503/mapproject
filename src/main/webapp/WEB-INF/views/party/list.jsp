@@ -84,14 +84,18 @@
 }
 
 .image {
+	width: 100%;
 	height: 180px;
-	background-color: #f4f4f4;
-	border-radius: 8px;
-	margin-bottom: 12px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	color: #999;
+	overflow: hidden;
+	border-radius: 5px;
+	background-color: #f5f5f5;
+}
+
+.image img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
 }
 
 .store {
@@ -140,7 +144,16 @@
 						</C:choose>
 					</button>
 
-					<div class="image">모임사진</div>
+					<div class="image">	<C:choose>
+		<C:when test="${not empty party.imageSysName}">
+		<img src="/uploads/${party.imageSysName}">
+		</C:when>
+
+		<C:otherwise>
+			모임사진
+		</C:otherwise>
+	</C:choose>
+</div>
 
 					<div class="store">${party.address}·${party.storeName}</div>
 
@@ -171,11 +184,31 @@
 			const card = document.createElement("div");
 			card.className = "card";
 			
+			const bookmarkBtn = document.createElement("button");
+
+			bookmarkBtn.type = "button";
+			bookmarkBtn.className = "bookmark-btn";
+			bookmarkBtn.dataset.partyId = party.partyId;
+			bookmarkBtn.textContent = "☆";
+
+			card.appendChild(bookmarkBtn);
+			
 			const image = document.createElement("div");
 			image.className = "image";
-			image.textContent = "모임사진";
+
+			if (party.imageSysName) {
+
+				const img = document.createElement("img");
+				img.src = "/uploads/" + party.imageSysName;
+
+				image.appendChild(img);
+
+			} else {
+
+				image.textContent = "모임사진";
+			}
+
 			card.appendChild(image);
-			
 			const store = document.createElement("div");
 			store.className = "store";
 			store.textContent = party.address + " · " + party.storeName;
@@ -202,7 +235,7 @@
 		}
 	});
 	
-	$(".bookmark-btn").on("click", function(e) {
+	$(document).on("click", ".bookmark-btn", function(e) {
 		e.stopPropagation();
 
 		let btn = $(this);
