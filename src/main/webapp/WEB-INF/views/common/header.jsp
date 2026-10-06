@@ -1,7 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-   pageEncoding="UTF-8"%>
+	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">   
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+	
 <style>
 .site-header {
   --line: #9ca3af;
@@ -71,42 +73,44 @@
 </style>
 
 <div class="site-header">
-  <div class="sh-left">
-    <a class="sh-logo" href="/"><img src="/images/logo.png" alt="짠내맵"></a>   <%-- ★ 이미지 로고 --%>
-    <nav class="sh-nav">
-      <a href="/map/main">지도</a>
-      <a href="/party/list">파티원모집</a>
-      <a href="#">챌린지</a>
-      <a href="#">가계부</a>
-      <a href="/FreeBoard/freeboard">자유게시판</a>
-      <a href="#">Q&amp;A게시판</a>
-    </nav>
-  </div>
+	<div class="sh-left">
+		<a class="sh-logo" href="/"><img src="/images/logo.png" alt="짠내맵"></a>
+		<%-- ★ 이미지 로고 --%>
+		<nav class="sh-nav">
+			<a href="/map/main">지도</a> <a href="/party/list">파티원모집</a> <a
+				href="#">챌린지</a> <a href="#">가계부</a> <a href="/FreeBoard/freeboard">자유게시판</a>
+			<a href="#">Q&amp;A게시판</a>
+		</nav>
+	</div>
 
-  <div class="sh-right">
-    <c:choose>
-      <c:when test="${not empty sessionScope.loginId}">
-        <a class="sh-btn" href="/notification/list">알림</a>
-        <a class="sh-btn" href="/member/logout">로그아웃</a>
-        <a class="sh-avatar" href="/member/mypage" title="마이페이지"><i class="fa-solid fa-circle-user"></i></a>
-      </c:when>
-      <c:otherwise>
-        <a class="sh-btn" href="/member/login">로그인</a>
-      </c:otherwise>
-    </c:choose>
-  </div>
+	<div class="sh-right">
+		<c:choose>
+			<c:when test="${not empty sessionScope.loginId}">
+				<a class="sh-btn" href="/notification/list">알림</a>
+				<a class="sh-btn" href="/member/logout">로그아웃</a>
+				<c:if	test="${param.showAdmin == 'true' and sessionScope.loginId == 'admin'}">
+					<a class="sh-btn" href="/admin/main">관리자 페이지</a>
+				</c:if>
+				<a class="sh-avatar" href="/member/mypage" title="마이페이지"><i
+					class="fa-solid fa-circle-user"></i></a>
+			</c:when>
+			<c:otherwise>
+				<a class="sh-btn" href="/member/login">로그인</a>
+			</c:otherwise>
+		</c:choose>
+	</div>
 </div>
 
 <script>
-// ★ 지금 주소가 메뉴 주소로 시작하면 그 메뉴에 밑줄(active)
-(function() {
-    var path = location.pathname;                       // 지금 페이지 주소 (예: /party/list)
-    var links = document.querySelectorAll(".sh-nav a");
-    for (var i = 0; i < links.length; i++) {
-        var href = links[i].getAttribute("href");       // 메뉴 주소 (예: /party)
-        if (href !== "#" && path.indexOf(href) === 0) { // 지금 주소가 메뉴 주소로 시작하면
-            links[i].classList.add("active");
-        }
-    }
-})();
+	// ★ 지금 주소가 메뉴 주소로 시작하면 그 메뉴에 밑줄(active)
+	(function() {
+		var path = location.pathname; // 지금 페이지 주소 (예: /party/list)
+		var links = document.querySelectorAll(".sh-nav a");
+		for (var i = 0; i < links.length; i++) {
+			var href = links[i].getAttribute("href"); // 메뉴 주소 (예: /party)
+			if (href !== "#" && path.indexOf(href) === 0) { // 지금 주소가 메뉴 주소로 시작하면
+				links[i].classList.add("active");
+			}
+		}
+	})();
 </script>

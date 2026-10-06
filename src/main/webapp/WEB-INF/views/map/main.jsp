@@ -72,7 +72,9 @@
 	</head>
 <body>
 
-	<jsp:include page="/WEB-INF/views/common/header.jsp" />
+	<jsp:include page="/WEB-INF/views/common/header.jsp" >
+	<jsp:param name="showAdmin" value="true" />
+	</jsp:include>
 	<div class="map-wrap">
 	<div id="map"></div>
 	<div class="filter-panel">
@@ -122,10 +124,7 @@
 		</div>
 	</div>
 	
-	<!--  지역별 -->
-	<div class ="pill-wrap">
-		<button type = "button" class = "pill" disabled> 지역별 ▾</button>
-	</div>
+	
 	</div>
 	<div class ="fp-applied">
 	<div class="fp-applied-head">

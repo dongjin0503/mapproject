@@ -82,7 +82,7 @@ public class FreeBoardDAO {
 	}
 	
 	public List<FreeBoardDTO> myContentList(String loginId){			//마이페이지 내 게시글 모아보기 리스트 & 댓글 갯수 포함
-		String sql = "select f.*, (select count(*) from reply r where r.post_id = f.post_id) as reply_count "
+		String sql = "select f.*, (select count(*) from freeboardreply r where r.post_id = f.post_id) as reply_count "
 		           + "from freeboard f where f.member_id = ? order by f.post_id desc";
 		return jdbc.query(sql, new BeanPropertyRowMapper<>(FreeBoardDTO.class), loginId);
 	}
