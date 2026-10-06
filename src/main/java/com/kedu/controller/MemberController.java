@@ -4,6 +4,8 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
@@ -13,7 +15,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.kedu.dao.BookMarkDAO;
+import com.kedu.dao.FreeBoardDAO;
 import com.kedu.dao.MemberDAO;
+import com.kedu.dto.BookMarkDTO;
+import com.kedu.dto.FreeBoardDTO;
 import com.kedu.dto.MemberDTO;
 
 @Controller
@@ -22,6 +28,7 @@ public class MemberController {
 
 	@Autowired
 	private MemberDAO dao; 
+	
 	
 	public static String getSHA512(String input) {
 	      if (input == null)
@@ -200,6 +207,65 @@ public class MemberController {
 		return "redirect:/member/mypage";
 	}
 	
+	// ------------------------------------------------------마이페이지 내 게시글, 북마크, 참여기록 모아보기
+	
+	
+	@Autowired
+	private FreeBoardDAO fdao;
+	
+	@Autowired
+	private BookMarkDAO bdao;
+	
+	
+	@ResponseBody
+	@RequestMapping("/bookmarkToggle")
+	public String toggle(HttpSession session, String contentType, int contentId) {
+	    String loginId = (String) session.getAttribute("loginId");
+	    if (loginId == null) return "login";   // 로그인 안 했으면
+	    if (bdao.existsBookmark(loginId, contentType, contentId)) {
+	        bdao.deleteBookmark(loginId, contentType, contentId);
+	        return "removed";
+	    } else {
+	        bdao.insertBookmark(loginId, contentType, contentId);
+	        return "added";
+	    }
+	}
+	
+	@RequestMapping("/myContent")
+	public String myContent(HttpSession session, Model model) throws Exception{
+		String loginId = (String)session.getAttribute("loginId");
+		List<FreeBoardDTO> myContentList= fdao.myContentList(loginId);
+		
+		model.addAttribute("myContentList",myContentList);
+		return "/member/myContent";
+		
+	}
+	
+	@RequestMapping("/bookmark")
+	public String bookmark(HttpSession session,Model model) throws Exception{
+		String loginId = (String)session.getAttribute("loginId");
+		List<BookMarkDTO> bookmarkList = bdao.bookmarkList(loginId);
+		
+		List<BookMarkDTO> storeList = new ArrayList<>();
+		List<BookMarkDTO> partyList = new ArrayList<>();
+		List<BookMarkDTO> challengeList = new ArrayList<>();
+
+		for (BookMarkDTO b : bookmarkList) {
+		    if ("STORE".equals(b.getContentType())) storeList.add(b);
+		    else if ("PARTY".equals(b.getContentType())) partyList.add(b);
+		    else if ("CHALLENGE".equals(b.getContentType())) challengeList.add(b);
+		}
+		model.addAttribute("storeList", storeList);
+		model.addAttribute("partyList", partyList);
+		model.addAttribute("challengeList", challengeList);
+		return "/member/bookmark";
+	}
+	
+	@RequestMapping("/participationHistory")
+	public String participationHistory() throws Exception{
+		
+		return "/member/participationHistory";
+	}
 	
 	
 }
