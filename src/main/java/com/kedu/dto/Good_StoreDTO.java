@@ -9,7 +9,19 @@ public class Good_StoreDTO {
 	private String address;
 	private double latitude;
 	private double longitude;
+	//null 값 허용하기 위해 Integer 사용
+	private Integer min_price;
 	
+
+
+	public Integer getMin_price() {
+		return min_price;
+	}
+
+	public void setMin_price(Integer min_price) {
+		this.min_price = min_price;
+	}
+
 	public int getStore_id() {
 		return store_id;
 	}

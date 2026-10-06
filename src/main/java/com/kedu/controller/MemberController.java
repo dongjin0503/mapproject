@@ -62,7 +62,7 @@ public class MemberController {
 		boolean result = dao.login(dto);
 		if(result) {
 			session.setAttribute("loginId", dto.getId()) ;
-		return "redirect:/";	
+		return "redirect:/map/main";	
 		} else {
 			model.addAttribute("msg","아이디 또는 비밀번호가 올바르지 않습니다.");
 			return "member/login";
@@ -74,7 +74,7 @@ public class MemberController {
 	public String logout (HttpSession session) {
 		session.invalidate();
 		
-		return "home" ;
+		return "redirect:/map/main";
 	}
 	
 	
@@ -95,7 +95,7 @@ public class MemberController {
 			dto.setId(id);
 			dao.delete(dto);
 			
-			return "redirect:/member/logout";
+			return "redirect:/map/main";
 		}
 	
 	@ResponseBody
