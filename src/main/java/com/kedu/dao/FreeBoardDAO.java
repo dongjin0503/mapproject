@@ -18,7 +18,7 @@ public class FreeBoardDAO {
 	public List<FreeBoardDTO> boardList(int start, int end, String search) {
 		String sql = "select * from ("
 	               + "select f.*, "
-	               + "(select count(*) from reply r where r.post_id = f.post_id) reply_count, "
+	               + "(select count(*) from freeboard_reply r where r.post_id = f.post_id) reply_count, "
 	               + "row_number() over(order by f.post_id desc) rn "
 	               + "from freeboard f "
 	               + "where title like ?) "
@@ -82,9 +82,13 @@ public class FreeBoardDAO {
 	}
 	
 	public List<FreeBoardDTO> myContentList(String loginId){			//마이페이지 내 게시글 모아보기 리스트 & 댓글 갯수 포함
-		String sql = "select f.*, (select count(*) from reply r where r.post_id = f.post_id) as reply_count "
+		String sql = "select f.*, (select count(*) from freeboard_reply r where r.post_id = f.post_id) as reply_count "
 		           + "from freeboard f where f.member_id = ? order by f.post_id desc";
 		return jdbc.query(sql, new BeanPropertyRowMapper<>(FreeBoardDTO.class), loginId);
+	}
+	public boolean isWriter(int postId, String memberId) {
+	    String sql = "select count(*) from freeboard where post_id=? and member_id=?";
+	    return jdbc.queryForObject(sql, Integer.class, postId, memberId) > 0;
 	}
 
 }

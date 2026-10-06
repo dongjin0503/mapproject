@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -400,7 +401,7 @@ public class PartyDAO {
 	public int insertBookmark(int partyId, String memberId) {
 
 		String sql = "insert into BOOKMARK " + "(BOOKMARK_ID, MEMBER_ID, CONTENT_TYPE, CONTENT_ID) "
-				+ "values (BOOKMARK_SEQ.nextval, ?, 'PARTY', ?)";
+				+ "values (seq_bookmark.nextval, ?, 'PARTY', ?)";
 
 		return jdbcTemplate.update(sql, memberId, partyId);
 	}
@@ -425,6 +426,11 @@ public class PartyDAO {
 				(rs, rowNum) -> rs.getInt("CONTENT_ID"),
 				memberId
 		);
+	}
+	public List<PartyDTO> findJoinedParties(String memberId) {
+	    String sql = "select p.* from PARTY p join PARTY_MEMBER pm on p.PARTY_ID = pm.PARTY_ID "
+	               + "where pm.MEMBER_ID = ? order by p.MEET_DATE desc";
+	    return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(PartyDTO.class), memberId);
 	}
 
 }

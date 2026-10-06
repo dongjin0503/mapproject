@@ -58,7 +58,7 @@ public class ChattingRoomController {
 	
 	@MessageMapping("/chat")
 	public ChattingRoomDTO chatting(ChattingRoomDTO dto) throws Exception{
-		
+		dto.setCreatedAt(new java.sql.Timestamp(System.currentTimeMillis())); //createdAt 오류날수있어서 추가함
 		dao.insert(dto);
 		
 		template.convertAndSend(				// convertAndSend(보낼목적지, 보낼 데이터);

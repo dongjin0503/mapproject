@@ -101,6 +101,21 @@ body {
 	font-weight: 700;
 	color: var(--accent);
 }
+.right { flex: 1; min-width: 0; padding: 20px; }
+.section-title {
+  font-size: 18px; font-weight: 700; color: var(--accent);
+  padding-bottom: 15px; border-bottom: 1px solid var(--line);
+}
+.content-list { margin-top: 20px; max-height: 500px; overflow-y: auto; }
+.content-list table { width: 100%; border-collapse: collapse; }
+.content-list th, .content-list td {
+  padding: 12px 8px; border-bottom: 1px solid var(--fill-strong);
+  text-align: center; font-size: 13px;
+}
+.content-list th { background: var(--fill); font-weight: 700; }
+.content-list th:nth-child(2), .content-list td:nth-child(2) { text-align: left; }
+.content-list a { color: var(--text); text-decoration: none; }
+.content-list a:hover { text-decoration: underline; }
 </style>
 
 </head>
@@ -121,6 +136,59 @@ body {
 					<a href="/member/bookmark"> 북마크 </a>
 					<a href="/member/myContent"> 내가 쓴 글 </a>
 					<a href="/member/participationHistory" class="active"> 참여 기록 </a>
+				</div>
+			</div>
+			<div class="right">
+				<div class="section-title">참여한 파티원 모집</div>
+				<div class="content-list">
+					<table>
+						<thead>
+							<tr>
+								<th>번호</th>
+								<th>제목</th>
+								<th>모임 날짜</th>
+							</tr>
+						</thead>
+						<c:choose>
+							<c:when test="${empty partyList}">
+								<tr><td colspan="3">참여한 모임이 없습니다.</td></tr>
+							</c:when>
+							<c:otherwise>
+								<c:forEach var="i" items="${partyList}">
+									<tr>
+										<td>${i.partyId}</td>
+										<td class="title"><a href="/party/detail?partyId=${i.partyId}"><c:out value="${i.title}" /></a></td>
+										<td><fmt:formatDate value="${i.meetDate}" pattern="yyyy.MM.dd HH:mm" /></td>
+									</tr>
+								</c:forEach>
+							</c:otherwise>
+						</c:choose>
+					</table>
+				</div>
+
+				<div class="section-title" style="margin-top: 30px;">참여한 챌린지</div>
+				<div class="content-list">
+					<table>
+						<thead>
+							<tr>
+								<th>번호</th>
+								<th>제목</th>
+							</tr>
+						</thead>
+						<c:choose>
+							<c:when test="${empty challengeList}">
+								<tr><td colspan="2">참여한 챌린지가 없습니다.</td></tr>
+							</c:when>
+							<c:otherwise>
+								<c:forEach var="i" items="${challengeList}">
+									<tr>
+										<td>${i.challenge_id}</td>
+										<td class="title"><a href="/challenge/detail?challenge_id=${i.challenge_id}"><c:out value="${i.title}" /></a></td>
+									</tr>
+								</c:forEach>
+							</c:otherwise>
+						</c:choose>
+					</table>
 				</div>
 			</div>
 		</div>
