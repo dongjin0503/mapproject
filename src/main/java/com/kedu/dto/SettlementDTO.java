@@ -12,7 +12,7 @@ public class SettlementDTO {
 	private int detailId;
 	private String memberId;
 	private String memberName;
-	private long Amount;
+	private long amount;
 	
 	public SettlementDTO() {}
 
@@ -26,7 +26,7 @@ public class SettlementDTO {
 		this.detailId = detailId;
 		this.memberId = memberId;
 		this.memberName = memberName;
-		Amount = amount;
+		this.amount = amount;
 	}
 
 	public int getSettlementId() {
@@ -86,13 +86,12 @@ public class SettlementDTO {
 	}
 
 	public long getAmount() {
-		return Amount;
+		return amount;
 	}
 
 	public void setAmount(long amount) {
-		Amount = amount;
+		this.amount = amount;
 	}
 	
 }
-	
-	
+

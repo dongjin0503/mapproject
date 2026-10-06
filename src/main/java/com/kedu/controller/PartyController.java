@@ -30,7 +30,7 @@ public class PartyController {
 
 	@Autowired
 	private PartyDAO partyDAO;
-	
+
 	@Autowired
 	private MemberDAO memberDAO;
 
@@ -38,9 +38,15 @@ public class PartyController {
 	private Gson gson;
 
 	@RequestMapping("/list")
-	public String list(Model model) {
+	public String list(Model model, HttpSession session) {
 		List<PartyDTO> parties = partyDAO.findAll(0);
 		model.addAttribute("parties", parties);
+		
+		String loginId = (String) session.getAttribute("loginId");
+		
+		if(loginId != null) {
+			model.addAttribute("bookmarkedPartyIds", partyDAO.findBookmarkedPartyIds(loginId));
+		}
 		return "party/list";
 	}
 
@@ -52,7 +58,7 @@ public class PartyController {
 	}
 
 	@RequestMapping("/detail")
-	public String derail(int partyId, Model model) {
+	public String derail(int partyId, HttpSession session, Model model) {
 		PartyDTO party = partyDAO.findById(partyId);
 
 		if (party == null) {
@@ -61,13 +67,23 @@ public class PartyController {
 		int memberCount = partyDAO.countMembers(partyId);
 		model.addAttribute("memberCount", memberCount);
 
-		List<String> memberNames = partyDAO.findMemberNames(partyId);
-		model.addAttribute("memberNames", memberNames);
+		model.addAttribute("members", partyDAO.findSettlementMembers(partyId));
 
 		MemberDTO host = memberDAO.selectMember(party.getHostId());
 		model.addAttribute("hostName", host.getUsername());
-	
+
+		String loginId = (String) session.getAttribute("loginId");
+
+		if (loginId != null) {
+
+			boolean isMember = partyDAO.isMember(partyId, loginId);
+			boolean hasPending = partyDAO.hasPendingApplication(partyId, loginId);
+
+			model.addAttribute("isMember", isMember);
+			model.addAttribute("hasPending", hasPending);
+		}
 		model.addAttribute("party", party);
+
 		return "party/detail";
 	}
 
@@ -81,21 +97,21 @@ public class PartyController {
 		PartyDTO party = partyDAO.findById(partyId);
 
 		String loginId = (String) session.getAttribute("loginId");
-		
+
 		if (loginId == null) {
 			return "redirect:/member/login";
 		}
-		
+
 		PartyDTO dto = partyDAO.findById(partyId);
-		
+
 		if (dto == null) {
 			return "redirect:/party/list";
 		}
-		
+
 		if (party == null) {
 			return "redirect:/party/list";
 		}
-		
+
 		model.addAttribute("party", dto);
 		return "party/apply";
 
@@ -164,37 +180,33 @@ public class PartyController {
 			if (!"Y".equals(agree)) {
 				throw new IllegalArgumentException("모임 규칙 및 노쇼 방지 안내에 동의해주세요.");
 			}
-			
+
 			PartyDTO dto = partyDAO.findById(partyId);
-			
-			if(dto == null) {
+
+			if (dto == null) {
 				return "redirect:/party/list";
 			}
-			
+
 			MemberDTO member = memberDAO.selectMember(loginId);
-			
-			if("male".equals(dto.getGenderRule())
-				&& !"남성".equals(member.getGender())) {
-					throw new IllegalArgumentException("남성만 참여할 수 있는 모임입니다.");
-				}
-			
-			if("female".equals(dto.getGenderRule())
-			&& !"여성".equals(member.getGender())) {
-			 throw new IllegalArgumentException("여성만 참여할 수 있는 모임입니다.");
+
+			if ("male".equals(dto.getGenderRule()) && !"남성".equals(member.getGender())) {
+				throw new IllegalArgumentException("남성만 참여할 수 있는 모임입니다.");
 			}
-			
-			int age = Period.between(member.getBirth_date().toLocalDate(),
-					LocalDate.now()
-					).getYears();
-				
-					if(dto.getMinAge() !=null && age < dto.getMinAge()) {
-					throw new IllegalArgumentException("최소" + dto.getMinAge() + "세부터 참여할 수 있습니다.");	
+
+			if ("female".equals(dto.getGenderRule()) && !"여성".equals(member.getGender())) {
+				throw new IllegalArgumentException("여성만 참여할 수 있는 모임입니다.");
 			}
-					
-					if(dto.getMaxAge() !=null && age > dto.getMaxAge()) {
-						throw new IllegalArgumentException("최대" + dto.getMaxAge() + "세까지 참여할 수 있습니다.");
-					}
-			
+
+			int age = Period.between(member.getBirth_date().toLocalDate(), LocalDate.now()).getYears();
+
+			if (dto.getMinAge() != null && age < dto.getMinAge()) {
+				throw new IllegalArgumentException("최소" + dto.getMinAge() + "세부터 참여할 수 있습니다.");
+			}
+
+			if (dto.getMaxAge() != null && age > dto.getMaxAge()) {
+				throw new IllegalArgumentException("최대" + dto.getMaxAge() + "세까지 참여할 수 있습니다.");
+			}
+
 			partyDAO.apply(partyId, loginId, answer);
 			return "redirect:/party/detail?partyId=" + partyId;
 
@@ -223,9 +235,9 @@ public class PartyController {
 		String loginId = (String) session.getAttribute("loginId");
 
 		if (loginId == null) {
-		    return "redirect:/member/login";
+			return "redirect:/member/login";
 		}
-		
+
 		if (!loginId.equals(dto.getHostId())) {
 			return "redirect:/party/list";
 		}
@@ -240,13 +252,12 @@ public class PartyController {
 
 	@RequestMapping(value = "/approve", method = RequestMethod.POST)
 	public String approve(@RequestParam("partyId") int partyId, @RequestParam("applicationId") int applicationId,
-			HttpSession session,
-			RedirectAttributes redirectAttributes) {
+			HttpSession session, RedirectAttributes redirectAttributes) {
 
 		String loginId = (String) session.getAttribute("loginId");
 
 		if (loginId == null) {
-		    return "redirect:/member/login";
+			return "redirect:/member/login";
 		}
 
 		try {
@@ -261,13 +272,12 @@ public class PartyController {
 
 	@RequestMapping(value = "/reject", method = RequestMethod.POST)
 	public String reject(@RequestParam("partyId") int partyId, @RequestParam("applicationId") int applicationId,
-			HttpSession session,
-			RedirectAttributes redirectAttributes) {
+			HttpSession session, RedirectAttributes redirectAttributes) {
 
 		String loginId = (String) session.getAttribute("loginId");
 
 		if (loginId == null) {
-		    return "redirect:/member/login";
+			return "redirect:/member/login";
 		}
 
 		try {
@@ -277,5 +287,85 @@ public class PartyController {
 			redirectAttributes.addFlashAttribute("message", e.getMessage());
 		}
 		return "redirect:/party/applications?partyId=" + partyId;
+	}
+
+	@RequestMapping(value = "/kick", method = RequestMethod.POST)
+	public String kick(@RequestParam("partyId") int partyId, @RequestParam("memberId") String memberId,
+			HttpSession session, RedirectAttributes redirectAttributes) {
+
+		String loginId = (String) session.getAttribute("loginId");
+
+		if (loginId == null) {
+			return "redirect:/member/login";
+		}
+
+		try {
+			partyDAO.kickMember(partyId, memberId, loginId);
+
+			redirectAttributes.addFlashAttribute("message", "멤버를 내보냈습니다.");
+		} catch (IllegalArgumentException e) {
+			redirectAttributes.addFlashAttribute("message", e.getMessage());
+		}
+		return "redirect:/party/detail?partyId=" + partyId;
+	}
+
+	@RequestMapping(value = "/cancelApplication", method = RequestMethod.POST)
+	public String cancelApplication(@RequestParam("partyId") int partyId, HttpSession session,
+			RedirectAttributes redirectAttributes) {
+
+		String loginId = (String) session.getAttribute("loginId");
+
+		if (loginId == null) {
+			return "redirect:/member/login";
+		}
+		try {
+			partyDAO.cancelApplication(partyId, loginId);
+			redirectAttributes.addFlashAttribute("message", "신청을 취소했습니다.");
+		} catch (IllegalArgumentException e) {
+			redirectAttributes.addFlashAttribute("message", e.getMessage());
+		}
+		return "redirect:/party/detail?partyId=" + partyId;
+	}
+
+	@RequestMapping(value = "/leave", method = RequestMethod.POST)
+	public String leave(@RequestParam("partyId") int partyId, HttpSession session,
+			RedirectAttributes redirectAttributes) {
+
+		String loginId = (String) session.getAttribute("loginId");
+
+		if (loginId == null) {
+			return "redirect:/member/login";
+		}
+		try {
+			partyDAO.leaveParty(partyId, loginId);
+			redirectAttributes.addFlashAttribute("message", "모임에서 나왔습니다.");
+		} catch (IllegalArgumentException e) {
+			redirectAttributes.addFlashAttribute("message", e.getMessage());
+		}
+		return "redirect:/party/detail?partyId=" + partyId;
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/bookmark", method = RequestMethod.POST)
+	public String bookmark(@RequestParam("partyId") int partyId, HttpSession session) {
+
+		String loginId = (String) session.getAttribute("loginId");
+
+		if (loginId == null) {
+			return "LOGIN";
+		}
+
+		if (partyDAO.isBookmarked(partyId, loginId)) {
+
+			partyDAO.deleteBookmark(partyId, loginId);
+
+			return "DELETE";
+
+		} else {
+
+			partyDAO.insertBookmark(partyId, loginId);
+
+			return "INSERT";
+		}
 	}
 }

@@ -44,7 +44,7 @@ public class SettlementDAO {
 	}
 
 	@Transactional
-	public void createEqual(int partyId, String hostId, long totalAmount) {
+	public int createEqual(int partyId, String hostId, long totalAmount) {
 
 		PartyDTO dto = partyDAO.findById(partyId);
 
@@ -89,6 +89,88 @@ public class SettlementDAO {
 			insertDetail(settlementId, memberId, memberAmount);
 		}
 
+		return settlementId;
 	}
 
+	@Transactional
+	public int createMenu(int partyId, String hostId, long totalAmount, List<String> memberIds,
+			List<Long> memberAmounts) {
+		PartyDTO dto = partyDAO.findById(partyId);
+
+		if (dto == null) {
+			throw new IllegalArgumentException("존재하지 않는 모임입니다.");
+		}
+
+		if (!dto.getHostId().equals(hostId)) {
+			throw new IllegalArgumentException("모임장만 정산할 수 있습니다.");
+		}
+
+		if (totalAmount <= 0) {
+			throw new IllegalArgumentException("정산 금액은 0원보다 커야 합니다.");
+		}
+
+		if (memberIds == null || memberAmounts == null || memberIds.isEmpty()) {
+			throw new IllegalArgumentException("정산할 멤버가 없습니다.");
+		}
+
+		if (memberIds.size() != memberAmounts.size()) {
+			throw new IllegalArgumentException("정산 정보가 올바르지 않습니다.");
+		}
+
+		int settlementId = getNextSettlementId();
+
+		SettlementDTO settlementDTO = new SettlementDTO();
+
+		settlementDTO.setSettlementId(settlementId);
+		settlementDTO.setPartyId(partyId);
+		settlementDTO.setSettlementType("MENU");
+		settlementDTO.setTotalAmount(totalAmount);
+
+		insert(settlementDTO);
+
+		for (int i = 0; i < memberIds.size(); i++) {
+			insertDetail(settlementId, memberIds.get(i), memberAmounts.get(i));
+		}
+		
+		return settlementId;
+	}
+
+	public SettlementDTO findSettlement(int settlementId) {
+
+		String sql = "select * from SETTLEMENT where SETTLEMENT_ID = ?";
+
+		return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
+
+			SettlementDTO dto = new SettlementDTO();
+
+			dto.setSettlementId(rs.getInt("SETTLEMENT_ID"));
+			dto.setPartyId(rs.getInt("PARTY_ID"));
+			dto.setSettlementType(rs.getString("SETTLEMENT_TYPE"));
+			dto.setTotalAmount(rs.getLong("TOTAL_AMOUNT"));
+
+			return dto;
+
+		}, settlementId);
+	}
+	
+	public List<SettlementDTO> findSettlementDetails(int settlementId) {
+
+		String sql = "select sd.MEMBER_ID, m.USERNAME, sd.AMOUNT "
+				+ "from SETTLEMENT_DETAIL sd "
+				+ "join MEMBER m on sd.MEMBER_ID = m.MEMBER_ID "
+				+ "where sd.SETTLEMENT_ID = ? "
+				+ "order by sd.DETAIL_ID";
+
+		return jdbcTemplate.query(sql, (rs, rowNum) -> {
+
+			SettlementDTO dto = new SettlementDTO();
+
+			dto.setMemberId(rs.getString("MEMBER_ID"));
+			dto.setMemberName(rs.getString("USERNAME"));
+			dto.setAmount(rs.getLong("AMOUNT"));
+
+			return dto;
+
+		}, settlementId);
+	}
 }

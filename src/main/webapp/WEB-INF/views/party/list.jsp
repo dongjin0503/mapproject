@@ -8,6 +8,7 @@
 <head>
 <meta charset="UTF-8">
 <title>파티원 찾기</title>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <style>
 * {
 	box-sizing: border-box;
@@ -53,12 +54,29 @@
 }
 
 .card {
+	position: relative;
 	height: 300px;
 	width: 350px;
 	padding: 10px;
 	border: 1px solid #ccc;
 	border-radius: 5px;
-	border: 1px solid #ccc;
+	cursor: pointer;
+}
+
+.bookmark-btn {
+	position: absolute;
+	top: 15px;
+	right: 15px;
+	width: 36px; height : 36px; border : none; background : white;
+	border-radius : 50%; font-size : 24px; cursor : pointer;
+	z-index: 10;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+	height: 36px;
+	border: none;
+	background: white;
+	border-radius: 50%;
+	font-size: 24px;
+	cursor: pointer;
 }
 
 .card:hover {
@@ -67,13 +85,13 @@
 
 .image {
 	height: 180px;
-	background-color: #eee;
-	border-radius: 5px;
+	background-color: #f4f4f4;
+	border-radius: 8px;
 	margin-bottom: 12px;
-	diplay: flex;
+	display: flex;
 	align-items: center;
 	justify-content: center;
-	color: #777;
+	color: #999;
 }
 
 .store {
@@ -98,23 +116,42 @@
 </style>
 </head>
 <body>
-<jsp:include page="/WEB-INF/views/common/header.jsp" />
+	<jsp:include page="/WEB-INF/views/common/header.jsp" />
 	<div class="container">
 		<button type="button" id="create-btn"
 			onclick="location.href='/party/create'">모임 만들기</button>
 		<div id="party-list">
 			<C:forEach var="party" items="${parties}">
-				<a href="/party/detail?partyId=${party.partyId}">
-					<div class="card">
-						<div class="image">모임사진</div>
-						<div class="store">${party.address}·${party.storeName}</div>
-						<div class="title">${party.title}</div>
-						<div class="meet-date">
-							<fmt:formatDate value="${party.meetDate}"
-								pattern="yyyy.MM.dd(E) HH:mm" />
-						</div>
+				<div class="card"
+					onclick="location.href='/party/detail?partyId=${party.partyId}'">
+
+					<button type="button" class="bookmark-btn"
+						data-party-id="${party.partyId}">
+						<C:choose>
+
+							<C:when test="${bookmarkedPartyIds.contains(party.partyId)}">
+			★
+		</C:when>
+
+							<C:otherwise>
+			☆
+		</C:otherwise>
+
+						</C:choose>
+					</button>
+
+					<div class="image">모임사진</div>
+
+					<div class="store">${party.address}·${party.storeName}</div>
+
+					<div class="title">${party.title}</div>
+
+					<div class="meet-date">
+						<fmt:formatDate value="${party.meetDate}"
+							pattern="yyyy.MM.dd(E) HH:mm" />
 					</div>
-				</a>
+
+				</div>
 			</C:forEach>
 		</div>
 	</div>
@@ -163,6 +200,37 @@
 			if(parties.length === 9) loading = false;
 			});
 		}
+	});
+	
+	$(".bookmark-btn").on("click", function(e) {
+		e.stopPropagation();
+
+		let btn = $(this);
+		let partyId = btn.data("party-id");
+
+		$.ajax({
+			url: "/party/bookmark",
+			type: "POST",
+			data: {
+				partyId: partyId
+			},
+
+			success: function(result) {
+
+				if (result === "LOGIN") {
+
+					location.href = "/member/login";
+
+				} else if (result === "INSERT") {
+
+					btn.text("★");
+
+				} else if (result === "DELETE") {
+
+					btn.text("☆");
+				}
+			}
+		});
 	});
 	</script>
 </body>
