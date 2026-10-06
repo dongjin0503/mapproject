@@ -15,7 +15,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 24px;
+  padding: 4px 24px;
   border-bottom: 1.5px solid var(--line);
   background: #fff;
   font-family: Arial, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
@@ -26,7 +26,7 @@
 
 /* ★ 로고: 이미지 */
 .sh-logo { display: block; text-decoration: none; }
-.sh-logo img { display: block; height: 40px; }
+.sh-logo img { display: block; height: 80px; }
 .sh-logo:hover { opacity: .75; }
 
 /* 메뉴 */
@@ -75,7 +75,7 @@
   <div class="sh-left">
     <a class="sh-logo" href="/"><img src="/images/logo.png" alt="짠내맵"></a>   <%-- ★ 이미지 로고 --%>
     <nav class="sh-nav">
-      <a href="#">지도</a>
+      <a href="/map/main">지도</a>
       <a href="/party/list">파티원모집</a>
       <a href="#">챌린지</a>
       <a href="#">가계부</a>
