@@ -229,9 +229,9 @@ input:not([readonly]):focus { border-color: var(--accent); }
 	<div class ="box menu"> 
 	<a href ="/member/mypage"  > 내 정보</a>
 	<a href ="/member/edit" class= "active"> 개인정보 수정 </a>
-	<a href ="#" > 북마크 </a>
-	<a href ="#" > 내가 쓴 글 </a>
-	<a href ="#" > 참여 기록 </a>
+	<a href ="/member/bookmark" > 북마크 </a>
+	<a href ="/member/myContent" > 내가 쓴 글 </a>
+	<a href ="/member/participationHistory" > 참여 기록 </a>
 	</div>
 	 </div> 
 	<div class="box right"> 

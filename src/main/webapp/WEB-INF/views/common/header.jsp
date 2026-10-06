@@ -1,7 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
    pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">   
 <style>
 .site-header {
@@ -79,7 +78,7 @@
       <a href="/party/list">파티원모집</a>
       <a href="#">챌린지</a>
       <a href="#">가계부</a>
-      <a href="#">자유게시판</a>
+      <a href="/FreeBoard/freeboard">자유게시판</a>
       <a href="#">Q&amp;A게시판</a>
     </nav>
   </div>

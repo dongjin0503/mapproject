@@ -30,14 +30,6 @@ body {
   background: #fff;
 }
 
-/* ---------- 상단 로고 바 ---------- */
-.logo-bar {
-  padding: 4px 24px;
-  border-bottom: 1.5px solid var(--line);
-}
-.logo { display: inline-block; text-decoration: none; }
-.logo img { display: block; height: 80px; }
-
 /* ---------- 전체 영역 ---------- */
 .wrap { width: 1100px; margin: 24px auto 40px; }
 .layout { display: flex; align-items: flex-start; gap: 20px; }
@@ -174,9 +166,9 @@ input[readonly] {
 	<div class ="box menu"> 
 	<a href ="/member/mypage"  class= "active"> 내 정보</a>
 	<a href ="/member/edit" > 개인정보 수정 </a>
-	<a href ="#" > 북마크 </a>
-	<a href ="#" > 내가 쓴 글 </a>
-	<a href ="#" > 참여 기록 </a>
+	<a href ="/member/bookmark" > 북마크 </a>
+	<a href ="/member/myContent" > 내가 쓴 글 </a>
+	<a href ="/member/participationHistory" > 참여 기록 </a>
 	</div>
 	 </div> 
 	<div class="box right"> 
