@@ -23,12 +23,12 @@ public class FreeBoardFileDAO {
 	}
 	
 	public List<FreeBoardFileDTO> fileList(int postId){
-		String sql = "select * from freeboard_file where post_id=?";
+		String sql = "select f.*, f.parent_post_id as post_id from freeboard_file f where f.parent_post_id=?";
 		return jdbc.query(sql,new BeanPropertyRowMapper<>(FreeBoardFileDTO.class),postId);
 	}
 	
 	public FreeBoardFileDTO selectById(int fileId) {
-	    String sql = "select * from freeboard_file where file_id=?";
+	    String sql = "select f.*, f.parent_post_id as post_id from freeboard_file f where f.file_id=?";
 	    return jdbc.queryForObject(sql, new BeanPropertyRowMapper<>(FreeBoardFileDTO.class), fileId);
 	}
 

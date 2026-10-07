@@ -38,7 +38,7 @@ public class ChattingRoomDAO {
 	}
 	
 	public List<String> selectMemberList(int partyId){
-		String sql = "select member_id from party_member where party_id=? order by party_member";
+		String sql = "select member_id from party_member where party_id=? order by join_date";
 		return jdbc.queryForList(sql, String.class, partyId);
 	}
 }

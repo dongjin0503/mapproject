@@ -213,6 +213,20 @@ loadStores();
 
 // ===== 가게 불러오기 =====
 function loadStores() {
+	// 북마크에서 넘어온 가게 열기 (/map/main?store_id=번호)
+	var openStoreId = new URLSearchParams(location.search).get("store_id");
+	if (openStoreId) {
+		$.ajax({
+			url : ctx + "/map/ajax/storeOne",
+			type : "get",
+			data : { storeId : openStoreId }
+		}).done(function(s) {
+			map.setLevel(3);
+			map.setCenter(new kakao.maps.LatLng(s.latitude, s.longitude));
+			showInfo(s, null);    // 기존 정보창 그대로 사용 (마커 없이 위치로 열기)
+		});
+	}
+	
 	var b = map.getBounds();
 	var sw = b.getSouthWest();
 	var ne = b.getNorthEast();

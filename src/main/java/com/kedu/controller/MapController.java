@@ -38,6 +38,11 @@ public class MapController {
 	public List<Store_ServiceDTO> service(int storeId) {
 		return dao.listService(storeId);
 	}
+	@ResponseBody
+	@RequestMapping("ajax/storeOne")
+	public Good_StoreDTO storeOne(int storeId) {
+	    return dao.selectOne(storeId);
+	}
 
 	@ResponseBody
 	@RequestMapping("ajax/bookmark")

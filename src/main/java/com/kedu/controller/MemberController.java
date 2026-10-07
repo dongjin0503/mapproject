@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.kedu.dao.BookMarkDAO;
 import com.kedu.dao.FreeBoardDAO;
 import com.kedu.dao.MemberDAO;
+import com.kedu.dao.PartyDAO;
 import com.kedu.dto.BookMarkDTO;
 import com.kedu.dto.FreeBoardDTO;
 import com.kedu.dto.MemberDTO;
@@ -216,6 +217,11 @@ public class MemberController {
 	@Autowired
 	private BookMarkDAO bdao;
 	
+	@Autowired
+	private PartyDAO pdao;
+	
+//	@Autowired
+//	private ChallengeDAO cdao;
 	
 	@ResponseBody
 	@RequestMapping("/bookmarkToggle")
@@ -262,9 +268,14 @@ public class MemberController {
 	}
 	
 	@RequestMapping("/participationHistory")
-	public String participationHistory() throws Exception{
-		
-		return "/member/participationHistory";
+	public String participationHistory(HttpSession session, Model model) throws Exception {
+	    String loginId = (String) session.getAttribute("loginId");
+	    if (loginId == null) return "redirect:/member/login";
+	    
+//	    model.addAttribute("challengeList",cdao.challengeList);
+	    model.addAttribute("member", dao.selectMember(loginId));
+	    model.addAttribute("partyList", pdao.findJoinedParties(loginId));
+	    return "/member/participationHistory";
 	}
 	
 	

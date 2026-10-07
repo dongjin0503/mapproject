@@ -1,7 +1,6 @@
 package com.kedu.controller;
 
 import java.io.File;
-import java.util.List;
 import java.util.UUID;
 
 import javax.servlet.http.HttpSession;
@@ -18,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.kedu.dao.FreeBoardDAO;
 import com.kedu.dao.FreeBoardFileDAO;
 import com.kedu.dao.FreeBoardLikeDAO;
-import com.kedu.dao.ReplyDAO;
+import com.kedu.dao.FreeBoardReplyDAO;
 import com.kedu.dto.FreeBoardDTO;
 import com.kedu.dto.FreeBoardFileDTO;
 
@@ -30,7 +29,7 @@ public class FreeboardController {
 	private FreeBoardDAO dao;
 
 	@Autowired
-	private ReplyDAO rdao;
+	private FreeBoardReplyDAO rdao;
 
 	@Autowired
 	private FreeBoardLikeDAO ldao;
@@ -119,8 +118,13 @@ public class FreeboardController {
 	}
 
 	@RequestMapping("/updateContent")
-	public String updateContent(FreeBoardDTO dto, Model model, @RequestParam(defaultValue = "1") int cpage,
+	public String updateContent(HttpSession session,FreeBoardDTO dto, Model model, @RequestParam(defaultValue = "1") int cpage,
 			MultipartFile[] files, @RequestParam(required = false) int[] deleteFileId) throws Exception {
+		String loginId = (String) session.getAttribute("loginId");
+	    if (loginId == null || !dao.isWriter(dto.getPostId(), loginId)) {
+	        return "redirect:/FreeBoard/detail?postId=" + dto.getPostId() + "&cpage=" + cpage;
+	    }
+		
 		dao.updateContent(dto);
 
 		// 삭제 체크한 파일 (다른 글의 파일은 못 지우게 postId 확인)
@@ -149,24 +153,32 @@ public class FreeboardController {
 	}
 
 	@RequestMapping(value = "/deleteContent", method = RequestMethod.POST)
-	public String deleteContent(int postId, @RequestParam(defaultValue = "1") int cpage) throws Exception {
+	public String deleteContent(HttpSession session, int postId, @RequestParam(defaultValue = "1") int cpage) throws Exception {
+		
+		
+		String loginId = (String) session.getAttribute("loginId");
+	    if (loginId == null || !dao.isWriter(postId, loginId)) {
+	        return "redirect:/FreeBoard/detail?postId=" + postId + "&cpage=" + cpage;
+	    }
+		
 		
 		for (FreeBoardFileDTO f : fdao.fileList(postId)) {
 		    new File("d:/uploads/" + f.getSysname()).delete();   // 실제 파일 삭제
 		    fdao.delete(f.getFileId());                          // DB 정보 삭제
 		}
-		rdao.deleteByPostId(postId);
-		dao.deleteContent(postId);
+		rdao.deleteByPostId(postId);								// 댓글 삭제
+		ldao.deleteLike(postId);									// 추천 삭제
+		dao.deleteContent(postId);									// 게시물 삭제
 
 		return "redirect:/FreeBoard/freeboard?cpage=" + cpage;
 	}
 
 	@ResponseBody
-	@RequestMapping(value = "/likecount", produces = "text/plain; charset=UTF-8")
+	@RequestMapping(value = "/likecount", produces = "text/plain; charset=UTF-8")	//좋아요 눌렀을때 406같은 에러뜨면 produces부분 삭제
 	public int likecount(int postId, HttpSession session) throws Exception {
 		String memberId = (String) session.getAttribute("loginId");
 		if (memberId == null) {
-		    return 0;
+		    return -1;
 		}
 
 		boolean likeCheckResult = ldao.likeCheck(postId, memberId);
