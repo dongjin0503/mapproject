@@ -84,18 +84,18 @@
 }
 
 .image {
-   width: 100%;
-   height: 180px;
-   overflow: hidden;
-   border-radius: 5px;
-   background-color: #f5f5f5;
+	width: 100%;
+	aspect-ratio: 16 / 9;
+	overflow: hidden;
+	border-radius: 5px;
+	background-color: #f5f5f5;
 }
 
 .image img {
-   width: 100%;
-   height: 100%;
-   object-fit: cover;
-   display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
 }
 
 .store {
