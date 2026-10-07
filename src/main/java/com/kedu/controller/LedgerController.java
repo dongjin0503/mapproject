@@ -1,7 +1,5 @@
 package com.kedu.controller;
 
-import java.time.LocalDate;
-
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,123 +16,123 @@ import com.kedu.dto.LedgerDTO;
 @RequestMapping("/ledger")
 public class LedgerController {
 
-	@Autowired
-	private LedgerDAO ledgerDAO;
+   @Autowired
+   private LedgerDAO ledgerDAO;
 
 
-	// ∞°∞Ë∫Œ ∏Ò∑œ
-	@RequestMapping("/list")
-	public String list(HttpSession session, Model model) {
+   // Í∞ÄÍ≥ÑÎ∂Ä Î™©Î°ù
+   @RequestMapping("/list")
+   public String list(HttpSession session, Model model) {
 
-		String loginId = (String) session.getAttribute("loginId");
+      String loginId = (String) session.getAttribute("loginId");
 
-		if (loginId == null) {
-			return "redirect:/member/login";
-		}
+      if (loginId == null) {
+         return "redirect:/member/login";
+      }
 
-		model.addAttribute(
-				"ledgers",
-				ledgerDAO.findAll(loginId)
-		);
+      model.addAttribute(
+            "ledgers",
+            ledgerDAO.findAll(loginId)
+      );
 
-		return "ledger/list";
-	}
-
-
-	// µÓ∑œ »≠∏È
-	@RequestMapping("/write")
-	public String write(HttpSession session) {
-
-		String loginId = (String) session.getAttribute("loginId");
-
-		if (loginId == null) {
-			return "redirect:/member/login";
-		}
-
-		return "ledger/write";
-	}
+      return "ledger/list";
+   }
 
 
-	// µÓ∑œ
-	@RequestMapping(value = "/insert", method = RequestMethod.POST)
-	public String insert(
-			LedgerDTO dto,
-			HttpSession session) {
+   // Îì±Î°ù ÌôîÎ©¥
+   @RequestMapping("/write")
+   public String write(HttpSession session) {
 
-		String loginId = (String) session.getAttribute("loginId");
+      String loginId = (String) session.getAttribute("loginId");
 
-		if (loginId == null) {
-			return "redirect:/member/login";
-		}
+      if (loginId == null) {
+         return "redirect:/member/login";
+      }
 
-		dto.setMemberId(loginId);
-
-		ledgerDAO.insert(dto);
-
-		return "redirect:/ledger/list";
-	}
+      return "ledger/write";
+   }
 
 
-	// ºˆ¡§ »≠∏È
-	@RequestMapping("/edit")
-	public String edit(
-			@RequestParam("ledgerId") int ledgerId,
-			HttpSession session,
-			Model model) {
+   // Îì±Î°ù
+   @RequestMapping(value = "/insert", method = RequestMethod.POST)
+   public String insert(
+         LedgerDTO dto,
+         HttpSession session) {
 
-		String loginId = (String) session.getAttribute("loginId");
+      String loginId = (String) session.getAttribute("loginId");
 
-		if (loginId == null) {
-			return "redirect:/member/login";
-		}
+      if (loginId == null) {
+         return "redirect:/member/login";
+      }
 
-		LedgerDTO ledger =
-				ledgerDAO.findById(ledgerId, loginId);
+      dto.setMemberId(loginId);
 
-		if (ledger == null) {
-			return "redirect:/ledger/list";
-		}
+      ledgerDAO.insert(dto);
 
-		model.addAttribute("ledger", ledger);
-
-		return "ledger/edit";
-	}
+      return "redirect:/ledger/list";
+   }
 
 
-	// ºˆ¡§
-	@RequestMapping(value = "/update", method = RequestMethod.POST)
-	public String update(
-			LedgerDTO dto,
-			HttpSession session) {
+   // ÏàòÏ†ï ÌôîÎ©¥
+   @RequestMapping("/edit")
+   public String edit(
+         @RequestParam("ledgerId") int ledgerId,
+         HttpSession session,
+         Model model) {
 
-		String loginId = (String) session.getAttribute("loginId");
+      String loginId = (String) session.getAttribute("loginId");
 
-		if (loginId == null) {
-			return "redirect:/member/login";
-		}
+      if (loginId == null) {
+         return "redirect:/member/login";
+      }
 
-		dto.setMemberId(loginId);
+      LedgerDTO ledger =
+            ledgerDAO.findById(ledgerId, loginId);
 
-		ledgerDAO.update(dto);
+      if (ledger == null) {
+         return "redirect:/ledger/list";
+      }
 
-		return "redirect:/ledger/list";
-	}
+      model.addAttribute("ledger", ledger);
+
+      return "ledger/edit";
+   }
 
 
-	// ªË¡¶
-	@RequestMapping(value = "/delete", method = RequestMethod.POST)
-	public String delete(
-			@RequestParam("ledgerId") int ledgerId,
-			HttpSession session) {
+   // ÏàòÏ†ï
+   @RequestMapping(value = "/update", method = RequestMethod.POST)
+   public String update(
+         LedgerDTO dto,
+         HttpSession session) {
 
-		String loginId = (String) session.getAttribute("loginId");
+      String loginId = (String) session.getAttribute("loginId");
 
-		if (loginId == null) {
-			return "redirect:/member/login";
-		}
+      if (loginId == null) {
+         return "redirect:/member/login";
+      }
 
-		ledgerDAO.delete(ledgerId, loginId);
+      dto.setMemberId(loginId);
 
-		return "redirect:/ledger/list";
-	}
+      ledgerDAO.update(dto);
+
+      return "redirect:/ledger/list";
+   }
+
+
+   // ÏÇ≠Ï†ú
+   @RequestMapping(value = "/delete", method = RequestMethod.POST)
+   public String delete(
+         @RequestParam("ledgerId") int ledgerId,
+         HttpSession session) {
+
+      String loginId = (String) session.getAttribute("loginId");
+
+      if (loginId == null) {
+         return "redirect:/member/login";
+      }
+
+      ledgerDAO.delete(ledgerId, loginId);
+
+      return "redirect:/ledger/list";
+   }
 }

@@ -92,4 +92,4 @@ public class FreeBoardDAO {
 	    return jdbc.queryForObject(sql, Integer.class, postId, memberId) > 0;
 	}
 
-}
+}//
