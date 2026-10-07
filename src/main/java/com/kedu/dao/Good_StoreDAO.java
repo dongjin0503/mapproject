@@ -68,13 +68,17 @@ public class Good_StoreDAO {
 	}
 	
 	public int addBookmark(String memberId , int storeId) {
-		String sql = "insert into bookmark(bookmark_id, member_id, content_type, content_id) values(bookmark_seq.nextval ,? ,'STORE' ,?) ";
-		return  jdbc.update(sql , memberId, storeId);
-				
+		String sql = "insert into bookmark(bookmark_id, member_id, content_type, content_id) values(seq_bookmark.nextval ,? ,'STORE' ,?) ";
+		return  jdbc.update(sql , memberId, storeId);			
 	}
 	
 	public int removeBookmark(String memberId, int storeId) {
 		String sql = "delete from bookmark where member_id = ? and content_type = 'STORE' and content_id = ?";
 		return jdbc.update(sql, memberId, storeId);
+	}
+	
+	public Good_StoreDTO selectOne(int storeId) {
+		String sql = "select * from good_store where store_id=?";
+		return jdbc.queryForObject(sql, new BeanPropertyRowMapper<>(Good_StoreDTO.class),storeId);
 	}
 }

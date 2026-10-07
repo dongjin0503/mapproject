@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +25,7 @@ public class PartyDAO {
 	public List<PartyDTO> findAll(int offset) {
 		String sql = "SELECT * FROM ( " + "  SELECT t.*, ROWNUM rn FROM ( "
 				+ "    SELECT p.PARTY_ID, p.STORE_ID, p.TITLE, p.MEET_DATE, s.STORE_NAME, "
-				+ "           REGEXP_SUBSTR(s.ADDRESS, '^[^ ]+½Ã [^ ]+±¸') AS address " + "    FROM PARTY p "
+				+ "           REGEXP_SUBSTR(s.ADDRESS, '^[^ ]+ì‹œ [^ ]+êµ¬') AS address " + "    FROM PARTY p "
 				+ "    LEFT JOIN GOOD_STORE s ON p.STORE_ID = s.STORE_ID " + "    ORDER BY p.PARTY_ID DESC "
 				+ "  ) t WHERE ROWNUM <= ? " + ") WHERE rn > ?";
 
@@ -149,21 +150,21 @@ public class PartyDAO {
 		List<Integer> ids = jdbcTemplate.query(sql, (rs, rowNum) -> rs.getInt("PARTY_ID"), partyId);
 
 		if (ids.isEmpty()) {
-			throw new IllegalArgumentException("Á¸ÀçÇÏÁö ¾Ê´Â ¸ğÀÓÀÔ´Ï´Ù.");
+			throw new IllegalArgumentException("ì¡´ì¬í•˜ì§€ ì•ŠëŠ” ëª¨ì„ì…ë‹ˆë‹¤.");
 		}
 
 		PartyDTO dto = findById(partyId);
 
 		if (!dto.getMeetDate().toLocalDateTime().isAfter(LocalDateTime.now())) {
-			throw new IllegalArgumentException("ÀÌ¹Ì ½ÃÀÛÇß°Å³ª Áö³­ ¸ğÀÓ¿¡´Â ½ÅÃ»ÇÒ ¼ö ¾ø½À´Ï´Ù.");
+			throw new IllegalArgumentException("ì´ë¯¸ ì‹œì‘í–ˆê±°ë‚˜ ì§€ë‚œ ëª¨ì„ì—ëŠ” ì‹ ì²­í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
 		}
 
 		if (isMember(partyId, applicantId) || hasPendingApplication(partyId, applicantId)) {
-			throw new IllegalArgumentException("ÀÌ¹Ì Âü¿©Çß°Å³ª ½ÅÃ» ´ë±â ÁßÀÎ ¸ğÀÓÀÔ´Ï´Ù.");
+			throw new IllegalArgumentException("ì´ë¯¸ ì°¸ì—¬í–ˆê±°ë‚˜ ì‹ ì²­ ëŒ€ê¸° ì¤‘ì¸ ëª¨ì„ì…ë‹ˆë‹¤.");
 		}
 
 		if (countMembers(partyId) >= dto.getMaxPeople()) {
-			throw new IllegalArgumentException("¸ğÁı ÀÎ¿øÀÌ ¸¶°¨µÇ¾ú½À´Ï´Ù.");
+			throw new IllegalArgumentException("ëª¨ì§‘ ì¸ì›ì´ ë§ˆê°ë˜ì—ˆìŠµë‹ˆë‹¤.");
 		}
 
 		if ("FCFS".equals(dto.getJoinType())) {
@@ -171,15 +172,15 @@ public class PartyDAO {
 			insertMember(partyId, applicantId);
 
 			notificationDAO.insert(dto.getHostId(), "PARTY_JOIN", "PARTY", partyId,
-					dto.getTitle() + " ¸ğÀÓ¿¡ »õ·Î¿î ¸â¹ö°¡ Âü¿©Çß½À´Ï´Ù.");
+					dto.getTitle() + " ëª¨ì„ì— ìƒˆë¡œìš´ ë©¤ë²„ê°€ ì°¸ì—¬í–ˆìŠµë‹ˆë‹¤.");
 
 		} else if ("APPROVAL".equals(dto.getJoinType())) {
 			insertApplication(partyId, applicantId, answer, "PENDING");
 
 			notificationDAO.insert(dto.getHostId(), "PARTY_APPLICATION", "PARTY", partyId,
-					dto.getTitle() + " ¸ğÀÓ¿¡ »õ·Î¿î Âü¿© ½ÅÃ»ÀÌ ÀÖ½À´Ï´Ù.");
+					dto.getTitle() + " ëª¨ì„ì— ìƒˆë¡œìš´ ì°¸ì—¬ ì‹ ì²­ì´ ìˆìŠµë‹ˆë‹¤.");
 		} else {
-			throw new IllegalArgumentException("Âü¿© ¹æ½ÄÀÌ ¿Ã¹Ù¸£Áö ¾Ê½À´Ï´Ù.");
+			throw new IllegalArgumentException("ì°¸ì—¬ ë°©ì‹ì´ ì˜¬ë°”ë¥´ì§€ ì•ŠìŠµë‹ˆë‹¤.");
 		}
 
 	}
@@ -232,7 +233,7 @@ public class PartyDAO {
 		List<Integer> ids = jdbcTemplate.query(sql, (rs, rowNum) -> rs.getInt("PARTY_ID"), partyId);
 
 		if (ids.isEmpty()) {
-			throw new IllegalArgumentException("Á¸ÀçÇÏÁö ¾Ê´Â ¸ğÀÓÀÔ´Ï´Ù.");
+			throw new IllegalArgumentException("ì¡´ì¬í•˜ì§€ ì•ŠëŠ” ëª¨ì„ì…ë‹ˆë‹¤.");
 		}
 	}
 
@@ -244,32 +245,32 @@ public class PartyDAO {
 		PartyApplicationDTO padto = findApplicationById(applicationId);
 
 		if (!hostId.equals(dto.getHostId())) {
-			throw new IllegalArgumentException("¸ğÀÓÀå¸¸ ½ÂÀÎÇÒ ¼ö ÀÖ½À´Ï´Ù.");
+			throw new IllegalArgumentException("ëª¨ì„ì¥ë§Œ ìŠ¹ì¸í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤.");
 		}
 		if (padto == null || padto.getPartyId() != partyId) {
-			throw new IllegalArgumentException("ÇØ´ç ¸ğÀÓÀÇ ½ÅÃ»ÀÌ ¾Æ´Õ´Ï´Ù.");
+			throw new IllegalArgumentException("í•´ë‹¹ ëª¨ì„ì˜ ì‹ ì²­ì´ ì•„ë‹™ë‹ˆë‹¤.");
 		}
 
 		if (!"PENDING".equals(padto.getStatus())) {
-			throw new IllegalArgumentException("ÀÌ¹Ì Ã³¸®ÇÑ ½ÅÃ»ÀÔ´Ï´Ù.");
+			throw new IllegalArgumentException("ì´ë¯¸ ì²˜ë¦¬í•œ ì‹ ì²­ì…ë‹ˆë‹¤.");
 		}
 		if (countMembers(partyId) >= dto.getMaxPeople()) {
-			throw new IllegalArgumentException("¸ğÁı ÀÎ¿øÀÌ ¸¶°¨µÇ¾ú½À´Ï´Ù.");
+			throw new IllegalArgumentException("ëª¨ì§‘ ì¸ì›ì´ ë§ˆê°ë˜ì—ˆìŠµë‹ˆë‹¤.");
 		}
 
 		if (isMember(partyId, padto.getApplicantId())) {
-			throw new IllegalArgumentException("ÀÌ¹Ì Âü¿© ÁßÀÎ È¸¿øÀÔ´Ï´Ù.");
+			throw new IllegalArgumentException("ì´ë¯¸ ì°¸ì—¬ ì¤‘ì¸ íšŒì›ì…ë‹ˆë‹¤.");
 		}
 
 		int count = updateApplicationStatus(applicationId, "APPROVED");
 
 		if (count != 1) {
-			throw new IllegalArgumentException("ÀÌ¹Ì Ã³¸®ÇÑ ½ÅÃ»ÀÔ´Ï´Ù.");
+			throw new IllegalArgumentException("ì´ë¯¸ ì²˜ë¦¬í•œ ì‹ ì²­ì…ë‹ˆë‹¤.");
 		}
 		insertMember(partyId, padto.getApplicantId());
 
 		notificationDAO.insert(padto.getApplicantId(), "PARTY_APPROVED", "PARTY", partyId,
-				dto.getTitle() + " ¸ğÀÓ Âü¿© ½ÅÃ»ÀÌ ½ÂÀÎµÇ¾ú½À´Ï´Ù.");
+				dto.getTitle() + " ëª¨ì„ ì°¸ì—¬ ì‹ ì²­ì´ ìŠ¹ì¸ë˜ì—ˆìŠµë‹ˆë‹¤.");
 	}
 
 	@Transactional
@@ -280,21 +281,21 @@ public class PartyDAO {
 		PartyApplicationDTO padto = findApplicationById(applicationId);
 
 		if (!hostId.equals(dto.getHostId())) {
-			throw new IllegalArgumentException("ÇØ´ç ¸ğÀÓÀÇ ½ÅÃ»ÀÌ ¾Æ´Õ´Ï´Ù.");
+			throw new IllegalArgumentException("í•´ë‹¹ ëª¨ì„ì˜ ì‹ ì²­ì´ ì•„ë‹™ë‹ˆë‹¤.");
 		}
 
 		if (padto == null || padto.getPartyId() != partyId) {
-			throw new IllegalArgumentException("ÇØ´Ù ¸ğÀÓÀÇ ½ÅÃ»ÀÌ ¾Æ´Õ´Ï´Ù.");
+			throw new IllegalArgumentException("í•´ë‹¤ ëª¨ì„ì˜ ì‹ ì²­ì´ ì•„ë‹™ë‹ˆë‹¤.");
 		}
 
 		int count = updateApplicationStatus(applicationId, "REJECTED");
 
 		if (count != 1) {
-			throw new IllegalArgumentException("ÀÌ¹Ì Ã³¸®ÇÑ ½ÅÃ»ÀÔ´Ï´Ù.");
+			throw new IllegalArgumentException("ì´ë¯¸ ì²˜ë¦¬í•œ ì‹ ì²­ì…ë‹ˆë‹¤.");
 		}
 
 		notificationDAO.insert(padto.getApplicantId(), "PARTY_REJECTED", "PARTY", partyId,
-				dto.getTitle() + " ¸ğÀÓ Âü¿© ½ÅÃ»ÀÌ °ÅÀıµÇ¾ú½À´Ï´Ù.");
+				dto.getTitle() + " ëª¨ì„ ì°¸ì—¬ ì‹ ì²­ì´ ê±°ì ˆë˜ì—ˆìŠµë‹ˆë‹¤.");
 	}
 
 	public List<String> findMemberNames(int partyId) {
@@ -326,19 +327,19 @@ public class PartyDAO {
 		PartyDTO dto = findById(partyId);
 
 		if (dto == null) {
-			throw new IllegalArgumentException("Á¸ÀçÇÏÁö ¾Ê´Â ¸ğÀÓÀÔ´Ï´Ù.");
+			throw new IllegalArgumentException("ì¡´ì¬í•˜ì§€ ì•ŠëŠ” ëª¨ì„ì…ë‹ˆë‹¤.");
 		}
 
 		if (!hostId.equals(dto.getHostId())) {
-			throw new IllegalArgumentException("¸ğÀÓÀå¸¸ ¸â¹ö¸¦ ³»º¸³¾ ¼ö ÀÖ½À´Ï´Ù.");
+			throw new IllegalArgumentException("ëª¨ì„ì¥ë§Œ ë©¤ë²„ë¥¼ ë‚´ë³´ë‚¼ ìˆ˜ ìˆìŠµë‹ˆë‹¤.");
 		}
 
 		if (hostId.equals(memberId)) {
-			throw new IllegalArgumentException("¸ğÀÓÀåÀº ³»º¸³¾ ¼ö ¾ø½À´Ï´Ù.");
+			throw new IllegalArgumentException("ëª¨ì„ì¥ì€ ë‚´ë³´ë‚¼ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
 		}
 
 		if (!isMember(partyId, memberId)) {
-			throw new IllegalArgumentException("Âü¿© ÁßÀÎ ¸â¹ö°¡ ¾Æ´Õ´Ï´Ù.");
+			throw new IllegalArgumentException("ì°¸ì—¬ ì¤‘ì¸ ë©¤ë²„ê°€ ì•„ë‹™ë‹ˆë‹¤.");
 		}
 
 		String sql = "delete from PARTY_MEMBER " + "where PARTY_ID = ? and MEMBER_ID = ?";
@@ -346,7 +347,7 @@ public class PartyDAO {
 		int result = jdbcTemplate.update(sql, partyId, memberId);
 
 		if (result != 1) {
-			throw new IllegalArgumentException("¸â¹ö ³»º¸³»±â¿¡ ½ÇÆĞÇß½À´Ï´Ù.");
+			throw new IllegalArgumentException("ë©¤ë²„ ë‚´ë³´ë‚´ê¸°ì— ì‹¤íŒ¨í–ˆìŠµë‹ˆë‹¤.");
 		}
 	}
 
@@ -357,7 +358,7 @@ public class PartyDAO {
 		int result = jdbcTemplate.update(sql, partyId, applicantId);
 
 		if (result != 1) {
-			throw new IllegalArgumentException("Ãë¼ÒÇÒ ½ÅÃ»ÀÌ ¾ø½À´Ï´Ù.");
+			throw new IllegalArgumentException("ì·¨ì†Œí•  ì‹ ì²­ì´ ì—†ìŠµë‹ˆë‹¤.");
 		}
 
 	}
@@ -367,15 +368,15 @@ public class PartyDAO {
 		PartyDTO party = findById(partyId);
 
 		if (party == null) {
-			throw new IllegalArgumentException("Á¸ÀçÇÏÁö ¾Ê´Â ¸ğÀÓÀÔ´Ï´Ù.");
+			throw new IllegalArgumentException("ì¡´ì¬í•˜ì§€ ì•ŠëŠ” ëª¨ì„ì…ë‹ˆë‹¤.");
 		}
 
 		if (party.getHostId().equals(memberId)) {
-			throw new IllegalArgumentException("¸ğÀÓÀåÀº ¸ğÀÓ¿¡¼­ ³ª°¥ ¼ö ¾ø½À´Ï´Ù.");
+			throw new IllegalArgumentException("ëª¨ì„ì¥ì€ ëª¨ì„ì—ì„œ ë‚˜ê°ˆ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
 		}
 
 		if (!isMember(partyId, memberId)) {
-			throw new IllegalArgumentException("Âü¿© ÁßÀÎ ¸ğÀÓÀÌ ¾Æ´Õ´Ï´Ù.");
+			throw new IllegalArgumentException("ì°¸ì—¬ ì¤‘ì¸ ëª¨ì„ì´ ì•„ë‹™ë‹ˆë‹¤.");
 		}
 
 		String sql = "delete from PARTY_MEMBER " + "where PARTY_ID = ? and MEMBER_ID = ?";
@@ -383,7 +384,7 @@ public class PartyDAO {
 		int result = jdbcTemplate.update(sql, partyId, memberId);
 
 		if (result != 1) {
-			throw new IllegalArgumentException("¸ğÀÓ ³ª°¡±â¿¡ ½ÇÆĞÇß½À´Ï´Ù.");
+			throw new IllegalArgumentException("ëª¨ì„ ë‚˜ê°€ê¸°ì— ì‹¤íŒ¨í–ˆìŠµë‹ˆë‹¤.");
 		}
 	}
 
@@ -400,7 +401,7 @@ public class PartyDAO {
 	public int insertBookmark(int partyId, String memberId) {
 
 		String sql = "insert into BOOKMARK " + "(BOOKMARK_ID, MEMBER_ID, CONTENT_TYPE, CONTENT_ID) "
-				+ "values (BOOKMARK_SEQ.nextval, ?, 'PARTY', ?)";
+				+ "values (seq_bookmark.nextval, ?, 'PARTY', ?)";
 
 		return jdbcTemplate.update(sql, memberId, partyId);
 	}
@@ -426,57 +427,3 @@ public class PartyDAO {
 				memberId
 		);
 	}
-	public int insertPartyImage(
-			int partyId,
-			String oriName,
-			String sysName) {
-
-		String sql =
-				"INSERT INTO PARTY_IMAGE "
-				+ "(IMAGE_ID, PARTY_ID, ORI_NAME, SYS_NAME) "
-				+ "VALUES (PARTY_IMAGE_SEQ.NEXTVAL, ?, ?, ?)";
-
-		return jdbcTemplate.update(
-				sql,
-				partyId,
-				oriName,
-				sysName
-		);
-	}
-	
-	public String findFirstImage(int partyId) {
-
-		String sql = "SELECT SYS_NAME "
-				+ "FROM (SELECT SYS_NAME "
-				+ "FROM PARTY_IMAGE "
-				+ "WHERE PARTY_ID = ? "
-				+ "ORDER BY IMAGE_ID) "
-				+ "WHERE ROWNUM = 1";
-
-		List<String> list = jdbcTemplate.query(
-				sql,
-				(rs, rowNum) -> rs.getString("SYS_NAME"),
-				partyId
-		);
-
-		if (list.isEmpty()) {
-			return null;
-		}
-
-		return list.get(0);
-	}
-	public List<String> findPartyImages(int partyId) {
-
-		String sql = "SELECT SYS_NAME "
-				+ "FROM PARTY_IMAGE "
-				+ "WHERE PARTY_ID = ? "
-				+ "ORDER BY IMAGE_ID";
-
-		return jdbcTemplate.query(
-				sql,
-				(rs, rowNum) -> rs.getString("SYS_NAME"),
-				partyId
-		);
-	}
-	
-}

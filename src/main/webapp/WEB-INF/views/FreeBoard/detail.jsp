@@ -398,6 +398,10 @@ hr {
 							postId : "${post.postId}"
 						}
 					}).done(function(resp) {
+						if (resp == -1) {
+					        alert("로그인 후 이용해주세요.");
+					        return;
+					    }
 						$("#p1").html(resp);
 					});
 				});

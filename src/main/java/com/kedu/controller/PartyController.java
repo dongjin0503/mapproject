@@ -101,7 +101,7 @@ public class PartyController {
 
 			boolean isMember = partyDAO.isMember(partyId, loginId);
 			boolean hasPending = partyDAO.hasPendingApplication(partyId, loginId);
-
+			model.addAttribute("bookmarked", partyDAO.isBookmarked(partyId, loginId));
 			model.addAttribute("isMember", isMember);
 			model.addAttribute("hasPending", hasPending);
 		}

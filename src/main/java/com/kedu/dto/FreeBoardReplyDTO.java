@@ -2,9 +2,8 @@ package com.kedu.dto;
 
 import java.sql.Timestamp;
 
-public class ReplyDTO {
+public class FreeBoardReplyDTO {
 
-	
 	private int replyId;
 	private int postId;
 	private String memberId;
@@ -15,8 +14,8 @@ public class ReplyDTO {
 	
 	private int replyCount;
 	
-	public ReplyDTO() {};
-	public ReplyDTO(int replyId, int postId, String memberId, int parentReplyId, String content, int likeCount,
+	public FreeBoardReplyDTO() {};
+	public FreeBoardReplyDTO(int replyId, int postId, String memberId, int parentReplyId, String content, int likeCount,
 			Timestamp createdAt) {
 		super();
 		this.replyId = replyId;
@@ -76,8 +75,5 @@ public class ReplyDTO {
 	public void setCreatedAt(Timestamp createdAt) {
 		this.createdAt = createdAt;
 	}
-	
-	
-	
 	
 }

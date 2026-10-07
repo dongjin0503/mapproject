@@ -267,7 +267,8 @@
 	<!-- 채팅방 -->
 	<div class="chat">
 		<div class="chatHeader">
-			<span>${partyTitle}</span> <span>${partyMember}</span>
+			<span>${partyTitle}<c:out value="${partyTitle}"/></span>
+			<span>${partyMember}<c:out value="${member}"/></span>
 			<input type="button" id="hamburgerbtn" value="☰">		<!-- 참여자목록, 채팅나가기버튼 -->
 				<div id="memberList" style="display: none;">
     				<c:forEach var="member" items="${memberList}">
