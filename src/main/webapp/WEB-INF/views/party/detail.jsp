@@ -7,6 +7,7 @@
 <head>
 <meta charset="UTF-8">
 <title>모임 상세</title>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <style>
 * {
 	box-sizing: border-box;
@@ -18,14 +19,42 @@
 	padding: 20px;
 }
 
-.party-image {
+.detail-image-box {
+	position: relative;
+	width: 100%;
 	height: 350px;
-	background-color: #eee;
-	border-radius: 10px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	color: #777;
+	overflow: hidden;
+	border-radius: 8px;
+	margin-bottom: 20px;
+}
+
+.detail-image {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+#prev-image-btn, #next-image-btn {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 40px;
+	height: 40px;
+	border: none;
+	border-radius: 50%;
+	background: rgba(0, 0, 0, 0.5);
+	color: white;
+	font-size: 28px;
+	cursor: pointer;
+}
+
+#prev-image-btn {
+	left: 10px;
+}
+
+#next-image-btn {
+	right: 10px;
 }
 
 .party-summary {
@@ -155,7 +184,24 @@
 <body>
 	<jsp:include page="/WEB-INF/views/common/header.jsp" />
 	<div class="container">
-		<div class="party-image">모임 이미지</div>
+		<C:if test="${not empty partyImages}">
+
+			<div class="detail-image-box">
+
+				<C:forEach var="image" items="${partyImages}" varStatus="status">
+
+					<img class="detail-image" src="/uploads/${image}"
+						style="${status.index == 0 ? '' : 'display:none;'}">
+
+				</C:forEach>
+
+				<C:if test="${partyImages.size() > 1}">
+					<button type="button" id="prev-image-btn">‹</button>
+					<button type="button" id="next-image-btn">›</button>
+				</C:if>
+			</div>
+
+		</C:if>
 
 		<section class="party-summary">
 			<h1>${party.title}
@@ -274,26 +320,6 @@
 		</div>
 	</div>
 	<script>
-		document.getElementById("bookmark-btn").onclick = function() {
-			var btn = this;
-			fetch("/party/bookmark", {
-				method : "POST",
-				headers : {
-					"Content-Type" : "application/x-www-form-urlencoded"
-				},
-				body : "partyId=${party.partyId}"
-			}).then(function(r) {
-				return r.text();
-			}).then(function(result) {
-				if (result === "LOGIN") {
-					location.href = "/member/login";
-				} else if (result === "INSERT") {
-					btn.textContent = "★";
-				} else if (result === "DELETE") {
-					btn.textContent = "☆";
-				}
-			});
-		};
 	</script>
 </body>
 </html>
