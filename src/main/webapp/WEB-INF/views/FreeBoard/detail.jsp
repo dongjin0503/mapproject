@@ -19,7 +19,7 @@
 body {
 	margin: 0;
 	padding-bottom: 40px;
-	background-color: #f7f8fa;
+	background-color: #fff;
 	font-family: "Noto Sans KR", "Malgun Gothic", Arial, sans-serif;
 	color: #1c2535;
 }
@@ -80,9 +80,17 @@ input, textarea, button {
 }
 
 /* 추천 버튼 + 숫자 */
+.likeBox {
+	margin-left: auto;
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
 #likeCount {
-	margin-top: 14px;
-	padding: 7px 18px;
+	padding: 4px 14px;
+	line-height: 1;
 	border: 1px solid #d5dce7;
 	border-radius: 20px;
 	background: white;
@@ -94,9 +102,13 @@ input, textarea, button {
 	border-color: #1c2535;
 }
 
+#likeCount i {
+	color: #2457d6;
+	font-size: 16px;
+}
+
 #p1 {
-	display: inline-block;
-	margin: 0 0 0 8px;
+	margin: 0;
 	font-weight: bold;
 	color: #2457d6;
 }
@@ -162,6 +174,22 @@ input, textarea, button {
 	outline: none;
 }
 
+/* 남의 글 본문 (에디터 없이 읽기만) */
+.viewContent {
+	min-height: 200px;
+	padding: 15px;
+	font-size: 15px;
+	line-height: 1.7;
+	color: #1c2535;
+	word-break: break-all;
+	overflow-wrap: anywhere;
+}
+
+.viewContent img {
+	max-width: 100%;
+	height: auto;
+}
+
 /* 첨부파일 */
 .fileContent {
 	padding: 10px 4px;
@@ -180,7 +208,7 @@ input, textarea, button {
 /* 하단 버튼 (목록으로/수정/수정완료/수정취소/삭제) */
 .footer {
 	display: flex;
-	justify-content: center;
+	justify-content: flex-start;
 	gap: 8px;
 	margin-top: 20px;
 }
@@ -204,6 +232,12 @@ input, textarea, button {
 .footer a:hover,
 .footer input:hover {
 	background-color: #2d3a52;
+}
+
+/* 목록으로 버튼은 항상 오른쪽 끝 */
+.footer a {
+	order: 99;
+	margin-left: auto;
 }
 
 #deletebtn {
@@ -235,20 +269,22 @@ hr {
 /* 댓글 작성 영역 */
 .commentPlace {
 	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
+	justify-content: flex-end;
 	gap: 10px;
 	margin-top: 15px;
-	padding: 15px 10px;
+	padding: 14px;
 	background-color: #fafbfe;
 	border: 1px solid #d5dce7;
-	border-radius: 6px;
+	border-radius: 8px;
 }
 
 .commentPlace textarea {
-	flex: 1;
+	flex: 1 1 100%;
 	width: 100%;
 	height: 80px;
-	padding: 12px 15px;
+	padding: 12px 14px;
 	border: 1px solid #d5dce7;
 	border-radius: 6px;
 	background-color: white;
@@ -263,22 +299,24 @@ hr {
 	border-color: #1c2535;
 }
 
-/* 작성자 */
+/* 작성자: 입력창이 아니라 글자처럼 왼쪽 아래에 표시 */
 .commentPlace input[name="memberId"] {
-	width: 150px;
-	height: 40px;
-	padding: 0 10px;
-	border: 1px solid #d5dce7;
-	border-radius: 6px;
-	background-color: #f3f5f9;
-	color: #8995a9;
-	font-size: 13px;
+	margin-right: auto;
+	width: 160px;
+	height: 32px;
+	padding: 0 4px;
+	border: none;
+	background: transparent;
+	color: #1c2535;
+	font-size: 14px;
+	font-weight: bold;
+	outline: none;
 }
 
 /* 댓글/답글 등록 버튼 */
 .commentPlace input[type="submit"] {
 	width: 90px;
-	height: 40px;
+	height: 36px;
 	border: none;
 	border-radius: 6px;
 	background-color: #1c2535;
@@ -293,7 +331,7 @@ hr {
 
 #recommentCancel {
 	width: 70px;
-	height: 40px;
+	height: 36px;
 	border: 1px solid #d5dce7;
 	border-radius: 6px;
 	background: white;
@@ -303,31 +341,53 @@ hr {
 
 /* 댓글 목록 */
 .replyList {
-	margin-top: 20px;
+	margin-top: 0;
 }
 
 .reply {
-	padding: 15px 10px;
+	padding: 16px 12px;
 	border-bottom: 1px solid #e8ecf3;
 }
 
-/* 댓글 작성자 + 작성일 + 버튼 */
+/* 대댓글: 간격 좁게 + 왼쪽 선으로 구분 */
+.replyList.childReply {
+	margin-top: 0;
+}
+
+.replyList.childReply .reply {
+	padding: 8px 12px;
+	background-color: #fafbfe;
+	border-left: 3px solid #d5dce7;
+}
+
+/* 작성자 + 작성일 + 버튼 */
 .replyInfo {
 	display: flex;
 	align-items: center;
-	gap: 10px;
-	margin-bottom: 8px;
+	gap: 8px;
+	margin-bottom: 4px;
 	font-size: 13px;
 }
 
 .replyWriter {
+	font-size: 15px;
 	font-weight: bold;
 	color: #1c2535;
+}
+
+.writerBadge {
+	padding: 1px 8px;
+	border-radius: 10px;
+	background-color: #e8eefc;
+	color: #2457d6;
+	font-size: 11px;
+	font-weight: bold;
 }
 
 .replyDate {
 	margin-right: auto;
 	color: #8995a9;
+	font-size: 12px;
 }
 
 .replyInfo input,
@@ -346,24 +406,30 @@ hr {
 	border-color: #1c2535;
 }
 
-/* 댓글 내용 */
+/* 댓글 내용: 평소엔 글자처럼, 수정 중에만 입력창처럼 */
 .replyContents {
 	width: 100%;
-	height: 70px;
-	padding: 10px;
+	height: 44px;
+	padding: 6px 0;
 	font-size: 14px;
 	line-height: 1.6;
 	color: #39465c;
-	border: 1px solid #e8ecf3;
+	border: 1px solid transparent;
 	border-radius: 6px;
-	background-color: #fafbfe;
+	background-color: transparent;
+	overflow: hidden;
 	resize: none;
 	outline: none;
 }
 
-.replyContents:focus {
-	border-color: #1c2535;
+.replyContents:not([readonly]) {
+	padding: 10px;
+	border-color: #d5dce7;
 	background-color: white;
+}
+
+.replyContents:not([readonly]):focus {
+	border-color: #1c2535;
 }
 </style>
 
@@ -384,10 +450,11 @@ hr {
 				<span>작성자: <c:out value="${post.memberId}" /></span>
 				<span>조회수: ${post.viewCount}</span>
 				<span>작성일: <fmt:formatDate value="${post.createdAt}" pattern="yyyy.MM.dd HH:mm"/></span>
+				<div class="likeBox">
+					<button type="button" id="likeCount"><i id="likeIcon" class="${liked ? 'fa-solid' : 'fa-regular'} fa-thumbs-up"></i></button>
+					<p id="p1">${post.likeCount}</p>
+				</div>
 			</div>
-
-				<input type="button" id="likeCount" value="추천">
-				<p id="p1">${post.likeCount}</p>
 
 			<script>
 				$("#likeCount").on("click", function() {
@@ -398,11 +465,15 @@ hr {
 							postId : "${post.postId}"
 						}
 					}).done(function(resp) {
-						if (resp == -1) {
+						if (resp == "-1") {
 					        alert("로그인 후 이용해주세요.");
 					        return;
 					    }
-						$("#p1").html(resp);
+						var r = resp.split(",");
+						$("#p1").text(r[0]);
+						$("#likeIcon").attr("class", (r[1] == "1" ? "fa-solid" : "fa-regular") + " fa-thumbs-up");
+					}).fail(function(xhr) {
+						alert("추천 처리 중 오류가 났어요. (" + xhr.status + ")");
 					});
 				});
 			</script>
@@ -423,8 +494,15 @@ hr {
 			</div>
 
 			<div class="content">
-				<textarea id="textArea" name="content" readonly><c:out
-						value="${post.content}" /></textarea>
+				<c:choose>
+					<c:when test="${post.memberId != loginId}">
+						<div class="viewContent">${post.content}</div>
+					</c:when>
+					<c:otherwise>
+						<textarea id="textArea" name="content" readonly><c:out
+								value="${post.content}" /></textarea>
+					</c:otherwise>
+				</c:choose>
 			</div>
 			<div class="fileContent">
     		<c:forEach var="i" items="${fileList}">
@@ -438,8 +516,10 @@ hr {
     			</div>
 			</div>
 			<script>
+			<c:if test="${post.memberId == loginId}">
 			$('#textArea').summernote({ height: 400, lang: 'ko-KR' });
 			$('#textArea').summernote('disable');
+			</c:if>
 				const originFileHtml = document.getElementById("updateFile").innerHTML;
 				function addFileInput() {
     				$("#updateFile").append('<br><input type="file" name="files">');
@@ -537,11 +617,12 @@ hr {
 			<input type="hidden" name="replyId" value="${reply.replyId}">
 			<input type="hidden" name="cpage" value="${cpage}">
 			<input type="hidden" name="postId" value="${post.postId}">
-			<div class="replyList">
-				<div class="reply" style="${reply.parentReplyId != 0 ? 'margin-left: 40px;' : ''}">
+			<div class="replyList ${(not empty reply.parentReplyId and reply.parentReplyId != 0) ? 'childReply' : ''}">
+				<div class="reply" style="${(not empty reply.parentReplyId and reply.parentReplyId != 0) ? 'margin-left: 40px;' : ''}">
 
 					<div class="replyInfo">
 						<span class="replyWriter"><c:out value="${reply.memberId}" /></span>
+						<c:if test="${reply.memberId == post.memberId}"><span class="writerBadge">글쓴이</span></c:if>
 						<span class="replyDate"><fmt:formatDate value="${reply.createdAt}" pattern="yyyy.MM.dd HH:mm"/></span>
 						<c:if test="${reply.memberId == loginId}">
 							<input id="replyUpbtn${reply.replyId}" type="button" value="수정">
@@ -569,7 +650,7 @@ hr {
 							
 						}	
 					</script> --%>
-					<c:if test="${reply.parentReplyId == 0 && not empty loginId}">
+					<c:if test="${(empty reply.parentReplyId or reply.parentReplyId == 0) && not empty loginId}">
     					<input type="button" value="답글" style="margin-top: 8px;" onclick="openRecomment(this, ${reply.replyId})">
 					</c:if>
 					
@@ -590,6 +671,7 @@ hr {
 									ok.style.display = "inline-block";
 									cancel.style.display = "inline-block";
 									box.readOnly = false;
+									fitReply(box);
 								};
 								cancel.onclick = function() {
 									up.style.display = "inline-block";
@@ -598,6 +680,7 @@ hr {
 									cancel.style.display = "none";
 									box.readOnly = true;
 									box.value = origin;
+									fitReply(box);
 								};
 								del.onclick = function() {
 									if (confirm("댓글을 삭제하시겠습니까?")) {
@@ -638,6 +721,14 @@ hr {
         		btn.closest("form").after(f);
         		f.style.display = "block";
     		}
+    		function fitReply(t) {
+        		t.style.height = "auto";
+        		t.style.height = t.scrollHeight + "px";
+    		}
+    		document.querySelectorAll(".replyContents").forEach(function(t) {
+        		fitReply(t);
+        		t.addEventListener("input", function() { fitReply(t); });
+    		});
     		document.getElementById("recommentCancel").onclick = function() {
         		document.getElementById("recommentForm").style.display = "none";
     		};
