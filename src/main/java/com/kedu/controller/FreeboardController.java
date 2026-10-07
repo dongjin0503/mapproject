@@ -38,13 +38,13 @@ public class FreeboardController {
 	private FreeBoardFileDAO fdao;
 
 	@RequestMapping("/freeboard")
-	public String boardList(@RequestParam(defaultValue = "1") int cpage, @RequestParam(defaultValue = "") String search,
+	public String boardList(@RequestParam(defaultValue = "") String category,@RequestParam(defaultValue = "1") int cpage, @RequestParam(defaultValue = "") String search,
 			Model model) throws Exception {				//search 기본값 ""공백으로놔서 검색안햇을때는 모든 리스트 불러오기
 		search = search.trim();							//검색조건의 공백 없애기
 		int recordCountPerPage = 10;
 		int naviCountPerPage = 5;
 
-		int recordTotalCount = dao.getTotalCount(search);
+		int recordTotalCount = dao.getTotalCount(search, category);
 		int pageTotalCount = Math.max(1, (int) Math.ceil(recordTotalCount / (double) recordCountPerPage));
 		if (cpage < 1)
 			cpage = 1;
@@ -54,7 +54,8 @@ public class FreeboardController {
 		int startRow = cpage * recordCountPerPage - (recordCountPerPage - 1);
 		int endRow = cpage * recordCountPerPage;
 
-		model.addAttribute("list", dao.boardList(startRow, endRow, search));
+		model.addAttribute("list", dao.boardList(startRow, endRow, search, category));
+		model.addAttribute("category", category);
 		model.addAttribute("recordTotalCount", recordTotalCount);
 		model.addAttribute("recordCountPerPage", recordCountPerPage);
 		model.addAttribute("naviCountPerPage", naviCountPerPage);
@@ -106,13 +107,16 @@ public class FreeboardController {
 	}
 
 	@RequestMapping("/detail")
-	public String detail(int postId, Model model, @RequestParam(defaultValue = "1") int cpage) throws Exception {
+	public String detail(HttpSession session,int postId, Model model, @RequestParam(defaultValue = "1") int cpage) throws Exception {
 
 		model.addAttribute("post", dao.detail(postId)); // viewCount+1포함
 		model.addAttribute("replyList", rdao.selectByPostId(postId));
 		model.addAttribute("commentCount", rdao.countByPostId(postId));
 		model.addAttribute("fileList", fdao.fileList(postId));
 		model.addAttribute("cpage", cpage);
+		
+		String loginId = (String) session.getAttribute("loginId");
+		model.addAttribute("liked", loginId != null && ldao.likeCheck(postId, loginId));	// 내가 추천했는지
 
 		return "/FreeBoard/detail";
 	}
@@ -175,10 +179,10 @@ public class FreeboardController {
 
 	@ResponseBody
 	@RequestMapping(value = "/likecount", produces = "text/plain; charset=UTF-8")	//좋아요 눌렀을때 406같은 에러뜨면 produces부분 삭제
-	public int likecount(int postId, HttpSession session) throws Exception {
+	public String likecount(int postId, HttpSession session) throws Exception {
 		String memberId = (String) session.getAttribute("loginId");
 		if (memberId == null) {
-		    return -1;
+		    return "-1";
 		}
 
 		boolean likeCheckResult = ldao.likeCheck(postId, memberId);
@@ -192,6 +196,6 @@ public class FreeboardController {
 		}
 
 		int liked = dao.getLikeCount(postId);
-		return liked;
+		return liked + "," + (likeCheckResult ? 0 : 1);	// "추천수,내추천상태(1=눌림)"
 	}
 }
