@@ -1,10 +1,12 @@
 package com.kedu.controller;
 
+import java.io.File;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.http.HttpSession;
 
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.google.gson.Gson;
@@ -40,6 +43,14 @@ public class PartyController {
 	@RequestMapping("/list")
 	public String list(Model model, HttpSession session) {
 		List<PartyDTO> parties = partyDAO.findAll(0);
+		
+		 for (PartyDTO party : parties) {
+	         party.setImageSysName(
+	               partyDAO.findFirstImage(party.getPartyId())
+	         );
+	      }
+		
+		
 		model.addAttribute("parties", parties);
 		
 		String loginId = (String) session.getAttribute("loginId");
@@ -54,13 +65,26 @@ public class PartyController {
 	@RequestMapping(value = "/more", produces = "application/json; charset=UTF-8")
 	public String more(@RequestParam int offset) {
 		List<PartyDTO> parties = partyDAO.findAll(offset);
+		 for (PartyDTO party : parties) {
+	         party.setImageSysName(
+	               partyDAO.findFirstImage(party.getPartyId())
+	         );
+	      }
+		
+		
 		return gson.toJson(parties);
 	}
 
 	@RequestMapping("/detail")
 	public String derail(int partyId, HttpSession session, Model model) {
 		PartyDTO party = partyDAO.findById(partyId);
-
+		
+		model.addAttribute(
+	            "partyImages",
+	            partyDAO.findPartyImages(partyId)
+	      );
+		
+		
 		if (party == null) {
 			return "redirect:/party/list";
 		}
@@ -118,8 +142,8 @@ public class PartyController {
 	}
 
 	@RequestMapping(value = "/createSubmit", method = RequestMethod.POST)
-	public String createSubmit(PartyDTO dto, @RequestParam("meetDateText") String meetDateText, HttpSession session,
-			Model model) {
+	public String createSubmit(PartyDTO dto, @RequestParam("meetDateText") String meetDateText,@RequestParam(value = "partyImage", required = false) MultipartFile[] partyImages, HttpSession session,
+			Model model) throws Exception {
 
 		String loginId = (String) session.getAttribute("loginId");
 		if (loginId == null) {
@@ -141,12 +165,10 @@ public class PartyController {
 
 		if (dto.getMinPeople() < 2 || dto.getMaxPeople() < dto.getMinPeople()) {
 			message += "모임의 최소 인원은 2명이며, 최대 인원은 최소 인원 이상이어야 합니다.\n";
-
 		}
 
 		if (dto.getMinAge() != null && dto.getMaxAge() != null && dto.getMinAge() > dto.getMaxAge()) {
 			message += "최대 나이는 최소 나이 이상이어야 합니다.\n";
-
 		}
 
 		if (!meetDate.isAfter(LocalDateTime.now())) {
@@ -161,7 +183,40 @@ public class PartyController {
 		}
 
 		int partyId = partyDAO.createParty(dto);
+		
+		if (partyImages != null) {
 
+	         for (MultipartFile partyImage : partyImages) {
+
+	            if (partyImage.isEmpty()) {
+	               continue;
+	            }
+
+	            String oriName = partyImage.getOriginalFilename();
+
+	            String sysName =
+	                  UUID.randomUUID().toString()
+	                  + "_" + oriName;
+
+	            File folder = new File("D:/study/uploads/");
+
+	            if (!folder.exists()) {
+	               folder.mkdirs();
+	            }
+
+	            partyImage.transferTo(
+	                  new File(folder, sysName)
+	            );
+
+	            partyDAO.insertPartyImage(
+	                  partyId,
+	                  oriName,
+	                  sysName
+	            );
+	         }
+	      }
+
+		
 		return "redirect:/party/detail?partyId=" + partyId;
 	}
 
