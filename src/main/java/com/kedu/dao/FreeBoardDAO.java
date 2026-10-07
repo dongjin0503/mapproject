@@ -16,13 +16,13 @@ public class FreeBoardDAO {
    private JdbcTemplate jdbc;
 
    public List<FreeBoardDTO> boardList(int start, int end, String search, String category) {
-		String sql = "select * from ("
-				+ "select f.*, "
-				+ "(select count(*) from freeboard_reply r where r.post_id = f.post_id) reply_count, "
-				+ "row_number() over(order by f.post_id desc) rn "
-				+ "from freeboard f "
-				+ "where title like ? and content_category like ?) "
-				+ "where rn between ? and ?";
+		String sql = "select * from (select f.*, m.username, " // member 테이블의 username 추가
+	            + "(select count(*) from freeboard_reply r where r.post_id = f.post_id) reply_count, "
+	            + "row_number() over(order by f.post_id desc) rn "
+	            + "from freeboard f "
+	            + "left join member m on f.member_id = m.member_id " // member 테이블과 조인
+	            + "where f.title like ? and f.content_category like ?) " // 컬럼 충돌 방지를 위해 f. 명시
+	            + "where rn between ? and ?";
 		return jdbc.query(sql, new BeanPropertyRowMapper<>(FreeBoardDTO.class), "%" + search + "%", categoryFilter(category), start, end);
 	}
 

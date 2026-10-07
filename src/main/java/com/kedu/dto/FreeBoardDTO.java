@@ -12,7 +12,9 @@ public class FreeBoardDTO {
 	private int likeCount;
 	private Timestamp createdAt;
 	private int replyCount;
-
+	
+	// 1. username 필드 추가
+	private String username;
 
 	
 	public FreeBoardDTO() {};
@@ -28,6 +30,31 @@ public class FreeBoardDTO {
 		this.likeCount = likeCount;
 		this.createdAt = createdAt;
 	}
+
+	// 2. username을 포함하는 전체 생성자 (필요 시 사용)
+	public FreeBoardDTO(int postId, String memberId, String title, String contentCategory, String content,
+			int viewCount, int likeCount, Timestamp createdAt, int replyCount, String username) {
+		this.postId = postId;
+		this.memberId = memberId;
+		this.title = title;
+		this.contentCategory = contentCategory;
+		this.content = content;
+		this.viewCount = viewCount;
+		this.likeCount = likeCount;
+		this.createdAt = createdAt;
+		this.replyCount = replyCount;
+		this.username = username;
+	}
+
+	// 3. username Getter / Setter 추가
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
 	public int getReplyCount() { return replyCount; }
 	public void setReplyCount(int replyCount) { this.replyCount = replyCount; }
 	public int getPostId() {
@@ -78,7 +105,4 @@ public class FreeBoardDTO {
 	public void setCreatedAt(Timestamp createdAt) {
 		this.createdAt = createdAt;
 	}
-	
-	
-	
 }
