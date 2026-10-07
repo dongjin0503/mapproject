@@ -15,17 +15,16 @@ public class FreeBoardDAO {
    @Autowired
    private JdbcTemplate jdbc;
 
-   public List<FreeBoardDTO> boardList(int start, int end, String search) {
-      String sql = "select * from ("
-                  + "select f.*, "
-                  + "(select count(*) from freeboard_reply r where r.post_id = f.post_id) reply_count, "
-                  + "row_number() over(order by f.post_id desc) rn "
-                  + "from freeboard f "
-                  + "where title like ?) "
-                  + "where rn between ? and ?";
-      
-      return jdbc.query(sql, new BeanPropertyRowMapper<>(FreeBoardDTO.class), "%" + search + "%", start, end);
-   }
+   public List<FreeBoardDTO> boardList(int start, int end, String search, String category) {
+		String sql = "select * from ("
+				+ "select f.*, "
+				+ "(select count(*) from freeboard_reply r where r.post_id = f.post_id) reply_count, "
+				+ "row_number() over(order by f.post_id desc) rn "
+				+ "from freeboard f "
+				+ "where title like ? and content_category like ?) "
+				+ "where rn between ? and ?";
+		return jdbc.query(sql, new BeanPropertyRowMapper<>(FreeBoardDTO.class), "%" + search + "%", categoryFilter(category), start, end);
+	}
 
 //   public List<FreeBoardDTO> searchTitle(String search) throws Exception {
 //      String sql = "select * from freeboard where title like ? order by post_id desc";
@@ -61,10 +60,14 @@ public class FreeBoardDAO {
       jdbc.update(sql, postId);
    }
 
-   public int getTotalCount(String search) {
-       String sql = "select count(*) from freeboard where title like ?";
-       return jdbc.queryForObject(sql, Integer.class, "%" + search + "%");
-   }
+   public int getTotalCount(String search, String category) {
+		String sql = "select count(*) from freeboard where title like ? and content_category like ?";
+		return jdbc.queryForObject(sql, Integer.class, "%" + search + "%", categoryFilter(category));
+	}
+   	// 전체(빈 값)면 "%"로 모든 글, 값이 있으면 그 카테고리만
+   private String categoryFilter(String category) {
+	   return (category == null || category.isEmpty()) ? "%" : category;
+   	}
 
    public void likeCountPlus(int postId) {
       String sql = "update freeboard set like_count=like_count+1 where post_id=?";
@@ -91,4 +94,5 @@ public class FreeBoardDAO {
        return jdbc.queryForObject(sql, Integer.class, postId, memberId) > 0;
    }
 
-}//
+
+}

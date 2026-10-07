@@ -21,7 +21,7 @@ public class FreeBoardReplyDAO {
 //    nullif(a,b) >> a랑 b 같으면 null, 다르면 a반환 
 //    이유 ReplyDTO.parentReplyId가 int라서 null을 못 담고, 일반 댓글은 0으로 넘어오기 때문
 //    DB에 null로 넣고 싶어서 SQL에서 0을 null로 바꿔주기
-	    jdbc.update(sql, dto.getPostId(), dto.getMemberId(), dto.getParentReplyId(), dto.getContent());
+	    jdbc.update(sql, dto.getPostId(), dto.getMemberId(), dto.getParentReplyId() == null ? 0 : dto.getParentReplyId(), dto.getContent());
 	}
 	
 	public void updateReply(FreeBoardReplyDTO dto) {

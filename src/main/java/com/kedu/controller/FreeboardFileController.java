@@ -19,7 +19,7 @@ public class FreeboardFileController {
 
 		File target = new File("d:/uploads/" + sysname);
 
-		oriname = new String(oriname.getBytes(), "ISO-8859-1");
+		oriname = new String(oriname.getBytes("UTF-8"), "ISO-8859-1");
 
 		// 지금 resp에 태워 보내는 데이터는 HTML이 아니라 파일 스트림이다
 		resp.setContentType("application/octet-stream");

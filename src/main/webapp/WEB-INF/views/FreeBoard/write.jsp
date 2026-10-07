@@ -20,7 +20,7 @@ body {
 	padding: 0 0 40px;
 	font-family: "Noto Sans KR", "Malgun Gothic", Arial, sans-serif;
 	color: #1c2535;
-	background: #f7f8fa;
+	background-color: #fff;
 }
 
 /* 글쓰기 카드 */

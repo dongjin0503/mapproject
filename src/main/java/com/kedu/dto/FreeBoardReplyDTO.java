@@ -7,7 +7,7 @@ public class FreeBoardReplyDTO {
 	private int replyId;
 	private int postId;
 	private String memberId;
-	private int parentReplyId;
+	private Integer parentReplyId;
 	private String content;
 	private int likeCount;
 	private Timestamp createdAt;
@@ -15,7 +15,7 @@ public class FreeBoardReplyDTO {
 	private int replyCount;
 	
 	public FreeBoardReplyDTO() {};
-	public FreeBoardReplyDTO(int replyId, int postId, String memberId, int parentReplyId, String content, int likeCount,
+	public FreeBoardReplyDTO(int replyId, int postId, String memberId, Integer parentReplyId, String content, int likeCount,
 			Timestamp createdAt) {
 		super();
 		this.replyId = replyId;
@@ -51,10 +51,10 @@ public class FreeBoardReplyDTO {
 	public void setMemberId(String memberId) {
 		this.memberId = memberId;
 	}
-	public int getParentReplyId() {
+	public Integer getParentReplyId() {
 		return parentReplyId;
 	}
-	public void setParentReplyId(int parentReplyId) {
+	public void setParentReplyId(Integer parentReplyId) {
 		this.parentReplyId = parentReplyId;
 	}
 	public String getContent() {
