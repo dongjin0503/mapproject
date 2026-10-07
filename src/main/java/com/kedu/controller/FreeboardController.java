@@ -39,8 +39,8 @@ public class FreeboardController {
 
 	@RequestMapping("/freeboard")
 	public String boardList(@RequestParam(defaultValue = "1") int cpage, @RequestParam(defaultValue = "") String search,
-			Model model) throws Exception {				//search ±âº»°ª ""°ø¹éÀ¸·Î³ö¼­ °Ë»ö¾ÈÇŞÀ»¶§´Â ¸ğµç ¸®½ºÆ® ºÒ·¯¿À±â
-		search = search.trim();							//°Ë»öÁ¶°ÇÀÇ °ø¹é ¾ø¾Ö±â
+			Model model) throws Exception {				//search ê¸°ë³¸ê°’ ""ê³µë°±ìœ¼ë¡œë†”ì„œ ê²€ìƒ‰ì•ˆí–‡ì„ë•ŒëŠ” ëª¨ë“  ë¦¬ìŠ¤íŠ¸ ë¶ˆëŸ¬ì˜¤ê¸°
+		search = search.trim();							//ê²€ìƒ‰ì¡°ê±´ì˜ ê³µë°± ì—†ì• ê¸°
 		int recordCountPerPage = 10;
 		int naviCountPerPage = 5;
 
@@ -64,7 +64,7 @@ public class FreeboardController {
 		return "/FreeBoard/freeboard";
 	}
 
-//	@RequestMapping("/search")		boardList ¸Ş¼Òµå¿¡¼­ °Ë»ö±îÁö Ã³¸®(ÇÊ¿ä¾ø´Ü¼Ò¸®)
+//	@RequestMapping("/search")		boardList ë©”ì†Œë“œì—ì„œ ê²€ìƒ‰ê¹Œì§€ ì²˜ë¦¬(í•„ìš”ì—†ë‹¨ì†Œë¦¬)
 //	public String search(String search, Model model) throws Exception {
 //
 //		List<FreeBoardDTO> searchList = dao.searchTitle(search);
@@ -108,7 +108,7 @@ public class FreeboardController {
 	@RequestMapping("/detail")
 	public String detail(int postId, Model model, @RequestParam(defaultValue = "1") int cpage) throws Exception {
 
-		model.addAttribute("post", dao.detail(postId)); // viewCount+1Æ÷ÇÔ
+		model.addAttribute("post", dao.detail(postId)); // viewCount+1í¬í•¨
 		model.addAttribute("replyList", rdao.selectByPostId(postId));
 		model.addAttribute("commentCount", rdao.countByPostId(postId));
 		model.addAttribute("fileList", fdao.fileList(postId));
@@ -127,7 +127,7 @@ public class FreeboardController {
 		
 		dao.updateContent(dto);
 
-		// »èÁ¦ Ã¼Å©ÇÑ ÆÄÀÏ (´Ù¸¥ ±ÛÀÇ ÆÄÀÏÀº ¸ø Áö¿ì°Ô postId È®ÀÎ)
+		// ì‚­ì œ ì²´í¬í•œ íŒŒì¼ (ë‹¤ë¥¸ ê¸€ì˜ íŒŒì¼ì€ ëª» ì§€ìš°ê²Œ postId í™•ì¸)
 		if (deleteFileId != null) {
 			for (int fileId : deleteFileId) {
 				FreeBoardFileDTO fdto = fdao.selectById(fileId);
@@ -137,7 +137,7 @@ public class FreeboardController {
 				}
 			}
 		}
-		// »õ·Î Ãß°¡ÇÑ ÆÄÀÏ (writeUp°ú °°Àº ¹æ½Ä)
+		// ìƒˆë¡œ ì¶”ê°€í•œ íŒŒì¼ (writeUpê³¼ ê°™ì€ ë°©ì‹)
 		if (files != null) {
 			for (MultipartFile file : files) {
 				if (file.isEmpty()) {
@@ -163,18 +163,18 @@ public class FreeboardController {
 		
 		
 		for (FreeBoardFileDTO f : fdao.fileList(postId)) {
-		    new File("d:/uploads/" + f.getSysname()).delete();   // ½ÇÁ¦ ÆÄÀÏ »èÁ¦
-		    fdao.delete(f.getFileId());                          // DB Á¤º¸ »èÁ¦
+		    new File("d:/uploads/" + f.getSysname()).delete();   // ì‹¤ì œ íŒŒì¼ ì‚­ì œ
+		    fdao.delete(f.getFileId());                          // DB ì •ë³´ ì‚­ì œ
 		}
-		rdao.deleteByPostId(postId);								// ´ñ±Û »èÁ¦
-		ldao.deleteLike(postId);									// ÃßÃµ »èÁ¦
-		dao.deleteContent(postId);									// °Ô½Ã¹° »èÁ¦
+		rdao.deleteByPostId(postId);								// ëŒ“ê¸€ ì‚­ì œ
+		ldao.deleteLike(postId);									// ì¶”ì²œ ì‚­ì œ
+		dao.deleteContent(postId);									// ê²Œì‹œë¬¼ ì‚­ì œ
 
 		return "redirect:/FreeBoard/freeboard?cpage=" + cpage;
 	}
 
 	@ResponseBody
-	@RequestMapping(value = "/likecount", produces = "text/plain; charset=UTF-8")	//ÁÁ¾Æ¿ä ´­·¶À»¶§ 406°°Àº ¿¡·¯¶ß¸é producesºÎºĞ »èÁ¦
+	@RequestMapping(value = "/likecount", produces = "text/plain; charset=UTF-8")	//ì¢‹ì•„ìš” ëˆŒë €ì„ë•Œ 406ê°™ì€ ì—ëŸ¬ëœ¨ë©´ producesë¶€ë¶„ ì‚­ì œ
 	public int likecount(int postId, HttpSession session) throws Exception {
 		String memberId = (String) session.getAttribute("loginId");
 		if (memberId == null) {

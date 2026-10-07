@@ -26,7 +26,7 @@ public class ChattingRoomController {
 	private ChattingRoomDAO dao;
 	
 	@Autowired
-	private SimpMessagingTemplate template;		// ÆÄÆ¼º° Àü¼ÛÀ¸·Î ÇÏ±âÀ§ÇØ @SendTo¸¦ º¯°æ(ÆÄÆ¼ ÇÏ³ª¸é SendTO)
+	private SimpMessagingTemplate template;		// íŒŒí‹°ë³„ ì „ì†¡ìœ¼ë¡œ í•˜ê¸°ìœ„í•´ @SendToë¥¼ ë³€ê²½(íŒŒí‹° í•˜ë‚˜ë©´ SendTO)
 	
 	@RequestMapping("/chat")
     public String chatPage(int partyId, Model model, HttpSession session) throws Exception {
@@ -40,10 +40,10 @@ public class ChattingRoomController {
 	    if (!partyDAO.isMember(partyId, loginId)) {
 	        return "redirect:/party/detail?partyId=" + partyId;
 	    }
-		List<ChattingRoomDTO> chatList = dao.selectByPartyId(partyId);		// partyId·Î Ã¤ÆÃ¹æ Ã¤ÆÃ±â·Ï °¡Á®¿À±â
-		List<String> memberList = dao.selectMemberList(partyId);		//ÆÄÆ¼Âü¿© ÀÎ¿ø ¾ÆÀÌµğ °¡Á®¿À±â
+		List<ChattingRoomDTO> chatList = dao.selectByPartyId(partyId);		// partyIdë¡œ ì±„íŒ…ë°© ì±„íŒ…ê¸°ë¡ ê°€ì ¸ì˜¤ê¸°
+		List<String> memberList = dao.selectMemberList(partyId);		//íŒŒí‹°ì°¸ì—¬ ì¸ì› ì•„ì´ë”” ê°€ì ¸ì˜¤ê¸°
 		
-		String title = dao.selectTitle(partyId);				// partyId·Î ÆÄÆ¼Å×ÀÌºí¿¡¼­ ÆÄÆ¼Á¦¸ñ°¡Á®¿À±â
+		String title = dao.selectTitle(partyId);				// partyIdë¡œ íŒŒí‹°í…Œì´ë¸”ì—ì„œ íŒŒí‹°ì œëª©ê°€ì ¸ì˜¤ê¸°
 		int partyMem = dao.selectMemberCount(partyId);
 		
 		model.addAttribute("memberList", memberList);
@@ -58,10 +58,10 @@ public class ChattingRoomController {
 	
 	@MessageMapping("/chat")
 	public ChattingRoomDTO chatting(ChattingRoomDTO dto) throws Exception{
-		dto.setCreatedAt(new java.sql.Timestamp(System.currentTimeMillis())); //createdAt ¿À·ù³¯¼öÀÖ¾î¼­ Ãß°¡ÇÔ
+		dto.setCreatedAt(new java.sql.Timestamp(System.currentTimeMillis())); //createdAt ì˜¤ë¥˜ë‚ ìˆ˜ìˆì–´ì„œ ì¶”ê°€í•¨
 		dao.insert(dto);
 		
-		template.convertAndSend(				// convertAndSend(º¸³¾¸ñÀûÁö, º¸³¾ µ¥ÀÌÅÍ);
+		template.convertAndSend(				// convertAndSend(ë³´ë‚¼ëª©ì ì§€, ë³´ë‚¼ ë°ì´í„°);
 		        "/topic/chat/" + dto.getPartyId(),dto
 		    );
 		

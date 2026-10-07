@@ -18,9 +18,9 @@ public class FreeBoardReplyDAO {
 	public void addReply(FreeBoardReplyDTO dto) {
 	    String sql = "insert into freeboard_reply(freeboard_reply_id,post_id,member_id,parent_reply_id,content,like_count)"
 	            + "values(seq_freeboard_reply.nextval,?,?,nullif(?,0),?,0)";
-//    nullif(a,b) >> a¶û b °°À¸¸é null, ´Ù¸£¸é a¹İÈ¯ 
-//    ÀÌÀ¯ ReplyDTO.parentReplyId°¡ int¶ó¼­ nullÀ» ¸ø ´ã°í, ÀÏ¹İ ´ñ±ÛÀº 0À¸·Î ³Ñ¾î¿À±â ¶§¹®
-//    DB¿¡ null·Î ³Ö°í ½Í¾î¼­ SQL¿¡¼­ 0À» null·Î ¹Ù²ãÁÖ±â
+//    nullif(a,b) >> aë‘ b ê°™ìœ¼ë©´ null, ë‹¤ë¥´ë©´ aë°˜í™˜ 
+//    ì´ìœ  ReplyDTO.parentReplyIdê°€ intë¼ì„œ nullì„ ëª» ë‹´ê³ , ì¼ë°˜ ëŒ“ê¸€ì€ 0ìœ¼ë¡œ ë„˜ì–´ì˜¤ê¸° ë•Œë¬¸
+//    DBì— nullë¡œ ë„£ê³  ì‹¶ì–´ì„œ SQLì—ì„œ 0ì„ nullë¡œ ë°”ê¿”ì£¼ê¸°
 	    jdbc.update(sql, dto.getPostId(), dto.getMemberId(), dto.getParentReplyId(), dto.getContent());
 	}
 	
@@ -43,7 +43,7 @@ public class FreeBoardReplyDAO {
 		           + "where r.post_id=? order by nvl(r.parent_reply_id, r.freeboard_reply_id), r.freeboard_reply_id";
 	    return jdbc.query(sql, new BeanPropertyRowMapper<>(FreeBoardReplyDTO.class), postId);
 	}
-//	nvl(a,b) >> a°¡ nullÀÌ¸é b, nullÀÌ ¾Æ´Ï¸é a ¹İÈ¯
+//	nvl(a,b) >> aê°€ nullì´ë©´ b, nullì´ ì•„ë‹ˆë©´ a ë°˜í™˜
 	public int countByPostId(int postId) {
 	    String sql = "select count(*) from freeboard_reply where post_id=?";
 	    return jdbc.queryForObject(sql, Integer.class, postId);

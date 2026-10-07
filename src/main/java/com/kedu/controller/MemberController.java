@@ -72,7 +72,7 @@ public class MemberController {
 			session.setAttribute("loginId", dto.getId()) ;
 		return "redirect:/map/main";	
 		} else {
-			model.addAttribute("msg","¾ÆÀÌµğ ¶Ç´Â ºñ¹Ğ¹øÈ£°¡ ¿Ã¹Ù¸£Áö ¾Ê½À´Ï´Ù.");
+			model.addAttribute("msg","ì•„ì´ë”” ë˜ëŠ” ë¹„ë°€ë²ˆí˜¸ê°€ ì˜¬ë°”ë¥´ì§€ ì•ŠìŠµë‹ˆë‹¤.");
 			return "member/login";
 		}
 		
@@ -208,7 +208,7 @@ public class MemberController {
 		return "redirect:/member/mypage";
 	}
 	
-	// ------------------------------------------------------¸¶ÀÌÆäÀÌÁö ³» °Ô½Ã±Û, ºÏ¸¶Å©, Âü¿©±â·Ï ¸ğ¾Æº¸±â
+	// ------------------------------------------------------ë§ˆì´í˜ì´ì§€ ë‚´ ê²Œì‹œê¸€, ë¶ë§ˆí¬, ì°¸ì—¬ê¸°ë¡ ëª¨ì•„ë³´ê¸°
 	
 	
 	@Autowired
@@ -227,7 +227,7 @@ public class MemberController {
 	@RequestMapping("/bookmarkToggle")
 	public String toggle(HttpSession session, String contentType, int contentId) {
 	    String loginId = (String) session.getAttribute("loginId");
-	    if (loginId == null) return "login";   // ·Î±×ÀÎ ¾È ÇßÀ¸¸é
+	    if (loginId == null) return "login";   // ë¡œê·¸ì¸ ì•ˆ í–ˆìœ¼ë©´
 	    if (bdao.existsBookmark(loginId, contentType, contentId)) {
 	        bdao.deleteBookmark(loginId, contentType, contentId);
 	        return "removed";

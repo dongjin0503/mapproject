@@ -49,21 +49,21 @@ public class SettlementDAO {
 		PartyDTO dto = partyDAO.findById(partyId);
 
 		if (dto == null) {
-			throw new IllegalArgumentException("Á¸ÀçÇÏÁö ¾Ê´Â ¸ðÀÓÀÔ´Ï´Ù.");
+			throw new IllegalArgumentException("ì¡´ìž¬í•˜ì§€ ì•ŠëŠ” ëª¨ìž„ìž…ë‹ˆë‹¤.");
 		}
 
 		if (!dto.getHostId().equals(hostId)) {
-			throw new IllegalArgumentException("¸ðÀÓÀå¸¸ Á¤»êÇÒ ¼ö ÀÖ½À´Ï´Ù.");
+			throw new IllegalArgumentException("ëª¨ìž„ìž¥ë§Œ ì •ì‚°í•  ìˆ˜ ìžˆìŠµë‹ˆë‹¤.");
 		}
 
 		if (totalAmount <= 0) {
-			throw new IllegalArgumentException("Á¤»ê ±Ý¾×Àº 0¿øº¸´Ù Ä¿¾ß ÇÕ´Ï´Ù.");
+			throw new IllegalArgumentException("ì •ì‚° ê¸ˆì•¡ì€ 0ì›ë³´ë‹¤ ì»¤ì•¼ í•©ë‹ˆë‹¤.");
 		}
 
 		List<String> memberIds = partyDAO.findMemberIds(partyId);
 
 		if (memberIds.isEmpty()) {
-			throw new IllegalArgumentException("Á¤»êÇÒ Âü¿© ¸â¹ö°¡ ¾ø½À´Ï´Ù.");
+			throw new IllegalArgumentException("ì •ì‚°í•  ì°¸ì—¬ ë©¤ë²„ê°€ ì—†ìŠµë‹ˆë‹¤.");
 		}
 
 		long amount = totalAmount / memberIds.size();
@@ -98,23 +98,23 @@ public class SettlementDAO {
 		PartyDTO dto = partyDAO.findById(partyId);
 
 		if (dto == null) {
-			throw new IllegalArgumentException("Á¸ÀçÇÏÁö ¾Ê´Â ¸ðÀÓÀÔ´Ï´Ù.");
+			throw new IllegalArgumentException("ì¡´ìž¬í•˜ì§€ ì•ŠëŠ” ëª¨ìž„ìž…ë‹ˆë‹¤.");
 		}
 
 		if (!dto.getHostId().equals(hostId)) {
-			throw new IllegalArgumentException("¸ðÀÓÀå¸¸ Á¤»êÇÒ ¼ö ÀÖ½À´Ï´Ù.");
+			throw new IllegalArgumentException("ëª¨ìž„ìž¥ë§Œ ì •ì‚°í•  ìˆ˜ ìžˆìŠµë‹ˆë‹¤.");
 		}
 
 		if (totalAmount <= 0) {
-			throw new IllegalArgumentException("Á¤»ê ±Ý¾×Àº 0¿øº¸´Ù Ä¿¾ß ÇÕ´Ï´Ù.");
+			throw new IllegalArgumentException("ì •ì‚° ê¸ˆì•¡ì€ 0ì›ë³´ë‹¤ ì»¤ì•¼ í•©ë‹ˆë‹¤.");
 		}
 
 		if (memberIds == null || memberAmounts == null || memberIds.isEmpty()) {
-			throw new IllegalArgumentException("Á¤»êÇÒ ¸â¹ö°¡ ¾ø½À´Ï´Ù.");
+			throw new IllegalArgumentException("ì •ì‚°í•  ë©¤ë²„ê°€ ì—†ìŠµë‹ˆë‹¤.");
 		}
 
 		if (memberIds.size() != memberAmounts.size()) {
-			throw new IllegalArgumentException("Á¤»ê Á¤º¸°¡ ¿Ã¹Ù¸£Áö ¾Ê½À´Ï´Ù.");
+			throw new IllegalArgumentException("ì •ì‚° ì •ë³´ê°€ ì˜¬ë°”ë¥´ì§€ ì•ŠìŠµë‹ˆë‹¤.");
 		}
 
 		int settlementId = getNextSettlementId();

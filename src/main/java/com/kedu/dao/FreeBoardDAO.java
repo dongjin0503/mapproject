@@ -81,7 +81,7 @@ public class FreeBoardDAO {
       return jdbc.queryForObject(sql, Integer.class, postId);
    }
    
-   public List<FreeBoardDTO> myContentList(String loginId){         //¸¶ÀÌÆäÀÌÁö ³» °Ô½Ã±Û ¸ğ¾Æº¸±â ¸®½ºÆ® & ´ñ±Û °¹¼ö Æ÷ÇÔ
+   public List<FreeBoardDTO> myContentList(String loginId){         //ë§ˆì´í˜ì´ì§€ ë‚´ ê²Œì‹œê¸€ ëª¨ì•„ë³´ê¸° ë¦¬ìŠ¤íŠ¸ & ëŒ“ê¸€ ê°¯ìˆ˜ í¬í•¨
       String sql = "select f.*, (select count(*) from freeboard_reply r where r.post_id = f.post_id) as reply_count "
                  + "from freeboard f where f.member_id = ? order by f.post_id desc";
       return jdbc.query(sql, new BeanPropertyRowMapper<>(FreeBoardDTO.class), loginId);
