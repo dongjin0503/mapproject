@@ -2,22 +2,21 @@ package com.kedu.dto;
 
 public class ChallengeDTO {
 
-	// ===== DB ÄÃ·³ (CHALLENGE Å×ÀÌºí) =====
+	// ===== DB ì»¬ëŸ¼ (CHALLENGE í…Œì´ë¸”) =====
 	private int challenge_id;
 	private String member_id;
-	private String category;
 	private String title;
 	private String description;
-	private String start_date;   // Äõ¸®¿¡¼­ to_char ·Î ±ÛÀÚ·Î ¹Ù²ã ¹ŞÀ½
+	private String start_date;   // ì¿¼ë¦¬ì—ì„œ to_char ë¡œ ê¸€ìë¡œ ë°”ê¿” ë°›ìŒ
 	private String end_date;
 	private String created_at;
 
-	// ===== Äõ¸®¿¡¼­ °è»êÇØ¼­ ¹Ş´Â °ª (DB ÄÃ·³ ¾Æ´Ô) =====
-	private int member_count;    // Âü¿©ÀÚ ¼ö
-	private int d_day;           // Á¾·á±îÁö ³²Àº ³¯
-	private String status;       // ¸ğÁıÁß / ÁøÇàÁß / Á¾·á
+	// ===== ì¿¼ë¦¬ì—ì„œ ê³„ì‚°í•´ì„œ ë°›ëŠ” ê°’ (DB ì»¬ëŸ¼ ì•„ë‹˜) =====
+	private int member_count;    // ì°¸ì—¬ì ìˆ˜
+	private int d_day;           // ì¢…ë£Œê¹Œì§€ ë‚¨ì€ ë‚ 
+	private String status;       // ëª¨ì§‘ì¤‘ / ì§„í–‰ì¤‘ / ì¢…ë£Œ
 
-	// ±âº» »ı¼ºÀÚ (BeanPropertyRowMapper °¡ ²À ÇÊ¿ä·Î ÇÔ)
+	// ê¸°ë³¸ ìƒì„±ì (BeanPropertyRowMapper ê°€ ê¼­ í•„ìš”ë¡œ í•¨)
 	public ChallengeDTO() {
 	}
 
@@ -35,14 +34,6 @@ public class ChallengeDTO {
 
 	public void setMember_id(String member_id) {
 		this.member_id = member_id;
-	}
-
-	public String getCategory() {
-		return category;
-	}
-
-	public void setCategory(String category) {
-		this.category = category;
 	}
 
 	public String getTitle() {
