@@ -1,5 +1,8 @@
 package com.kedu.controller;
 
+import java.sql.Date;
+import java.time.YearMonth;
+
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +37,22 @@ public class LedgerController {
             "ledgers",
             ledgerDAO.findAll(loginId)
       );
+      
+      String month = YearMonth.now().toString();
+      
+      int totalIncome = ledgerDAO.getMonthlyIncome(loginId, month);
+      
+      int totalExpense = ledgerDAO.getMonthlyExpense(loginId, month);
+      
+      int budget = ledgerDAO.getMonthlyBudget(loginId, month);
+      
+      int remainAmount =
+    			budget + totalIncome - totalExpense;
+      
+      model.addAttribute("totalIncome", totalIncome);
+      model.addAttribute("totalExpense", totalExpense);
+      model.addAttribute("budget", budget);
+      model.addAttribute("remainAmount", remainAmount);
 
       return "ledger/list";
    }
@@ -57,6 +76,7 @@ public class LedgerController {
    @RequestMapping(value = "/insert", method = RequestMethod.POST)
    public String insert(
          LedgerDTO dto,
+         @RequestParam("ledgerDateText") String ledgerDateText,
          HttpSession session) {
 
       String loginId = (String) session.getAttribute("loginId");
@@ -66,6 +86,8 @@ public class LedgerController {
       }
 
       dto.setMemberId(loginId);
+      
+      dto.setLedgerDate(Date.valueOf(ledgerDateText));
 
       ledgerDAO.insert(dto);
 
@@ -103,6 +125,7 @@ public class LedgerController {
    @RequestMapping(value = "/update", method = RequestMethod.POST)
    public String update(
          LedgerDTO dto,
+ 		@RequestParam("ledgerDateText") String ledgerDateText,
          HttpSession session) {
 
       String loginId = (String) session.getAttribute("loginId");
@@ -112,7 +135,10 @@ public class LedgerController {
       }
 
       dto.setMemberId(loginId);
-
+      
+      dto.setLedgerDate(
+  			Date.valueOf(ledgerDateText)
+  	);
       ledgerDAO.update(dto);
 
       return "redirect:/ledger/list";
@@ -135,4 +161,39 @@ public class LedgerController {
 
       return "redirect:/ledger/list";
    }
+   
+   // 예산 저장
+   @RequestMapping(value = "/budget", method = RequestMethod.POST)
+   public String budget(
+		   @RequestParam("startType") String startType,
+   		@RequestParam(value = "budgetAmount", required = false, defaultValue = "0") int budgetAmount,
+   		HttpSession session) {
+
+   	String loginId = (String) session.getAttribute("loginId");
+
+   	if (loginId == null) {
+   		return "redirect:/member/login";
+   	}
+   	
+   	YearMonth currentMonth = YearMonth.now();
+
+   	String month = currentMonth.toString();
+
+   	
+   	if(startType.equals("carry")) {
+   		
+   		String previousMonth = currentMonth.minusMonths(1).toString();
+   		
+   		budgetAmount = ledgerDAO.getPreviousBalance(loginId, previousMonth);
+   	}
+   	
+   	ledgerDAO.saveMonthlyBudget(
+   			loginId,
+   			month,
+   			budgetAmount
+   	);
+
+   	return "redirect:/ledger/list";
+   }
+   
 }
