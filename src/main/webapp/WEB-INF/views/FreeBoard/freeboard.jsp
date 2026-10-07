@@ -18,7 +18,7 @@ body {
 	margin: 0;
 	font-family: "Noto Sans KR", "Malgun Gothic", Arial, sans-serif;
 	color: #1c2535;
-	background-color: #f7f8fa;
+	background-color: #fff;
 }
 
 /* 전체 컨테이너 */
@@ -268,7 +268,16 @@ body {
 	color: #8995a9;
 	font-size: 12px;
 }
-```
+.meBadge {
+	margin-left: 6px;
+	padding: 1px 8px;
+	border-radius: 10px;
+	background-color: #e8eefc;
+	color: #2457d6;
+	font-size: 11px;
+	font-weight: bold;
+}
+   .myRow { background-color: #f3f6ff; }
 
 </style>
 </head>
@@ -283,18 +292,19 @@ body {
 
 			<!-- 2. 카테고리 -->
 			<div class="category">
-				<input type="button" class="active" value="전체"> <input
-					type="button" value="공지"> <input type="button" value="자유">
-				<input type="button" value="질문"> <input type="button"
-					value="정보">
+				<input type="button" class="${empty category ? 'active' : ''}" value="전체" onclick="goCategory('')">
+				<input type="button" class="${category == '공지' ? 'active' : ''}" value="공지" onclick="goCategory('공지')">
+				<input type="button" class="${category == '자유' ? 'active' : ''}" value="자유" onclick="goCategory('자유')">
+				<input type="button" class="${category == '질문' ? 'active' : ''}" value="질문" onclick="goCategory('질문')">
+				<input type="button" class="${category == '정보' ? 'active' : ''}" value="정보" onclick="goCategory('정보')">
 			</div>
-
 			<!-- 3. 검색 및 글쓰기 -->
 			<div class="board-tools">
 
 				<div class="search-box">
 				
 					<form action="/FreeBoard/freeboard">
+					<input type="hidden" name="category" value="<c:out value='${category}'/>">
 						<input type="text" name="search" value="<c:out value='${search}'/>" placeholder="제목으로 게시글 검색">
 						<input type="submit" value="검색">
 					</form>
@@ -332,7 +342,9 @@ body {
 									<td class="title"><a href="/FreeBoard/detail?postId=${i.postId}&cpage=${cpage}"><c:out value="${i.title}"/></a>
 										<c:if test="${i.replyCount > 0}"><span class="reply-count">[${i.replyCount}]</span></c:if>
 									</td>
-									<td><c:out value="${i.memberId}"/></td>
+									<td><c:out value="${i.memberId}"/>
+										<c:if test="${i.memberId == loginId}"><span class="meBadge">나</span></c:if>
+									</td>
 									<td>${i.viewCount}</td>
 									<td><fmt:formatDate value="${i.createdAt}" pattern="yyyy.MM.dd"/></td>
 								</tr>
@@ -343,7 +355,7 @@ body {
 			</div>
 
 			<!-- 페이지네이션 -->
-			<div class="pagination" id="navigation" data-search="<c:out value='${search}'/>"></div>
+			<div class="pagination" id="navigation" data-search="<c:out value='${search}'/>" data-category="<c:out value='${category}'/>"></div>
 			<script>
 				let recordTotalCount = ${recordTotalCount};
 				let recordCountPerPage = ${recordCountPerPage};
@@ -363,10 +375,14 @@ body {
 
 				let navi = document.getElementById("navigation");
 				let searchWord = navi.dataset.search;
+				// 카테고리 버튼: 검색어는 유지하고 1페이지부터
+				function goCategory(c) {
+					location.href = "/FreeBoard/freeboard?category=" + encodeURIComponent(c) + "&search=" + encodeURIComponent(searchWord);
+				}
 
 				function addLink(text, page, active) {
 					let a = document.createElement("a");
-					a.setAttribute("href", "/FreeBoard/freeboard?cpage=" + page + "&search=" + encodeURIComponent(searchWord));
+					a.setAttribute("href", "/FreeBoard/freeboard?cpage=" + page + "&search=" + encodeURIComponent(searchWord) + "&category=" + encodeURIComponent(categoryWord));
 					a.textContent = text;
 					if (active)
 						a.classList.add("active");
