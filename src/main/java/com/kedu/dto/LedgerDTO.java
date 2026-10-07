@@ -16,15 +16,15 @@ public class LedgerDTO {
    }
 
    public LedgerDTO(int ledgerId, String memberId, Date ledgerDate, String type, String category, int amount,
-		String memo) {
-	super();
-	this.ledgerId = ledgerId;
-	this.memberId = memberId;
-	this.ledgerDate = ledgerDate;
-	this.type = type;
-	this.category = category;
-	this.amount = amount;
-	this.memo = memo;
+      String memo) {
+   super();
+   this.ledgerId = ledgerId;
+   this.memberId = memberId;
+   this.ledgerDate = ledgerDate;
+   this.type = type;
+   this.category = category;
+   this.amount = amount;
+   this.memo = memo;
 }
 
 public int getLedgerId() {

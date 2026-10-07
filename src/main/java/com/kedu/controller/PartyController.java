@@ -31,396 +31,396 @@ import com.kedu.dto.PartyDTO;
 @RequestMapping("/party")
 public class PartyController {
 
-	@Autowired
-	private PartyDAO partyDAO;
-
-	@Autowired
-	private MemberDAO memberDAO;
-
-	@Autowired
-	private Gson gson;
-
-	@RequestMapping("/list")
-	public String list(Model model, HttpSession session) {
-		List<PartyDTO> parties = partyDAO.findAll(0);
-		
-		 for (PartyDTO party : parties) {
-	         party.setImageSysName(
-	               partyDAO.findFirstImage(party.getPartyId())
-	         );
-	      }
-		
-		
-		model.addAttribute("parties", parties);
-		
-		String loginId = (String) session.getAttribute("loginId");
-		
-		if(loginId != null) {
-			model.addAttribute("bookmarkedPartyIds", partyDAO.findBookmarkedPartyIds(loginId));
-		}
-		return "party/list";
-	}
-
-	@ResponseBody
-	@RequestMapping(value = "/more", produces = "application/json; charset=UTF-8")
-	public String more(@RequestParam int offset) {
-		List<PartyDTO> parties = partyDAO.findAll(offset);
-		 for (PartyDTO party : parties) {
-	         party.setImageSysName(
-	               partyDAO.findFirstImage(party.getPartyId())
-	         );
-	      }
-		
-		
-		return gson.toJson(parties);
-	}
-
-	@RequestMapping("/detail")
-	public String derail(int partyId, HttpSession session, Model model) {
-		PartyDTO party = partyDAO.findById(partyId);
-		
-		model.addAttribute(
-	            "partyImages",
-	            partyDAO.findPartyImages(partyId)
-	      );
-		
-		
-		if (party == null) {
-			return "redirect:/party/list";
-		}
-		int memberCount = partyDAO.countMembers(partyId);
-		model.addAttribute("memberCount", memberCount);
-
-		model.addAttribute("members", partyDAO.findSettlementMembers(partyId));
-
-		MemberDTO host = memberDAO.selectMember(party.getHostId());
-		model.addAttribute("hostName", host.getUsername());
-
-		String loginId = (String) session.getAttribute("loginId");
-
-		if (loginId != null) {
-
-			boolean isMember = partyDAO.isMember(partyId, loginId);
-			boolean hasPending = partyDAO.hasPendingApplication(partyId, loginId);
-			model.addAttribute("bookmarked", partyDAO.isBookmarked(partyId, loginId));
-			model.addAttribute("isMember", isMember);
-			model.addAttribute("hasPending", hasPending);
-		}
-		model.addAttribute("party", party);
-
-		return "party/detail";
-	}
-
-	@RequestMapping("/create")
-	public String create() {
-		return "party/create";
-	}
-
-	@RequestMapping("/apply")
-	public String apply(int partyId, HttpSession session, Model model) {
-		PartyDTO party = partyDAO.findById(partyId);
-
-		String loginId = (String) session.getAttribute("loginId");
-
-		if (loginId == null) {
-			return "redirect:/member/login";
-		}
-
-		PartyDTO dto = partyDAO.findById(partyId);
-
-		if (dto == null) {
-			return "redirect:/party/list";
-		}
-
-		if (party == null) {
-			return "redirect:/party/list";
-		}
+   @Autowired
+   private PartyDAO partyDAO;
+
+   @Autowired
+   private MemberDAO memberDAO;
+
+   @Autowired
+   private Gson gson;
+
+   @RequestMapping("/list")
+   public String list(Model model, HttpSession session) {
+      List<PartyDTO> parties = partyDAO.findAll(0);
+      
+       for (PartyDTO party : parties) {
+            party.setImageSysName(
+                  partyDAO.findFirstImage(party.getPartyId())
+            );
+         }
+      
+      
+      model.addAttribute("parties", parties);
+      
+      String loginId = (String) session.getAttribute("loginId");
+      
+      if(loginId != null) {
+         model.addAttribute("bookmarkedPartyIds", partyDAO.findBookmarkedPartyIds(loginId));
+      }
+      return "party/list";
+   }
+
+   @ResponseBody
+   @RequestMapping(value = "/more", produces = "application/json; charset=UTF-8")
+   public String more(@RequestParam int offset) {
+      List<PartyDTO> parties = partyDAO.findAll(offset);
+       for (PartyDTO party : parties) {
+            party.setImageSysName(
+                  partyDAO.findFirstImage(party.getPartyId())
+            );
+         }
+      
+      
+      return gson.toJson(parties);
+   }
+
+   @RequestMapping("/detail")
+   public String derail(int partyId, HttpSession session, Model model) {
+      PartyDTO party = partyDAO.findById(partyId);
+      
+      model.addAttribute(
+               "partyImages",
+               partyDAO.findPartyImages(partyId)
+         );
+      
+      
+      if (party == null) {
+         return "redirect:/party/list";
+      }
+      int memberCount = partyDAO.countMembers(partyId);
+      model.addAttribute("memberCount", memberCount);
+
+      model.addAttribute("members", partyDAO.findSettlementMembers(partyId));
+
+      MemberDTO host = memberDAO.selectMember(party.getHostId());
+      model.addAttribute("hostName", host.getUsername());
+
+      String loginId = (String) session.getAttribute("loginId");
+
+      if (loginId != null) {
+
+         boolean isMember = partyDAO.isMember(partyId, loginId);
+         boolean hasPending = partyDAO.hasPendingApplication(partyId, loginId);
+         model.addAttribute("bookmarked", partyDAO.isBookmarked(partyId, loginId));
+         model.addAttribute("isMember", isMember);
+         model.addAttribute("hasPending", hasPending);
+      }
+      model.addAttribute("party", party);
+
+      return "party/detail";
+   }
+
+   @RequestMapping("/create")
+   public String create() {
+      return "party/create";
+   }
+
+   @RequestMapping("/apply")
+   public String apply(int partyId, HttpSession session, Model model) {
+      PartyDTO party = partyDAO.findById(partyId);
+
+      String loginId = (String) session.getAttribute("loginId");
+
+      if (loginId == null) {
+         return "redirect:/member/login";
+      }
+
+      PartyDTO dto = partyDAO.findById(partyId);
+
+      if (dto == null) {
+         return "redirect:/party/list";
+      }
+
+      if (party == null) {
+         return "redirect:/party/list";
+      }
 
-		model.addAttribute("party", dto);
-		return "party/apply";
+      model.addAttribute("party", dto);
+      return "party/apply";
 
-	}
+   }
 
-	@RequestMapping(value = "/createSubmit", method = RequestMethod.POST)
-	public String createSubmit(PartyDTO dto, @RequestParam("meetDateText") String meetDateText,@RequestParam(value = "partyImage", required = false) MultipartFile[] partyImages, HttpSession session,
-			Model model) throws Exception {
+   @RequestMapping(value = "/createSubmit", method = RequestMethod.POST)
+   public String createSubmit(PartyDTO dto, @RequestParam("meetDateText") String meetDateText,@RequestParam(value = "partyImage", required = false) MultipartFile[] partyImages, HttpSession session,
+         Model model) throws Exception {
 
-		String loginId = (String) session.getAttribute("loginId");
-		if (loginId == null) {
-			return "redirect:/member/login";
-		}
+      String loginId = (String) session.getAttribute("loginId");
+      if (loginId == null) {
+         return "redirect:/member/login";
+      }
 
-		dto.setHostId(loginId);
+      dto.setHostId(loginId);
 
-		LocalDateTime meetDate = LocalDateTime.parse(meetDateText);
-		dto.setMeetDate(Timestamp.valueOf(meetDate));
+      LocalDateTime meetDate = LocalDateTime.parse(meetDateText);
+      dto.setMeetDate(Timestamp.valueOf(meetDate));
 
-		String message = "";
+      String message = "";
 
-		if (dto.getTitle() == null || dto.getTitle().trim().isEmpty()) {
-			message += "∏¿” ¡¶∏Ò¿ª ¿‘∑¬«ÿ ¡÷ººø‰.\n";
-		} else {
-			dto.setTitle(dto.getTitle().trim());
-		}
+      if (dto.getTitle() == null || dto.getTitle().trim().isEmpty()) {
+         message += "Î™®ÏûÑ Ï†úÎ™©ÏùÑ ÏûÖÎ†•Ìï¥ Ï£ºÏÑ∏Ïöî.\n";
+      } else {
+         dto.setTitle(dto.getTitle().trim());
+      }
 
-		if (dto.getMinPeople() < 2 || dto.getMaxPeople() < dto.getMinPeople()) {
-			message += "∏¿”¿« √÷º“ ¿Œø¯¿∫ 2∏Ì¿Ã∏Á, √÷¥Î ¿Œø¯¿∫ √÷º“ ¿Œø¯ ¿ÃªÛ¿ÃæÓæﬂ «’¥œ¥Ÿ.\n";
-		}
+      if (dto.getMinPeople() < 2 || dto.getMaxPeople() < dto.getMinPeople()) {
+         message += "Î™®ÏûÑÏùò ÏµúÏÜå Ïù∏ÏõêÏùÄ 2Î™ÖÏù¥Î©∞, ÏµúÎåÄ Ïù∏ÏõêÏùÄ ÏµúÏÜå Ïù∏Ïõê Ïù¥ÏÉÅÏù¥Ïñ¥Ïïº Ìï©ÎãàÎã§.\n";
+      }
 
-		if (dto.getMinAge() != null && dto.getMaxAge() != null && dto.getMinAge() > dto.getMaxAge()) {
-			message += "√÷¥Î ≥™¿Ã¥¬ √÷º“ ≥™¿Ã ¿ÃªÛ¿ÃæÓæﬂ «’¥œ¥Ÿ.\n";
-		}
+      if (dto.getMinAge() != null && dto.getMaxAge() != null && dto.getMinAge() > dto.getMaxAge()) {
+         message += "ÏµúÎåÄ ÎÇòÏù¥Îäî ÏµúÏÜå ÎÇòÏù¥ Ïù¥ÏÉÅÏù¥Ïñ¥Ïïº Ìï©ÎãàÎã§.\n";
+      }
 
-		if (!meetDate.isAfter(LocalDateTime.now())) {
-			message += "∏¿” ≥Ø¬•¥¬ «ˆ¿Á Ω√∞£ ¿Ã»ƒ∑Œ º±≈√«ÿ ¡÷ººø‰.\n";
-		}
+      if (!meetDate.isAfter(LocalDateTime.now())) {
+         message += "Î™®ÏûÑ ÎÇ†ÏßúÎäî ÌòÑÏû¨ ÏãúÍ∞Ñ Ïù¥ÌõÑÎ°ú ÏÑ†ÌÉùÌï¥ Ï£ºÏÑ∏Ïöî.\n";
+      }
 
-		if (!message.isEmpty()) {
-			model.addAttribute("message", message);
-			model.addAttribute("party", dto);
-			model.addAttribute("meetDateText", meetDateText);
-			return "party/create";
-		}
+      if (!message.isEmpty()) {
+         model.addAttribute("message", message);
+         model.addAttribute("party", dto);
+         model.addAttribute("meetDateText", meetDateText);
+         return "party/create";
+      }
 
-		int partyId = partyDAO.createParty(dto);
-		
-		if (partyImages != null) {
+      int partyId = partyDAO.createParty(dto);
+      
+      if (partyImages != null) {
 
-	         for (MultipartFile partyImage : partyImages) {
+            for (MultipartFile partyImage : partyImages) {
 
-	            if (partyImage.isEmpty()) {
-	               continue;
-	            }
+               if (partyImage.isEmpty()) {
+                  continue;
+               }
 
-	            String oriName = partyImage.getOriginalFilename();
+               String oriName = partyImage.getOriginalFilename();
 
-	            String sysName =
-	                  UUID.randomUUID().toString()
-	                  + "_" + oriName;
+               String sysName =
+                     UUID.randomUUID().toString()
+                     + "_" + oriName;
 
-	            File folder = new File("D:/study/uploads/");
+               File folder = new File("D:/study/uploads/");
 
-	            if (!folder.exists()) {
-	               folder.mkdirs();
-	            }
+               if (!folder.exists()) {
+                  folder.mkdirs();
+               }
 
-	            partyImage.transferTo(
-	                  new File(folder, sysName)
-	            );
+               partyImage.transferTo(
+                     new File(folder, sysName)
+               );
 
-	            partyDAO.insertPartyImage(
-	                  partyId,
-	                  oriName,
-	                  sysName
-	            );
-	         }
-	      }
+               partyDAO.insertPartyImage(
+                     partyId,
+                     oriName,
+                     sysName
+               );
+            }
+         }
 
-		
-		return "redirect:/party/detail?partyId=" + partyId;
-	}
+      
+      return "redirect:/party/detail?partyId=" + partyId;
+   }
 
-	@RequestMapping(value = "/applySubmit", method = RequestMethod.POST)
-	public String applySubmit(@RequestParam("partyId") int partyId,
-			@RequestParam(value = "answer", defaultValue = "") String answer,
-			@RequestParam(value = "agree", defaultValue = "") String agree, HttpSession session, Model model) {
+   @RequestMapping(value = "/applySubmit", method = RequestMethod.POST)
+   public String applySubmit(@RequestParam("partyId") int partyId,
+         @RequestParam(value = "answer", defaultValue = "") String answer,
+         @RequestParam(value = "agree", defaultValue = "") String agree, HttpSession session, Model model) {
 
-		String loginId = (String) session.getAttribute("loginId");
+      String loginId = (String) session.getAttribute("loginId");
 
-		if (loginId == null) {
-			return "redirect:/member/login";
-		}
+      if (loginId == null) {
+         return "redirect:/member/login";
+      }
 
-		try {
-			if (!"Y".equals(agree)) {
-				throw new IllegalArgumentException("∏¿” ±‘ƒ¢ π◊ ≥ÎºÓ πÊ¡ˆ æ»≥ªø° µø¿««ÿ¡÷ººø‰.");
-			}
+      try {
+         if (!"Y".equals(agree)) {
+            throw new IllegalArgumentException("Î™®ÏûÑ Í∑úÏπô Î∞è ÎÖ∏Ïáº Î∞©ÏßÄ ÏïàÎÇ¥Ïóê ÎèôÏùòÌï¥Ï£ºÏÑ∏Ïöî.");
+         }
 
-			PartyDTO dto = partyDAO.findById(partyId);
+         PartyDTO dto = partyDAO.findById(partyId);
 
-			if (dto == null) {
-				return "redirect:/party/list";
-			}
+         if (dto == null) {
+            return "redirect:/party/list";
+         }
 
-			MemberDTO member = memberDAO.selectMember(loginId);
+         MemberDTO member = memberDAO.selectMember(loginId);
 
-			if ("male".equals(dto.getGenderRule()) && !"≥≤º∫".equals(member.getGender())) {
-				throw new IllegalArgumentException("≥≤º∫∏∏ ¬¸ø©«“ ºˆ ¿÷¥¬ ∏¿”¿‘¥œ¥Ÿ.");
-			}
+         if ("male".equals(dto.getGenderRule()) && !"ÎÇ®ÏÑ±".equals(member.getGender())) {
+            throw new IllegalArgumentException("ÎÇ®ÏÑ±Îßå Ï∞∏Ïó¨Ìï† Ïàò ÏûàÎäî Î™®ÏûÑÏûÖÎãàÎã§.");
+         }
 
-			if ("female".equals(dto.getGenderRule()) && !"ø©º∫".equals(member.getGender())) {
-				throw new IllegalArgumentException("ø©º∫∏∏ ¬¸ø©«“ ºˆ ¿÷¥¬ ∏¿”¿‘¥œ¥Ÿ.");
-			}
+         if ("female".equals(dto.getGenderRule()) && !"Ïó¨ÏÑ±".equals(member.getGender())) {
+            throw new IllegalArgumentException("Ïó¨ÏÑ±Îßå Ï∞∏Ïó¨Ìï† Ïàò ÏûàÎäî Î™®ÏûÑÏûÖÎãàÎã§.");
+         }
 
-			int age = Period.between(member.getBirth_date().toLocalDate(), LocalDate.now()).getYears();
+         int age = Period.between(member.getBirth_date().toLocalDate(), LocalDate.now()).getYears();
 
-			if (dto.getMinAge() != null && age < dto.getMinAge()) {
-				throw new IllegalArgumentException("√÷º“" + dto.getMinAge() + "ºº∫Œ≈Õ ¬¸ø©«“ ºˆ ¿÷Ω¿¥œ¥Ÿ.");
-			}
+         if (dto.getMinAge() != null && age < dto.getMinAge()) {
+            throw new IllegalArgumentException("ÏµúÏÜå" + dto.getMinAge() + "ÏÑ∏Î∂ÄÌÑ∞ Ï∞∏Ïó¨Ìï† Ïàò ÏûàÏäµÎãàÎã§.");
+         }
 
-			if (dto.getMaxAge() != null && age > dto.getMaxAge()) {
-				throw new IllegalArgumentException("√÷¥Î" + dto.getMaxAge() + "ºº±Ó¡ˆ ¬¸ø©«“ ºˆ ¿÷Ω¿¥œ¥Ÿ.");
-			}
+         if (dto.getMaxAge() != null && age > dto.getMaxAge()) {
+            throw new IllegalArgumentException("ÏµúÎåÄ" + dto.getMaxAge() + "ÏÑ∏ÍπåÏßÄ Ï∞∏Ïó¨Ìï† Ïàò ÏûàÏäµÎãàÎã§.");
+         }
 
-			partyDAO.apply(partyId, loginId, answer);
-			return "redirect:/party/detail?partyId=" + partyId;
+         partyDAO.apply(partyId, loginId, answer);
+         return "redirect:/party/detail?partyId=" + partyId;
 
-		} catch (IllegalArgumentException e) {
-			PartyDTO dto = partyDAO.findById(partyId);
+      } catch (IllegalArgumentException e) {
+         PartyDTO dto = partyDAO.findById(partyId);
 
-			if (dto == null) {
-				return "redirect:/party/list";
-			}
-			model.addAttribute("party", dto);
-			model.addAttribute("message", e.getMessage());
-			model.addAttribute("answer", answer);
+         if (dto == null) {
+            return "redirect:/party/list";
+         }
+         model.addAttribute("party", dto);
+         model.addAttribute("message", e.getMessage());
+         model.addAttribute("answer", answer);
 
-			return "party/apply";
-		}
-	}
+         return "party/apply";
+      }
+   }
 
-	@RequestMapping("/applications")
-	public String applications(int partyId, HttpSession session, Model model) {
-		PartyDTO dto = partyDAO.findById(partyId);
+   @RequestMapping("/applications")
+   public String applications(int partyId, HttpSession session, Model model) {
+      PartyDTO dto = partyDAO.findById(partyId);
 
-		if (dto == null) {
-			return "redirect:/party/list";
-		}
+      if (dto == null) {
+         return "redirect:/party/list";
+      }
 
-		String loginId = (String) session.getAttribute("loginId");
+      String loginId = (String) session.getAttribute("loginId");
 
-		if (loginId == null) {
-			return "redirect:/member/login";
-		}
+      if (loginId == null) {
+         return "redirect:/member/login";
+      }
 
-		if (!loginId.equals(dto.getHostId())) {
-			return "redirect:/party/list";
-		}
+      if (!loginId.equals(dto.getHostId())) {
+         return "redirect:/party/list";
+      }
 
-		List<PartyApplicationDTO> applications = partyDAO.findPendingApplications(partyId);
+      List<PartyApplicationDTO> applications = partyDAO.findPendingApplications(partyId);
 
-		model.addAttribute("party", dto);
-		model.addAttribute("applications", applications);
+      model.addAttribute("party", dto);
+      model.addAttribute("applications", applications);
 
-		return "party/applications";
-	}
+      return "party/applications";
+   }
 
-	@RequestMapping(value = "/approve", method = RequestMethod.POST)
-	public String approve(@RequestParam("partyId") int partyId, @RequestParam("applicationId") int applicationId,
-			HttpSession session, RedirectAttributes redirectAttributes) {
+   @RequestMapping(value = "/approve", method = RequestMethod.POST)
+   public String approve(@RequestParam("partyId") int partyId, @RequestParam("applicationId") int applicationId,
+         HttpSession session, RedirectAttributes redirectAttributes) {
 
-		String loginId = (String) session.getAttribute("loginId");
+      String loginId = (String) session.getAttribute("loginId");
 
-		if (loginId == null) {
-			return "redirect:/member/login";
-		}
+      if (loginId == null) {
+         return "redirect:/member/login";
+      }
 
-		try {
-			partyDAO.approve(partyId, applicationId, loginId);
-			redirectAttributes.addFlashAttribute("message", "Ω¬¿Œ«ﬂΩ¿¥œ¥Ÿ.");
-		} catch (IllegalArgumentException e) {
-			redirectAttributes.addFlashAttribute("message", e.getMessage());
-		}
+      try {
+         partyDAO.approve(partyId, applicationId, loginId);
+         redirectAttributes.addFlashAttribute("message", "ÏäπÏù∏ÌñàÏäµÎãàÎã§.");
+      } catch (IllegalArgumentException e) {
+         redirectAttributes.addFlashAttribute("message", e.getMessage());
+      }
 
-		return "redirect:/party/applications?partyId=" + partyId;
-	}
+      return "redirect:/party/applications?partyId=" + partyId;
+   }
 
-	@RequestMapping(value = "/reject", method = RequestMethod.POST)
-	public String reject(@RequestParam("partyId") int partyId, @RequestParam("applicationId") int applicationId,
-			HttpSession session, RedirectAttributes redirectAttributes) {
+   @RequestMapping(value = "/reject", method = RequestMethod.POST)
+   public String reject(@RequestParam("partyId") int partyId, @RequestParam("applicationId") int applicationId,
+         HttpSession session, RedirectAttributes redirectAttributes) {
 
-		String loginId = (String) session.getAttribute("loginId");
+      String loginId = (String) session.getAttribute("loginId");
 
-		if (loginId == null) {
-			return "redirect:/member/login";
-		}
+      if (loginId == null) {
+         return "redirect:/member/login";
+      }
 
-		try {
-			partyDAO.reject(partyId, applicationId, loginId);
-			redirectAttributes.addFlashAttribute("message", "∞≈¿˝«ﬂΩ¿¥œ¥Ÿ.");
-		} catch (IllegalArgumentException e) {
-			redirectAttributes.addFlashAttribute("message", e.getMessage());
-		}
-		return "redirect:/party/applications?partyId=" + partyId;
-	}
+      try {
+         partyDAO.reject(partyId, applicationId, loginId);
+         redirectAttributes.addFlashAttribute("message", "Í±∞Ï†àÌñàÏäµÎãàÎã§.");
+      } catch (IllegalArgumentException e) {
+         redirectAttributes.addFlashAttribute("message", e.getMessage());
+      }
+      return "redirect:/party/applications?partyId=" + partyId;
+   }
 
-	@RequestMapping(value = "/kick", method = RequestMethod.POST)
-	public String kick(@RequestParam("partyId") int partyId, @RequestParam("memberId") String memberId,
-			HttpSession session, RedirectAttributes redirectAttributes) {
+   @RequestMapping(value = "/kick", method = RequestMethod.POST)
+   public String kick(@RequestParam("partyId") int partyId, @RequestParam("memberId") String memberId,
+         HttpSession session, RedirectAttributes redirectAttributes) {
 
-		String loginId = (String) session.getAttribute("loginId");
+      String loginId = (String) session.getAttribute("loginId");
 
-		if (loginId == null) {
-			return "redirect:/member/login";
-		}
+      if (loginId == null) {
+         return "redirect:/member/login";
+      }
 
-		try {
-			partyDAO.kickMember(partyId, memberId, loginId);
+      try {
+         partyDAO.kickMember(partyId, memberId, loginId);
 
-			redirectAttributes.addFlashAttribute("message", "∏‚πˆ∏¶ ≥ª∫∏≥¬Ω¿¥œ¥Ÿ.");
-		} catch (IllegalArgumentException e) {
-			redirectAttributes.addFlashAttribute("message", e.getMessage());
-		}
-		return "redirect:/party/detail?partyId=" + partyId;
-	}
+         redirectAttributes.addFlashAttribute("message", "Î©§Î≤ÑÎ•º ÎÇ¥Î≥¥ÎÉàÏäµÎãàÎã§.");
+      } catch (IllegalArgumentException e) {
+         redirectAttributes.addFlashAttribute("message", e.getMessage());
+      }
+      return "redirect:/party/detail?partyId=" + partyId;
+   }
 
-	@RequestMapping(value = "/cancelApplication", method = RequestMethod.POST)
-	public String cancelApplication(@RequestParam("partyId") int partyId, HttpSession session,
-			RedirectAttributes redirectAttributes) {
+   @RequestMapping(value = "/cancelApplication", method = RequestMethod.POST)
+   public String cancelApplication(@RequestParam("partyId") int partyId, HttpSession session,
+         RedirectAttributes redirectAttributes) {
 
-		String loginId = (String) session.getAttribute("loginId");
+      String loginId = (String) session.getAttribute("loginId");
 
-		if (loginId == null) {
-			return "redirect:/member/login";
-		}
-		try {
-			partyDAO.cancelApplication(partyId, loginId);
-			redirectAttributes.addFlashAttribute("message", "Ω≈√ª¿ª √Îº“«ﬂΩ¿¥œ¥Ÿ.");
-		} catch (IllegalArgumentException e) {
-			redirectAttributes.addFlashAttribute("message", e.getMessage());
-		}
-		return "redirect:/party/detail?partyId=" + partyId;
-	}
+      if (loginId == null) {
+         return "redirect:/member/login";
+      }
+      try {
+         partyDAO.cancelApplication(partyId, loginId);
+         redirectAttributes.addFlashAttribute("message", "Ïã†Ï≤≠ÏùÑ Ï∑®ÏÜåÌñàÏäµÎãàÎã§.");
+      } catch (IllegalArgumentException e) {
+         redirectAttributes.addFlashAttribute("message", e.getMessage());
+      }
+      return "redirect:/party/detail?partyId=" + partyId;
+   }
 
-	@RequestMapping(value = "/leave", method = RequestMethod.POST)
-	public String leave(@RequestParam("partyId") int partyId, HttpSession session,
-			RedirectAttributes redirectAttributes) {
+   @RequestMapping(value = "/leave", method = RequestMethod.POST)
+   public String leave(@RequestParam("partyId") int partyId, HttpSession session,
+         RedirectAttributes redirectAttributes) {
 
-		String loginId = (String) session.getAttribute("loginId");
+      String loginId = (String) session.getAttribute("loginId");
 
-		if (loginId == null) {
-			return "redirect:/member/login";
-		}
-		try {
-			partyDAO.leaveParty(partyId, loginId);
-			redirectAttributes.addFlashAttribute("message", "∏¿”ø°º≠ ≥™ø‘Ω¿¥œ¥Ÿ.");
-		} catch (IllegalArgumentException e) {
-			redirectAttributes.addFlashAttribute("message", e.getMessage());
-		}
-		return "redirect:/party/detail?partyId=" + partyId;
-	}
+      if (loginId == null) {
+         return "redirect:/member/login";
+      }
+      try {
+         partyDAO.leaveParty(partyId, loginId);
+         redirectAttributes.addFlashAttribute("message", "Î™®ÏûÑÏóêÏÑú ÎÇòÏôîÏäµÎãàÎã§.");
+      } catch (IllegalArgumentException e) {
+         redirectAttributes.addFlashAttribute("message", e.getMessage());
+      }
+      return "redirect:/party/detail?partyId=" + partyId;
+   }
 
-	@ResponseBody
-	@RequestMapping(value = "/bookmark", method = RequestMethod.POST)
-	public String bookmark(@RequestParam("partyId") int partyId, HttpSession session) {
+   @ResponseBody
+   @RequestMapping(value = "/bookmark", method = RequestMethod.POST)
+   public String bookmark(@RequestParam("partyId") int partyId, HttpSession session) {
 
-		String loginId = (String) session.getAttribute("loginId");
+      String loginId = (String) session.getAttribute("loginId");
 
-		if (loginId == null) {
-			return "LOGIN";
-		}
+      if (loginId == null) {
+         return "LOGIN";
+      }
 
-		if (partyDAO.isBookmarked(partyId, loginId)) {
+      if (partyDAO.isBookmarked(partyId, loginId)) {
 
-			partyDAO.deleteBookmark(partyId, loginId);
+         partyDAO.deleteBookmark(partyId, loginId);
 
-			return "DELETE";
+         return "DELETE";
 
-		} else {
+      } else {
 
-			partyDAO.insertBookmark(partyId, loginId);
+         partyDAO.insertBookmark(partyId, loginId);
 
-			return "INSERT";
-		}
-	}
+         return "INSERT";
+      }
+   }
 }

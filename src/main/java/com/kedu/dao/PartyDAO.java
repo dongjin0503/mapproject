@@ -16,473 +16,473 @@ import com.kedu.dto.SettlementDTO;
 @Repository
 public class PartyDAO {
 
-	@Autowired
-	private JdbcTemplate jdbcTemplate;
-
-	@Autowired
-	private NotificationDAO notificationDAO;
-
-	public List<PartyDTO> findAll(int offset) {
-		String sql = "SELECT * FROM ( " + "  SELECT t.*, ROWNUM rn FROM ( "
-				+ "    SELECT p.PARTY_ID, p.STORE_ID, p.TITLE, p.MEET_DATE, s.STORE_NAME, "
-				+ "           REGEXP_SUBSTR(s.ADDRESS, '^[^ ]+Ω√ [^ ]+±∏') AS address " + "    FROM PARTY p "
-				+ "    LEFT JOIN GOOD_STORE s ON p.STORE_ID = s.STORE_ID " + "    ORDER BY p.PARTY_ID DESC "
-				+ "  ) t WHERE ROWNUM <= ? " + ") WHERE rn > ?";
-
-		return jdbcTemplate.query(sql, (rs, rowNum) -> {
-			PartyDTO party = new PartyDTO();
-			party.setPartyId(rs.getInt("PARTY_ID"));
-			party.setStoreId(rs.getInt("STORE_ID"));
-			party.setTitle(rs.getString("TITLE"));
-			party.setMeetDate(rs.getTimestamp("MEET_DATE"));
-			party.setStoreName(rs.getString("STORE_NAME"));
-			party.setAddress(rs.getString("ADDRESS"));
-			return party;
-		}, offset + 9, offset);
-	}
-
-	public PartyDTO findById(int partyId) {
-		String sql = "select p.*, s.STORE_NAME, s.ADDRESS " + "from PARTY p "
-				+ "left join GOOD_STORE s on p.STORE_ID = s.STORE_ID " + "where p.PARTY_ID = ?";
-
-		List<PartyDTO> results = jdbcTemplate.query(sql, (rs, rowNum) -> {
-			PartyDTO party = new PartyDTO();
-			party.setPartyId(rs.getInt("PARTY_ID"));
-			party.setHostId(rs.getString("HOST_ID"));
-			party.setStoreId(rs.getInt("STORE_ID"));
-			party.setContents(rs.getString("CONTENTS"));
-			party.setTitle(rs.getString("TITLE"));
-			party.setMeetDate(rs.getTimestamp("MEET_DATE"));
-			party.setStoreName(rs.getString("STORE_NAME"));
-			party.setAddress(rs.getString("ADDRESS"));
-			party.setJoinType(rs.getString("JOIN_TYPE"));
-			party.setMinPeople(rs.getInt("MIN_PEOPLE"));
-			party.setMaxPeople(rs.getInt("MAX_PEOPLE"));
-			party.setGenderRule(rs.getString("GENDER_RULE"));
-			int minAge = rs.getInt("MIN_AGE");
-			party.setMinAge(rs.wasNull() ? null : minAge);
-
-			int maxAge = rs.getInt("MAX_AGE");
-			party.setMaxAge(rs.wasNull() ? null : maxAge);
-
-			party.setQuestion(rs.getString("QUESTION"));
-			party.setRegdate(rs.getTimestamp("REGDATE"));
-
-			return party;
-		}, partyId);
-
-		return results.isEmpty() ? null : results.get(0);
-	}
-
-	public int countMembers(int partyId) {
-		String sql = "select count(*) from PARTY_MEMBER where PARTY_ID = ?";
-		return jdbcTemplate.queryForObject(sql, Integer.class, partyId);
-	}
-
-	public List<String> findMemberIds(int partyId) {
-		String sql = "select MEMBER_ID FROM PARTY_MEMBER " + "where PARTY_ID = ? order by JOIN_DATE";
-		return jdbcTemplate.query(sql, (rs, rowNum) -> rs.getString("MEMBER_ID"), partyId);
-	}
-
-	public int getNextPartyId() {
-		String sql = "select PARTY_SEQ.nextval from dual";
-		return jdbcTemplate.queryForObject(sql, Integer.class);
-	}
-
-	public int insert(PartyDTO partyDTO) {
-		String sql = "insert into PARTY "
-				+ "(PARTY_ID, HOST_ID, STORE_ID, TITLE, CONTENTS, MEET_DATE, JOIN_TYPE, MIN_PEOPLE, MAX_PEOPLE, GENDER_RULE, MIN_AGE, MAX_AGE, QUESTION) "
-				+ "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-		return jdbcTemplate.update(sql, partyDTO.getPartyId(), partyDTO.getHostId(), partyDTO.getStoreId(),
-				partyDTO.getTitle(), partyDTO.getContents(), partyDTO.getMeetDate(), partyDTO.getJoinType(),
-				partyDTO.getMinPeople(), partyDTO.getMaxPeople(), partyDTO.getGenderRule(), partyDTO.getMinAge(),
-				partyDTO.getMaxAge(), partyDTO.getQuestion());
-	}
-
-	public int insertMember(int partyId, String memberId) {
-		String sql = "insert into PARTY_MEMBER " + "(PARTY_MEMBER_ID, PARTY_ID, MEMBER_ID) "
-				+ "values (PARTY_MEMBER_SEQ.nextval, ?, ?)";
-
-		return jdbcTemplate.update(sql, partyId, memberId);
-	}
-
-	@Transactional
-	public int createParty(PartyDTO partyDTO) {
-		int partyId = getNextPartyId();
-		partyDTO.setPartyId(partyId);
-
-		insert(partyDTO);
-		insertMember(partyId, partyDTO.getHostId());
-
-		return partyId;
-	}
+   @Autowired
+   private JdbcTemplate jdbcTemplate;
+
+   @Autowired
+   private NotificationDAO notificationDAO;
+
+   public List<PartyDTO> findAll(int offset) {
+      String sql = "SELECT * FROM ( " + "  SELECT t.*, ROWNUM rn FROM ( "
+            + "    SELECT p.PARTY_ID, p.STORE_ID, p.TITLE, p.MEET_DATE, s.STORE_NAME, "
+            + "           REGEXP_SUBSTR(s.ADDRESS, '^[^ ]+Ïãú [^ ]+Íµ¨') AS address " + "    FROM PARTY p "
+            + "    LEFT JOIN GOOD_STORE s ON p.STORE_ID = s.STORE_ID " + "    ORDER BY p.PARTY_ID DESC "
+            + "  ) t WHERE ROWNUM <= ? " + ") WHERE rn > ?";
+
+      return jdbcTemplate.query(sql, (rs, rowNum) -> {
+         PartyDTO party = new PartyDTO();
+         party.setPartyId(rs.getInt("PARTY_ID"));
+         party.setStoreId(rs.getInt("STORE_ID"));
+         party.setTitle(rs.getString("TITLE"));
+         party.setMeetDate(rs.getTimestamp("MEET_DATE"));
+         party.setStoreName(rs.getString("STORE_NAME"));
+         party.setAddress(rs.getString("ADDRESS"));
+         return party;
+      }, offset + 9, offset);
+   }
+
+   public PartyDTO findById(int partyId) {
+      String sql = "select p.*, s.STORE_NAME, s.ADDRESS " + "from PARTY p "
+            + "left join GOOD_STORE s on p.STORE_ID = s.STORE_ID " + "where p.PARTY_ID = ?";
+
+      List<PartyDTO> results = jdbcTemplate.query(sql, (rs, rowNum) -> {
+         PartyDTO party = new PartyDTO();
+         party.setPartyId(rs.getInt("PARTY_ID"));
+         party.setHostId(rs.getString("HOST_ID"));
+         party.setStoreId(rs.getInt("STORE_ID"));
+         party.setContents(rs.getString("CONTENTS"));
+         party.setTitle(rs.getString("TITLE"));
+         party.setMeetDate(rs.getTimestamp("MEET_DATE"));
+         party.setStoreName(rs.getString("STORE_NAME"));
+         party.setAddress(rs.getString("ADDRESS"));
+         party.setJoinType(rs.getString("JOIN_TYPE"));
+         party.setMinPeople(rs.getInt("MIN_PEOPLE"));
+         party.setMaxPeople(rs.getInt("MAX_PEOPLE"));
+         party.setGenderRule(rs.getString("GENDER_RULE"));
+         int minAge = rs.getInt("MIN_AGE");
+         party.setMinAge(rs.wasNull() ? null : minAge);
+
+         int maxAge = rs.getInt("MAX_AGE");
+         party.setMaxAge(rs.wasNull() ? null : maxAge);
+
+         party.setQuestion(rs.getString("QUESTION"));
+         party.setRegdate(rs.getTimestamp("REGDATE"));
+
+         return party;
+      }, partyId);
+
+      return results.isEmpty() ? null : results.get(0);
+   }
+
+   public int countMembers(int partyId) {
+      String sql = "select count(*) from PARTY_MEMBER where PARTY_ID = ?";
+      return jdbcTemplate.queryForObject(sql, Integer.class, partyId);
+   }
+
+   public List<String> findMemberIds(int partyId) {
+      String sql = "select MEMBER_ID FROM PARTY_MEMBER " + "where PARTY_ID = ? order by JOIN_DATE";
+      return jdbcTemplate.query(sql, (rs, rowNum) -> rs.getString("MEMBER_ID"), partyId);
+   }
+
+   public int getNextPartyId() {
+      String sql = "select PARTY_SEQ.nextval from dual";
+      return jdbcTemplate.queryForObject(sql, Integer.class);
+   }
+
+   public int insert(PartyDTO partyDTO) {
+      String sql = "insert into PARTY "
+            + "(PARTY_ID, HOST_ID, STORE_ID, TITLE, CONTENTS, MEET_DATE, JOIN_TYPE, MIN_PEOPLE, MAX_PEOPLE, GENDER_RULE, MIN_AGE, MAX_AGE, QUESTION) "
+            + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+      return jdbcTemplate.update(sql, partyDTO.getPartyId(), partyDTO.getHostId(), partyDTO.getStoreId(),
+            partyDTO.getTitle(), partyDTO.getContents(), partyDTO.getMeetDate(), partyDTO.getJoinType(),
+            partyDTO.getMinPeople(), partyDTO.getMaxPeople(), partyDTO.getGenderRule(), partyDTO.getMinAge(),
+            partyDTO.getMaxAge(), partyDTO.getQuestion());
+   }
+
+   public int insertMember(int partyId, String memberId) {
+      String sql = "insert into PARTY_MEMBER " + "(PARTY_MEMBER_ID, PARTY_ID, MEMBER_ID) "
+            + "values (PARTY_MEMBER_SEQ.nextval, ?, ?)";
+
+      return jdbcTemplate.update(sql, partyId, memberId);
+   }
+
+   @Transactional
+   public int createParty(PartyDTO partyDTO) {
+      int partyId = getNextPartyId();
+      partyDTO.setPartyId(partyId);
+
+      insert(partyDTO);
+      insertMember(partyId, partyDTO.getHostId());
+
+      return partyId;
+   }
 
-	public boolean isMember(int partyId, String memberId) {
-		String sql = "select count(*) from PARTY_MEMBER " + "where PARTY_ID = ? and MEMBER_ID = ?";
+   public boolean isMember(int partyId, String memberId) {
+      String sql = "select count(*) from PARTY_MEMBER " + "where PARTY_ID = ? and MEMBER_ID = ?";
 
-		int count = jdbcTemplate.queryForObject(sql, Integer.class, partyId, memberId);
+      int count = jdbcTemplate.queryForObject(sql, Integer.class, partyId, memberId);
 
-		return count > 0;
-	}
+      return count > 0;
+   }
 
-	public boolean hasPendingApplication(int partyId, String applicantId) {
-		String sql = "select count(*) from PARTY_APPLICATION " + "where PARTY_ID = ? and APPLICANT_ID = ? "
-				+ "and STATUS = 'PENDING'";
+   public boolean hasPendingApplication(int partyId, String applicantId) {
+      String sql = "select count(*) from PARTY_APPLICATION " + "where PARTY_ID = ? and APPLICANT_ID = ? "
+            + "and STATUS = 'PENDING'";
 
-		int count = jdbcTemplate.queryForObject(sql, Integer.class, partyId, applicantId);
+      int count = jdbcTemplate.queryForObject(sql, Integer.class, partyId, applicantId);
 
-		return count > 0;
-	}
+      return count > 0;
+   }
 
-	public int insertApplication(int partyId, String applicantId, String answer, String status) {
+   public int insertApplication(int partyId, String applicantId, String answer, String status) {
 
-		String sql = "insert into PARTY_APPLICATION " + "(APPLICATION_ID, PARTY_ID, APPLICANT_ID, ANSWER, STATUS) "
-				+ "values (PARTY_APPLICATION_SEQ.nextval, ?, ?, ?, ?)";
+      String sql = "insert into PARTY_APPLICATION " + "(APPLICATION_ID, PARTY_ID, APPLICANT_ID, ANSWER, STATUS) "
+            + "values (PARTY_APPLICATION_SEQ.nextval, ?, ?, ?, ?)";
 
-		return jdbcTemplate.update(sql, partyId, applicantId, answer, status);
+      return jdbcTemplate.update(sql, partyId, applicantId, answer, status);
 
-	}
+   }
 
-	@Transactional
-	public void apply(int partyId, String applicantId, String answer) {
-		String sql = "select PARTY_ID from PARTY where PARTY_ID = ? for update";
-		List<Integer> ids = jdbcTemplate.query(sql, (rs, rowNum) -> rs.getInt("PARTY_ID"), partyId);
+   @Transactional
+   public void apply(int partyId, String applicantId, String answer) {
+      String sql = "select PARTY_ID from PARTY where PARTY_ID = ? for update";
+      List<Integer> ids = jdbcTemplate.query(sql, (rs, rowNum) -> rs.getInt("PARTY_ID"), partyId);
 
-		if (ids.isEmpty()) {
-			throw new IllegalArgumentException("¡∏¿Á«œ¡ˆ æ ¥¬ ∏¿”¿‘¥œ¥Ÿ.");
-		}
+      if (ids.isEmpty()) {
+         throw new IllegalArgumentException("Ï°¥Ïû¨ÌïòÏßÄ ÏïäÎäî Î™®ÏûÑÏûÖÎãàÎã§.");
+      }
 
-		PartyDTO dto = findById(partyId);
+      PartyDTO dto = findById(partyId);
 
-		if (!dto.getMeetDate().toLocalDateTime().isAfter(LocalDateTime.now())) {
-			throw new IllegalArgumentException("¿ÃπÃ Ω√¿€«ﬂ∞≈≥™ ¡ˆ≥≠ ∏¿”ø°¥¬ Ω≈√ª«“ ºˆ æ¯Ω¿¥œ¥Ÿ.");
-		}
+      if (!dto.getMeetDate().toLocalDateTime().isAfter(LocalDateTime.now())) {
+         throw new IllegalArgumentException("Ïù¥ÎØ∏ ÏãúÏûëÌñàÍ±∞ÎÇò ÏßÄÎÇú Î™®ÏûÑÏóêÎäî Ïã†Ï≤≠Ìï† Ïàò ÏóÜÏäµÎãàÎã§.");
+      }
 
-		if (isMember(partyId, applicantId) || hasPendingApplication(partyId, applicantId)) {
-			throw new IllegalArgumentException("¿ÃπÃ ¬¸ø©«ﬂ∞≈≥™ Ω≈√ª ¥Î±‚ ¡ﬂ¿Œ ∏¿”¿‘¥œ¥Ÿ.");
-		}
+      if (isMember(partyId, applicantId) || hasPendingApplication(partyId, applicantId)) {
+         throw new IllegalArgumentException("Ïù¥ÎØ∏ Ï∞∏Ïó¨ÌñàÍ±∞ÎÇò Ïã†Ï≤≠ ÎåÄÍ∏∞ Ï§ëÏù∏ Î™®ÏûÑÏûÖÎãàÎã§.");
+      }
 
-		if (countMembers(partyId) >= dto.getMaxPeople()) {
-			throw new IllegalArgumentException("∏¡˝ ¿Œø¯¿Ã ∏∂∞®µ«æ˙Ω¿¥œ¥Ÿ.");
-		}
+      if (countMembers(partyId) >= dto.getMaxPeople()) {
+         throw new IllegalArgumentException("Î™®Ïßë Ïù∏ÏõêÏù¥ ÎßàÍ∞êÎêòÏóàÏäµÎãàÎã§.");
+      }
 
-		if ("FCFS".equals(dto.getJoinType())) {
-			insertApplication(partyId, applicantId, answer, "APPROVED");
-			insertMember(partyId, applicantId);
+      if ("FCFS".equals(dto.getJoinType())) {
+         insertApplication(partyId, applicantId, answer, "APPROVED");
+         insertMember(partyId, applicantId);
 
-			notificationDAO.insert(dto.getHostId(), "PARTY_JOIN", "PARTY", partyId,
-					dto.getTitle() + " ∏¿”ø° ªı∑ŒøÓ ∏‚πˆ∞° ¬¸ø©«ﬂΩ¿¥œ¥Ÿ.");
+         notificationDAO.insert(dto.getHostId(), "PARTY_JOIN", "PARTY", partyId,
+               dto.getTitle() + " Î™®ÏûÑÏóê ÏÉàÎ°úÏö¥ Î©§Î≤ÑÍ∞Ä Ï∞∏Ïó¨ÌñàÏäµÎãàÎã§.");
 
-		} else if ("APPROVAL".equals(dto.getJoinType())) {
-			insertApplication(partyId, applicantId, answer, "PENDING");
+      } else if ("APPROVAL".equals(dto.getJoinType())) {
+         insertApplication(partyId, applicantId, answer, "PENDING");
 
-			notificationDAO.insert(dto.getHostId(), "PARTY_APPLICATION", "PARTY", partyId,
-					dto.getTitle() + " ∏¿”ø° ªı∑ŒøÓ ¬¸ø© Ω≈√ª¿Ã ¿÷Ω¿¥œ¥Ÿ.");
-		} else {
-			throw new IllegalArgumentException("¬¸ø© πÊΩƒ¿Ã ø√πŸ∏£¡ˆ æ Ω¿¥œ¥Ÿ.");
-		}
+         notificationDAO.insert(dto.getHostId(), "PARTY_APPLICATION", "PARTY", partyId,
+               dto.getTitle() + " Î™®ÏûÑÏóê ÏÉàÎ°úÏö¥ Ï∞∏Ïó¨ Ïã†Ï≤≠Ïù¥ ÏûàÏäµÎãàÎã§.");
+      } else {
+         throw new IllegalArgumentException("Ï∞∏Ïó¨ Î∞©ÏãùÏù¥ Ïò¨Î∞îÎ•¥ÏßÄ ÏïäÏäµÎãàÎã§.");
+      }
 
-	}
+   }
 
-	public List<PartyApplicationDTO> findPendingApplications(int partyId) {
-		String sql = "select * from PARTY_APPLICATION " + "where PARTY_ID = ? and STATUS = 'PENDING' "
-				+ "order by APPLY_DATE, APPLICATION_ID";
+   public List<PartyApplicationDTO> findPendingApplications(int partyId) {
+      String sql = "select * from PARTY_APPLICATION " + "where PARTY_ID = ? and STATUS = 'PENDING' "
+            + "order by APPLY_DATE, APPLICATION_ID";
 
-		return jdbcTemplate.query(sql, (rs, rowNum) -> {
-			PartyApplicationDTO padto = new PartyApplicationDTO();
+      return jdbcTemplate.query(sql, (rs, rowNum) -> {
+         PartyApplicationDTO padto = new PartyApplicationDTO();
 
-			padto.setApplicationId(rs.getInt("APPLICATION_ID"));
-			padto.setPartyId(rs.getInt("PARTY_ID"));
-			padto.setApplicantId(rs.getString("APPLICANT_ID"));
-			padto.setAnswer(rs.getString("ANSWER"));
-			padto.setStatus(rs.getString("STATUS"));
-			padto.setApplyDate(rs.getTimestamp("APPLY_DATE"));
+         padto.setApplicationId(rs.getInt("APPLICATION_ID"));
+         padto.setPartyId(rs.getInt("PARTY_ID"));
+         padto.setApplicantId(rs.getString("APPLICANT_ID"));
+         padto.setAnswer(rs.getString("ANSWER"));
+         padto.setStatus(rs.getString("STATUS"));
+         padto.setApplyDate(rs.getTimestamp("APPLY_DATE"));
 
-			return padto;
-		}, partyId);
-	}
+         return padto;
+      }, partyId);
+   }
 
-	public PartyApplicationDTO findApplicationById(int applicationId) {
-		String sql = "select * from PARTY_APPLICATION where APPLICATION_ID = ?";
+   public PartyApplicationDTO findApplicationById(int applicationId) {
+      String sql = "select * from PARTY_APPLICATION where APPLICATION_ID = ?";
 
-		List<PartyApplicationDTO> results = jdbcTemplate.query(sql, (rs, rowNum) -> {
-			PartyApplicationDTO padto = new PartyApplicationDTO();
+      List<PartyApplicationDTO> results = jdbcTemplate.query(sql, (rs, rowNum) -> {
+         PartyApplicationDTO padto = new PartyApplicationDTO();
 
-			padto.setApplicationId(rs.getInt("APPLICATION_ID"));
-			padto.setPartyId(rs.getInt("PARTY_ID"));
-			padto.setApplicantId(rs.getString("APPLICANT_ID"));
-			padto.setAnswer(rs.getString("ANSWER"));
-			padto.setStatus(rs.getString("STATUS"));
-			padto.setApplyDate(rs.getTimestamp("APPLY_DATE"));
+         padto.setApplicationId(rs.getInt("APPLICATION_ID"));
+         padto.setPartyId(rs.getInt("PARTY_ID"));
+         padto.setApplicantId(rs.getString("APPLICANT_ID"));
+         padto.setAnswer(rs.getString("ANSWER"));
+         padto.setStatus(rs.getString("STATUS"));
+         padto.setApplyDate(rs.getTimestamp("APPLY_DATE"));
 
-			return padto;
-		}, applicationId);
-		return results.isEmpty() ? null : results.get(0);
-	}
+         return padto;
+      }, applicationId);
+      return results.isEmpty() ? null : results.get(0);
+   }
 
-	public int updateApplicationStatus(int applicationId, String status) {
-		String sql = "update PARTY_APPLICATION set STATUS = ? " + "where APPLICATION_ID = ? and STATUS = 'PENDING'";
+   public int updateApplicationStatus(int applicationId, String status) {
+      String sql = "update PARTY_APPLICATION set STATUS = ? " + "where APPLICATION_ID = ? and STATUS = 'PENDING'";
 
-		return jdbcTemplate.update(sql, status, applicationId);
-	}
+      return jdbcTemplate.update(sql, status, applicationId);
+   }
 
-	private void lockParty(int partyId) {
-		String sql = "select PARTY_ID from PARTY where PARTY_ID = ? for update";
+   private void lockParty(int partyId) {
+      String sql = "select PARTY_ID from PARTY where PARTY_ID = ? for update";
 
-		List<Integer> ids = jdbcTemplate.query(sql, (rs, rowNum) -> rs.getInt("PARTY_ID"), partyId);
+      List<Integer> ids = jdbcTemplate.query(sql, (rs, rowNum) -> rs.getInt("PARTY_ID"), partyId);
 
-		if (ids.isEmpty()) {
-			throw new IllegalArgumentException("¡∏¿Á«œ¡ˆ æ ¥¬ ∏¿”¿‘¥œ¥Ÿ.");
-		}
-	}
+      if (ids.isEmpty()) {
+         throw new IllegalArgumentException("Ï°¥Ïû¨ÌïòÏßÄ ÏïäÎäî Î™®ÏûÑÏûÖÎãàÎã§.");
+      }
+   }
 
-	@Transactional
-	public void approve(int partyId, int applicationId, String hostId) {
-		lockParty(partyId);
+   @Transactional
+   public void approve(int partyId, int applicationId, String hostId) {
+      lockParty(partyId);
 
-		PartyDTO dto = findById(partyId);
-		PartyApplicationDTO padto = findApplicationById(applicationId);
+      PartyDTO dto = findById(partyId);
+      PartyApplicationDTO padto = findApplicationById(applicationId);
 
-		if (!hostId.equals(dto.getHostId())) {
-			throw new IllegalArgumentException("∏¿”¿Â∏∏ Ω¬¿Œ«“ ºˆ ¿÷Ω¿¥œ¥Ÿ.");
-		}
-		if (padto == null || padto.getPartyId() != partyId) {
-			throw new IllegalArgumentException("«ÿ¥Á ∏¿”¿« Ω≈√ª¿Ã æ∆¥’¥œ¥Ÿ.");
-		}
+      if (!hostId.equals(dto.getHostId())) {
+         throw new IllegalArgumentException("Î™®ÏûÑÏû•Îßå ÏäπÏù∏Ìï† Ïàò ÏûàÏäµÎãàÎã§.");
+      }
+      if (padto == null || padto.getPartyId() != partyId) {
+         throw new IllegalArgumentException("Ìï¥Îãπ Î™®ÏûÑÏùò Ïã†Ï≤≠Ïù¥ ÏïÑÎãôÎãàÎã§.");
+      }
 
-		if (!"PENDING".equals(padto.getStatus())) {
-			throw new IllegalArgumentException("¿ÃπÃ √≥∏Æ«— Ω≈√ª¿‘¥œ¥Ÿ.");
-		}
-		if (countMembers(partyId) >= dto.getMaxPeople()) {
-			throw new IllegalArgumentException("∏¡˝ ¿Œø¯¿Ã ∏∂∞®µ«æ˙Ω¿¥œ¥Ÿ.");
-		}
+      if (!"PENDING".equals(padto.getStatus())) {
+         throw new IllegalArgumentException("Ïù¥ÎØ∏ Ï≤òÎ¶¨Ìïú Ïã†Ï≤≠ÏûÖÎãàÎã§.");
+      }
+      if (countMembers(partyId) >= dto.getMaxPeople()) {
+         throw new IllegalArgumentException("Î™®Ïßë Ïù∏ÏõêÏù¥ ÎßàÍ∞êÎêòÏóàÏäµÎãàÎã§.");
+      }
 
-		if (isMember(partyId, padto.getApplicantId())) {
-			throw new IllegalArgumentException("¿ÃπÃ ¬¸ø© ¡ﬂ¿Œ »∏ø¯¿‘¥œ¥Ÿ.");
-		}
+      if (isMember(partyId, padto.getApplicantId())) {
+         throw new IllegalArgumentException("Ïù¥ÎØ∏ Ï∞∏Ïó¨ Ï§ëÏù∏ ÌöåÏõêÏûÖÎãàÎã§.");
+      }
 
-		int count = updateApplicationStatus(applicationId, "APPROVED");
+      int count = updateApplicationStatus(applicationId, "APPROVED");
 
-		if (count != 1) {
-			throw new IllegalArgumentException("¿ÃπÃ √≥∏Æ«— Ω≈√ª¿‘¥œ¥Ÿ.");
-		}
-		insertMember(partyId, padto.getApplicantId());
+      if (count != 1) {
+         throw new IllegalArgumentException("Ïù¥ÎØ∏ Ï≤òÎ¶¨Ìïú Ïã†Ï≤≠ÏûÖÎãàÎã§.");
+      }
+      insertMember(partyId, padto.getApplicantId());
 
-		notificationDAO.insert(padto.getApplicantId(), "PARTY_APPROVED", "PARTY", partyId,
-				dto.getTitle() + " ∏¿” ¬¸ø© Ω≈√ª¿Ã Ω¬¿Œµ«æ˙Ω¿¥œ¥Ÿ.");
-	}
+      notificationDAO.insert(padto.getApplicantId(), "PARTY_APPROVED", "PARTY", partyId,
+            dto.getTitle() + " Î™®ÏûÑ Ï∞∏Ïó¨ Ïã†Ï≤≠Ïù¥ ÏäπÏù∏ÎêòÏóàÏäµÎãàÎã§.");
+   }
 
-	@Transactional
-	public void reject(int partyId, int applicationId, String hostId) {
-		lockParty(partyId);
+   @Transactional
+   public void reject(int partyId, int applicationId, String hostId) {
+      lockParty(partyId);
 
-		PartyDTO dto = findById(partyId);
-		PartyApplicationDTO padto = findApplicationById(applicationId);
+      PartyDTO dto = findById(partyId);
+      PartyApplicationDTO padto = findApplicationById(applicationId);
 
-		if (!hostId.equals(dto.getHostId())) {
-			throw new IllegalArgumentException("«ÿ¥Á ∏¿”¿« Ω≈√ª¿Ã æ∆¥’¥œ¥Ÿ.");
-		}
+      if (!hostId.equals(dto.getHostId())) {
+         throw new IllegalArgumentException("Ìï¥Îãπ Î™®ÏûÑÏùò Ïã†Ï≤≠Ïù¥ ÏïÑÎãôÎãàÎã§.");
+      }
 
-		if (padto == null || padto.getPartyId() != partyId) {
-			throw new IllegalArgumentException("«ÿ¥Ÿ ∏¿”¿« Ω≈√ª¿Ã æ∆¥’¥œ¥Ÿ.");
-		}
+      if (padto == null || padto.getPartyId() != partyId) {
+         throw new IllegalArgumentException("Ìï¥Îã§ Î™®ÏûÑÏùò Ïã†Ï≤≠Ïù¥ ÏïÑÎãôÎãàÎã§.");
+      }
 
-		int count = updateApplicationStatus(applicationId, "REJECTED");
+      int count = updateApplicationStatus(applicationId, "REJECTED");
 
-		if (count != 1) {
-			throw new IllegalArgumentException("¿ÃπÃ √≥∏Æ«— Ω≈√ª¿‘¥œ¥Ÿ.");
-		}
+      if (count != 1) {
+         throw new IllegalArgumentException("Ïù¥ÎØ∏ Ï≤òÎ¶¨Ìïú Ïã†Ï≤≠ÏûÖÎãàÎã§.");
+      }
 
-		notificationDAO.insert(padto.getApplicantId(), "PARTY_REJECTED", "PARTY", partyId,
-				dto.getTitle() + " ∏¿” ¬¸ø© Ω≈√ª¿Ã ∞≈¿˝µ«æ˙Ω¿¥œ¥Ÿ.");
-	}
+      notificationDAO.insert(padto.getApplicantId(), "PARTY_REJECTED", "PARTY", partyId,
+            dto.getTitle() + " Î™®ÏûÑ Ï∞∏Ïó¨ Ïã†Ï≤≠Ïù¥ Í±∞Ï†àÎêòÏóàÏäµÎãàÎã§.");
+   }
 
-	public List<String> findMemberNames(int partyId) {
-		String sql = "select m.USERNAME " + "from PARTY_MEMBER pm " + "join MEMBER m on pm.MEMBER_ID = m.MEMBER_ID "
-				+ "where pm.PARTY_ID = ? " + "order by pm.JOIN_DATE, pm.PARTY_MEMBER_ID";
+   public List<String> findMemberNames(int partyId) {
+      String sql = "select m.USERNAME " + "from PARTY_MEMBER pm " + "join MEMBER m on pm.MEMBER_ID = m.MEMBER_ID "
+            + "where pm.PARTY_ID = ? " + "order by pm.JOIN_DATE, pm.PARTY_MEMBER_ID";
 
-		return jdbcTemplate.query(sql, (rs, rowNum) -> rs.getString("USERNAME"), partyId);
-	}
+      return jdbcTemplate.query(sql, (rs, rowNum) -> rs.getString("USERNAME"), partyId);
+   }
 
-	public List<SettlementDTO> findSettlementMembers(int partyId) {
+   public List<SettlementDTO> findSettlementMembers(int partyId) {
 
-		String sql = "select pm.MEMBER_ID, m.USERNAME " + "from PARTY_MEMBER pm "
-				+ "join MEMBER m on pm.MEMBER_ID = m.MEMBER_ID " + "where pm.PARTY_ID = ? "
-				+ "order by pm.JOIN_DATE, pm.PARTY_MEMBER_ID";
+      String sql = "select pm.MEMBER_ID, m.USERNAME " + "from PARTY_MEMBER pm "
+            + "join MEMBER m on pm.MEMBER_ID = m.MEMBER_ID " + "where pm.PARTY_ID = ? "
+            + "order by pm.JOIN_DATE, pm.PARTY_MEMBER_ID";
 
-		return jdbcTemplate.query(sql, (rs, rowNum) -> {
+      return jdbcTemplate.query(sql, (rs, rowNum) -> {
 
-			SettlementDTO settlementDTO = new SettlementDTO();
+         SettlementDTO settlementDTO = new SettlementDTO();
 
-			settlementDTO.setMemberId(rs.getString("MEMBER_ID"));
-			settlementDTO.setMemberName(rs.getString("USERNAME"));
+         settlementDTO.setMemberId(rs.getString("MEMBER_ID"));
+         settlementDTO.setMemberName(rs.getString("USERNAME"));
 
-			return settlementDTO;
-		}, partyId);
-	}
+         return settlementDTO;
+      }, partyId);
+   }
 
-	@Transactional
-	public void kickMember(int partyId, String memberId, String hostId) {
-		PartyDTO dto = findById(partyId);
+   @Transactional
+   public void kickMember(int partyId, String memberId, String hostId) {
+      PartyDTO dto = findById(partyId);
 
-		if (dto == null) {
-			throw new IllegalArgumentException("¡∏¿Á«œ¡ˆ æ ¥¬ ∏¿”¿‘¥œ¥Ÿ.");
-		}
+      if (dto == null) {
+         throw new IllegalArgumentException("Ï°¥Ïû¨ÌïòÏßÄ ÏïäÎäî Î™®ÏûÑÏûÖÎãàÎã§.");
+      }
 
-		if (!hostId.equals(dto.getHostId())) {
-			throw new IllegalArgumentException("∏¿”¿Â∏∏ ∏‚πˆ∏¶ ≥ª∫∏≥æ ºˆ ¿÷Ω¿¥œ¥Ÿ.");
-		}
+      if (!hostId.equals(dto.getHostId())) {
+         throw new IllegalArgumentException("Î™®ÏûÑÏû•Îßå Î©§Î≤ÑÎ•º ÎÇ¥Î≥¥ÎÇº Ïàò ÏûàÏäµÎãàÎã§.");
+      }
 
-		if (hostId.equals(memberId)) {
-			throw new IllegalArgumentException("∏¿”¿Â¿∫ ≥ª∫∏≥æ ºˆ æ¯Ω¿¥œ¥Ÿ.");
-		}
+      if (hostId.equals(memberId)) {
+         throw new IllegalArgumentException("Î™®ÏûÑÏû•ÏùÄ ÎÇ¥Î≥¥ÎÇº Ïàò ÏóÜÏäµÎãàÎã§.");
+      }
 
-		if (!isMember(partyId, memberId)) {
-			throw new IllegalArgumentException("¬¸ø© ¡ﬂ¿Œ ∏‚πˆ∞° æ∆¥’¥œ¥Ÿ.");
-		}
+      if (!isMember(partyId, memberId)) {
+         throw new IllegalArgumentException("Ï∞∏Ïó¨ Ï§ëÏù∏ Î©§Î≤ÑÍ∞Ä ÏïÑÎãôÎãàÎã§.");
+      }
 
-		String sql = "delete from PARTY_MEMBER " + "where PARTY_ID = ? and MEMBER_ID = ?";
+      String sql = "delete from PARTY_MEMBER " + "where PARTY_ID = ? and MEMBER_ID = ?";
 
-		int result = jdbcTemplate.update(sql, partyId, memberId);
+      int result = jdbcTemplate.update(sql, partyId, memberId);
 
-		if (result != 1) {
-			throw new IllegalArgumentException("∏‚πˆ ≥ª∫∏≥ª±‚ø° Ω«∆–«ﬂΩ¿¥œ¥Ÿ.");
-		}
-	}
+      if (result != 1) {
+         throw new IllegalArgumentException("Î©§Î≤Ñ ÎÇ¥Î≥¥ÎÇ¥Í∏∞Ïóê Ïã§Ìå®ÌñàÏäµÎãàÎã§.");
+      }
+   }
 
-	public void cancelApplication(int partyId, String applicantId) {
-		String sql = "update PARTY_APPLICATION " + "set STATUS = 'CANCLED' " + "where PARTY_ID = ? "
-				+ "and APPLICANT_ID = ? " + "and STATUS = 'PENDING'";
+   public void cancelApplication(int partyId, String applicantId) {
+      String sql = "update PARTY_APPLICATION " + "set STATUS = 'CANCLED' " + "where PARTY_ID = ? "
+            + "and APPLICANT_ID = ? " + "and STATUS = 'PENDING'";
 
-		int result = jdbcTemplate.update(sql, partyId, applicantId);
+      int result = jdbcTemplate.update(sql, partyId, applicantId);
 
-		if (result != 1) {
-			throw new IllegalArgumentException("√Îº“«“ Ω≈√ª¿Ã æ¯Ω¿¥œ¥Ÿ.");
-		}
+      if (result != 1) {
+         throw new IllegalArgumentException("Ï∑®ÏÜåÌï† Ïã†Ï≤≠Ïù¥ ÏóÜÏäµÎãàÎã§.");
+      }
 
-	}
+   }
 
-	public void leaveParty(int partyId, String memberId) {
+   public void leaveParty(int partyId, String memberId) {
 
-		PartyDTO party = findById(partyId);
+      PartyDTO party = findById(partyId);
 
-		if (party == null) {
-			throw new IllegalArgumentException("¡∏¿Á«œ¡ˆ æ ¥¬ ∏¿”¿‘¥œ¥Ÿ.");
-		}
+      if (party == null) {
+         throw new IllegalArgumentException("Ï°¥Ïû¨ÌïòÏßÄ ÏïäÎäî Î™®ÏûÑÏûÖÎãàÎã§.");
+      }
 
-		if (party.getHostId().equals(memberId)) {
-			throw new IllegalArgumentException("∏¿”¿Â¿∫ ∏¿”ø°º≠ ≥™∞• ºˆ æ¯Ω¿¥œ¥Ÿ.");
-		}
+      if (party.getHostId().equals(memberId)) {
+         throw new IllegalArgumentException("Î™®ÏûÑÏû•ÏùÄ Î™®ÏûÑÏóêÏÑú ÎÇòÍ∞à Ïàò ÏóÜÏäµÎãàÎã§.");
+      }
 
-		if (!isMember(partyId, memberId)) {
-			throw new IllegalArgumentException("¬¸ø© ¡ﬂ¿Œ ∏¿”¿Ã æ∆¥’¥œ¥Ÿ.");
-		}
+      if (!isMember(partyId, memberId)) {
+         throw new IllegalArgumentException("Ï∞∏Ïó¨ Ï§ëÏù∏ Î™®ÏûÑÏù¥ ÏïÑÎãôÎãàÎã§.");
+      }
 
-		String sql = "delete from PARTY_MEMBER " + "where PARTY_ID = ? and MEMBER_ID = ?";
+      String sql = "delete from PARTY_MEMBER " + "where PARTY_ID = ? and MEMBER_ID = ?";
 
-		int result = jdbcTemplate.update(sql, partyId, memberId);
+      int result = jdbcTemplate.update(sql, partyId, memberId);
 
-		if (result != 1) {
-			throw new IllegalArgumentException("∏¿” ≥™∞°±‚ø° Ω«∆–«ﬂΩ¿¥œ¥Ÿ.");
-		}
-	}
+      if (result != 1) {
+         throw new IllegalArgumentException("Î™®ÏûÑ ÎÇòÍ∞ÄÍ∏∞Ïóê Ïã§Ìå®ÌñàÏäµÎãàÎã§.");
+      }
+   }
 
-	public boolean isBookmarked(int partyId, String memberId) {
+   public boolean isBookmarked(int partyId, String memberId) {
 
-		String sql = "select count(*) from BOOKMARK " + "where MEMBER_ID = ? " + "and CONTENT_TYPE = 'PARTY' "
-				+ "and CONTENT_ID = ?";
+      String sql = "select count(*) from BOOKMARK " + "where MEMBER_ID = ? " + "and CONTENT_TYPE = 'PARTY' "
+            + "and CONTENT_ID = ?";
 
-		int count = jdbcTemplate.queryForObject(sql, Integer.class, memberId, partyId);
+      int count = jdbcTemplate.queryForObject(sql, Integer.class, memberId, partyId);
 
-		return count > 0;
-	}
+      return count > 0;
+   }
 
-	public int insertBookmark(int partyId, String memberId) {
+   public int insertBookmark(int partyId, String memberId) {
 
-		String sql = "insert into BOOKMARK " + "(BOOKMARK_ID, MEMBER_ID, CONTENT_TYPE, CONTENT_ID) "
-				+ "values (seq_bookmark.nextval, ?, 'PARTY', ?)";
+      String sql = "insert into BOOKMARK " + "(BOOKMARK_ID, MEMBER_ID, CONTENT_TYPE, CONTENT_ID) "
+            + "values (seq_bookmark.nextval, ?, 'PARTY', ?)";
 
-		return jdbcTemplate.update(sql, memberId, partyId);
-	}
+      return jdbcTemplate.update(sql, memberId, partyId);
+   }
 
-	public int deleteBookmark(int partyId, String memberId) {
+   public int deleteBookmark(int partyId, String memberId) {
 
-		String sql = "delete from BOOKMARK " + "where MEMBER_ID = ? " + "and CONTENT_TYPE = 'PARTY' "
-				+ "and CONTENT_ID = ?";
+      String sql = "delete from BOOKMARK " + "where MEMBER_ID = ? " + "and CONTENT_TYPE = 'PARTY' "
+            + "and CONTENT_ID = ?";
 
-		return jdbcTemplate.update(sql, memberId, partyId);
-	}
-	
-	public List<Integer> findBookmarkedPartyIds(String memberId) {
+      return jdbcTemplate.update(sql, memberId, partyId);
+   }
+   
+   public List<Integer> findBookmarkedPartyIds(String memberId) {
 
-		String sql = "select CONTENT_ID "
-				+ "from BOOKMARK "
-				+ "where MEMBER_ID = ? "
-				+ "and CONTENT_TYPE = 'PARTY'";
+      String sql = "select CONTENT_ID "
+            + "from BOOKMARK "
+            + "where MEMBER_ID = ? "
+            + "and CONTENT_TYPE = 'PARTY'";
 
-		return jdbcTemplate.query(
-				sql,
-				(rs, rowNum) -> rs.getInt("CONTENT_ID"),
-				memberId
-		);
-	}
-	public List<PartyDTO> findJoinedParties(String memberId) {
-	    String sql = "select p.* from PARTY p join PARTY_MEMBER pm on p.PARTY_ID = pm.PARTY_ID "
-	               + "where pm.MEMBER_ID = ? order by p.MEET_DATE desc";
-	    return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(PartyDTO.class), memberId);
-	}
+      return jdbcTemplate.query(
+            sql,
+            (rs, rowNum) -> rs.getInt("CONTENT_ID"),
+            memberId
+      );
+   }
+   public List<PartyDTO> findJoinedParties(String memberId) {
+       String sql = "select p.* from PARTY p join PARTY_MEMBER pm on p.PARTY_ID = pm.PARTY_ID "
+                  + "where pm.MEMBER_ID = ? order by p.MEET_DATE desc";
+       return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(PartyDTO.class), memberId);
+   }
 
-	 public int insertPartyImage(
-	         int partyId,
-	         String oriName,
-	         String sysName) {
+    public int insertPartyImage(
+            int partyId,
+            String oriName,
+            String sysName) {
 
-	      String sql =
-	            "INSERT INTO PARTY_IMAGE "
-	            + "(IMAGE_ID, PARTY_ID, ORI_NAME, SYS_NAME) "
-	            + "VALUES (PARTY_IMAGE_SEQ.NEXTVAL, ?, ?, ?)";
+         String sql =
+               "INSERT INTO PARTY_IMAGE "
+               + "(IMAGE_ID, PARTY_ID, ORI_NAME, SYS_NAME) "
+               + "VALUES (PARTY_IMAGE_SEQ.NEXTVAL, ?, ?, ?)";
 
-	      return jdbcTemplate.update(
-	            sql,
-	            partyId,
-	            oriName,
-	            sysName
-	      );
-	   }
-	   
-	   public String findFirstImage(int partyId) {
+         return jdbcTemplate.update(
+               sql,
+               partyId,
+               oriName,
+               sysName
+         );
+      }
+      
+      public String findFirstImage(int partyId) {
 
-	      String sql = "SELECT SYS_NAME "
-	            + "FROM (SELECT SYS_NAME "
-	            + "FROM PARTY_IMAGE "
-	            + "WHERE PARTY_ID = ? "
-	            + "ORDER BY IMAGE_ID) "
-	            + "WHERE ROWNUM = 1";
+         String sql = "SELECT SYS_NAME "
+               + "FROM (SELECT SYS_NAME "
+               + "FROM PARTY_IMAGE "
+               + "WHERE PARTY_ID = ? "
+               + "ORDER BY IMAGE_ID) "
+               + "WHERE ROWNUM = 1";
 
-	      List<String> list = jdbcTemplate.query(
-	            sql,
-	            (rs, rowNum) -> rs.getString("SYS_NAME"),
-	            partyId
-	      );
+         List<String> list = jdbcTemplate.query(
+               sql,
+               (rs, rowNum) -> rs.getString("SYS_NAME"),
+               partyId
+         );
 
-	      if (list.isEmpty()) {
-	         return null;
-	      }
+         if (list.isEmpty()) {
+            return null;
+         }
 
-	      return list.get(0);
-	   }
-	   public List<String> findPartyImages(int partyId) {
+         return list.get(0);
+      }
+      public List<String> findPartyImages(int partyId) {
 
-	      String sql = "SELECT SYS_NAME "
-	            + "FROM PARTY_IMAGE "
-	            + "WHERE PARTY_ID = ? "
-	            + "ORDER BY IMAGE_ID";
+         String sql = "SELECT SYS_NAME "
+               + "FROM PARTY_IMAGE "
+               + "WHERE PARTY_ID = ? "
+               + "ORDER BY IMAGE_ID";
 
-	      return jdbcTemplate.query(
-	            sql,
-	            (rs, rowNum) -> rs.getString("SYS_NAME"),
-	            partyId
-	      );
-	   }
+         return jdbcTemplate.query(
+               sql,
+               (rs, rowNum) -> rs.getString("SYS_NAME"),
+               partyId
+         );
+      }
 }

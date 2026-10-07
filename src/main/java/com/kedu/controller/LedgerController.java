@@ -20,7 +20,7 @@ public class LedgerController {
    private LedgerDAO ledgerDAO;
 
 
-   // °¡°èºÎ ¸ñ·Ï
+   // ê°€ê³„ë¶€ ëª©ë¡
    @RequestMapping("/list")
    public String list(HttpSession session, Model model) {
 
@@ -39,7 +39,7 @@ public class LedgerController {
    }
 
 
-   // µî·Ï È­¸é
+   // ë“±ë¡ í™”ë©´
    @RequestMapping("/write")
    public String write(HttpSession session) {
 
@@ -53,7 +53,7 @@ public class LedgerController {
    }
 
 
-   // µî·Ï
+   // ë“±ë¡
    @RequestMapping(value = "/insert", method = RequestMethod.POST)
    public String insert(
          LedgerDTO dto,
@@ -73,7 +73,7 @@ public class LedgerController {
    }
 
 
-   // ¼öÁ¤ È­¸é
+   // ìˆ˜ì • í™”ë©´
    @RequestMapping("/edit")
    public String edit(
          @RequestParam("ledgerId") int ledgerId,
@@ -99,7 +99,7 @@ public class LedgerController {
    }
 
 
-   // ¼öÁ¤
+   // ìˆ˜ì •
    @RequestMapping(value = "/update", method = RequestMethod.POST)
    public String update(
          LedgerDTO dto,
@@ -119,7 +119,7 @@ public class LedgerController {
    }
 
 
-   // »èÁ¦
+   // ì‚­ì œ
    @RequestMapping(value = "/delete", method = RequestMethod.POST)
    public String delete(
          @RequestParam("ledgerId") int ledgerId,
