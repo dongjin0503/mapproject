@@ -2,13 +2,13 @@ package com.kedu.dto;
 
 public class SettlementDTO {
 
-	// Á¤»ê ÀüÃ¼ Á¤º¸
+	// ì •ì‚° ì „ì²´ ì •ë³´
 	private int settlementId;
 	private int partyId;
 	private String settlementType;
 	private long totalAmount;
 	
-	//¸â¹öº° Á¤»ê Á¤º¸
+	//ë©¤ë²„ë³„ ì •ì‚° ì •ë³´
 	private int detailId;
 	private String memberId;
 	private String memberName;

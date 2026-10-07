@@ -9,7 +9,7 @@ public class Good_StoreDTO {
 	private String address;
 	private double latitude;
 	private double longitude;
-	//null °ª Çã¿ëÇÏ±â À§ÇØ Integer »ç¿ë
+	//null ê°’ í—ˆìš©í•˜ê¸° ìœ„í•´ Integer ì‚¬ìš©
 	private Integer min_price;
 	
 

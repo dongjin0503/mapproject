@@ -78,7 +78,7 @@ public class SettlementController {
 
 			} else {
 
-				throw new IllegalArgumentException("Á¤»ê ¹æ½ÄÀÌ ¿Ã¹Ù¸£Áö ¾Ê½À´Ï´Ù.");
+				throw new IllegalArgumentException("ì •ì‚° ë°©ì‹ì´ ì˜¬ë°”ë¥´ì§€ ì•ŠìŠµë‹ˆë‹¤.");
 			}
 
 			return "redirect:/settlement/result?settlementId=" + settlementId;

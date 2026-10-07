@@ -21,7 +21,7 @@ public class FreeboardFileController {
 
 		oriname = new String(oriname.getBytes(), "ISO-8859-1");
 
-		// Áö±İ resp¿¡ ÅÂ¿ö º¸³»´Â µ¥ÀÌÅÍ´Â HTMLÀÌ ¾Æ´Ï¶ó ÆÄÀÏ ½ºÆ®¸²ÀÌ´Ù
+		// ì§€ê¸ˆ respì— íƒœì›Œ ë³´ë‚´ëŠ” ë°ì´í„°ëŠ” HTMLì´ ì•„ë‹ˆë¼ íŒŒì¼ ìŠ¤íŠ¸ë¦¼ì´ë‹¤
 		resp.setContentType("application/octet-stream");
 		resp.setHeader("Content-Disposition", "attachment; filename=\"" + oriname + "\"");
 
