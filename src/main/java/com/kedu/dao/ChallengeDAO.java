@@ -15,21 +15,28 @@ public class ChallengeDAO {
 	@Autowired
 	private JdbcTemplate jdbc;
 
-	// Ã§¸°Áö ¸ñ·Ï (Âü¿©ÀÚ ¼ö, D-day, »óÅÂ±îÁö °°ÀÌ °è»êÇØ¼­ °¡Á®¿È)
+	// ì±Œë¦°ì§€ ëª©ë¡ (ì°¸ì—¬ì ìˆ˜, D-day, ìƒíƒœê¹Œì§€ ê°™ì´ ê³„ì‚°í•´ì„œ ê°€ì ¸ì˜´)
 	public List<ChallengeDTO> listChallenge() {
-		String sql = "select c.challenge_id, c.member_id, c.category, c.title, c.description, "
+		String sql = "select c.challenge_id, c.member_id, c.title, c.description, "
 				+ "to_char(c.start_date, 'YYYY-MM-DD') as start_date, "
 				+ "to_char(c.end_date, 'YYYY-MM-DD') as end_date, "
 				+ "(select count(*) from challenge_member m where m.challenge_id = c.challenge_id) as member_count, "
 				+ "trunc(c.end_date) - trunc(sysdate) as d_day, "
 				+ "case "
-				+ "when trunc(sysdate) < trunc(c.start_date) then '¸ğÁıÁß' "
-				+ "when trunc(sysdate) > trunc(c.end_date) then 'Á¾·á' "
-				+ "else 'ÁøÇàÁß' "
+				+ "when trunc(sysdate) < trunc(c.start_date) then 'ëª¨ì§‘ì¤‘' "
+				+ "when trunc(sysdate) > trunc(c.end_date) then 'ì¢…ë£Œ' "
+				+ "else 'ì§„í–‰ì¤‘' "
 				+ "end as status "
 				+ "from challenge c "
 				+ "order by c.challenge_id desc";
 
 		return jdbc.query(sql, new BeanPropertyRowMapper<>(ChallengeDTO.class));
+	}
+	
+	public int addChallenge(String memberId, ChallengeDTO dto) {
+		String sql = "insert into challenge(challenge_id, member_id, title, description, start_date, end_date) "
+				+ "values(challenge_seq.nextval, ?, ?, ?, to_date(?, 'YYYY-MM-DD'), to_date(?, 'YYYY-MM-DD'))";
+
+		return jdbc.update(sql, memberId, dto.getTitle(), dto.getDescription(), dto.getStart_date(), dto.getEnd_date());
 	}
 }
