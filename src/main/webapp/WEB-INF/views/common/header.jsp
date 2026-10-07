@@ -117,7 +117,7 @@
 		<%-- ★ 이미지 로고 --%>
 		<nav class="sh-nav">
 			<a href="/map/main">지도</a> <a href="/party/list">파티원모집</a> <a
-				href="#">챌린지</a> <a href="#">가계부</a> <a href="/FreeBoard/freeboard">자유게시판</a>
+				href="#">챌린지</a> <a href="/ledger/list">가계부</a> <a href="/FreeBoard/freeboard">자유게시판</a>
 			<a href="#">Q&amp;A게시판</a>
 		</nav>
 	</div>
