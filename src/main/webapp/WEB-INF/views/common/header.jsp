@@ -72,6 +72,19 @@
    gap: 10px;
 }
 
+/* ★ 버튼 기본 모양 (로그인, 관리자 페이지) */
+.sh-btn {
+   display: inline-block;
+   padding: 6px 14px;
+   border: 1px solid var(--line);
+   border-radius: 6px;
+   background: #fff;
+   font-size: 13px;
+   font-weight: 600;
+   color: var(--text);
+   text-decoration: none;
+   cursor: pointer;
+}
 
 .sh-btn:hover {
    background: var(--fill);
@@ -116,31 +129,37 @@
       <a class="sh-logo" href="/"><img src="/images/logo.png" alt="짠내맵"></a>
       <%-- ★ 이미지 로고 --%>
       <nav class="sh-nav">
-         <a href="/map/main">지도</a> <a href="/party/list">파티원모집</a> <a
-            href="#">챌린지</a> <a href="/ledger/list">가계부</a> <a href="/FreeBoard/freeboard">자유게시판</a>
+         <a href="/map/main">지도</a>
+         <a href="/party/list">파티원모집</a>
+         <a href="/challenge/list">챌린지</a>
+         <a href="/ledger/list">가계부</a>
+         <a href="/FreeBoard/freeboard">자유게시판</a>
          <a href="#">Q&amp;A게시판</a>
       </nav>
    </div>
 
    <div class="sh-right">
       <c:choose>
-<c:when test="${not empty sessionScope.loginId}">
+         <c:when test="${not empty sessionScope.loginId}">
 
-   <a  href="/member/logout"><i class="fa-solid fa-right-from-bracket"></i></a>
+            <%-- ★ 관리자 버튼: 메인에서만(showAdmin), admin 계정일 때만 --%>
+            <c:if test="${param.showAdmin == 'true' and sessionScope.loginId == 'admin'}">
+               <a class="sh-btn" href="/admin/main">관리자 페이지</a>
+            </c:if>
 
-   <a class="sh-notification" href="/notification/list" title="알림">
-      <i class="fa-solid fa-bell"></i>
-   </a>
+            <a class="sh-notification" href="/member/logout" title="로그아웃">
+               <i class="fa-solid fa-right-from-bracket"></i>
+            </a>
 
-   <a class="sh-avatar" href="/member/mypage" title="마이페이지">
-      <i class="fa-solid fa-circle-user"></i>
-   </a>
+            <a class="sh-notification" href="/notification/list" title="알림">
+               <i class="fa-solid fa-bell"></i>
+            </a>
 
-   <c:if test="${param.showAdmin == 'true' and sessionScope.loginId == 'admin'}">
-      <a class="sh-btn" href="/admin/main">관리자 페이지</a>
-   </c:if>
+            <a class="sh-avatar" href="/member/mypage" title="마이페이지">
+               <i class="fa-solid fa-circle-user"></i>
+            </a>
 
-</c:when>
+         </c:when>
          <c:otherwise>
             <a class="sh-btn" href="/member/login">로그인</a>
          </c:otherwise>
