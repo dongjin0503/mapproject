@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.kedu.dao.NotificationDAO;
 import com.kedu.dao.PartyDAO;
 import com.kedu.dao.SettlementDAO;
 import com.kedu.dto.PartyDTO;
@@ -22,6 +23,9 @@ public class SettlementController {
 
 	@Autowired
 	private PartyDAO partyDAO;
+	
+	@Autowired
+	private NotificationDAO notificationDAO;
 
 	@Autowired
 	private SettlementDAO settlementDAO;
@@ -53,9 +57,11 @@ public class SettlementController {
 
 	@RequestMapping(value = "/createSubmit", method = RequestMethod.POST)
 	public String createSubmit(@RequestParam("partyId") int partyId,
-			@RequestParam("settlementType") String settlementType, @RequestParam("totalAmount") long totalAmount,
+			@RequestParam("settlementType") String settlementType, 
+			@RequestParam("totalAmount") long totalAmount,
 			@RequestParam(value = "memberIds", required = false) List<String> memberIds,
-			@RequestParam(value = "memberAmounts", required = false) List<Long> memberAmounts, HttpSession session,
+			@RequestParam(value = "memberAmounts", required = false) List<Long> memberAmounts, 
+			HttpSession session,
 			Model model) {
 
 		String loginId = (String) session.getAttribute("loginId");
@@ -80,6 +86,23 @@ public class SettlementController {
 
 				throw new IllegalArgumentException("정산 방식이 올바르지 않습니다.");
 			}
+			
+			List<String> partyMemberIds =
+					partyDAO.findMemberIds(partyId);
+			
+			for (String memberId : partyMemberIds) {
+				
+				if(!memberId.equals(loginId)) {
+					
+					notificationDAO.insert(
+							memberId,
+							"SETTLEMEMT_CREATED",
+							"PARTY",
+							partyId,
+							"모임비 정산이 완료되었습니다."
+							);
+				}
+			}
 
 			return "redirect:/settlement/result?settlementId=" + settlementId;
 
@@ -99,10 +122,26 @@ public class SettlementController {
 	}
 
 	@RequestMapping("/result")
-	public String result(@RequestParam("settlementId") int settlementId, Model model) {
+	public String result(@RequestParam("settlementId") int settlementId,HttpSession session, Model model) {
 
+		String loginId = (String) session.getAttribute("loginId");
+		
+		if(loginId == null) {
+			return "redirect:/member/login";
+		}
+		
 		SettlementDTO settlementDTO = settlementDAO.findSettlement(settlementId);
 
+		if(settlementDTO == null) {
+			return "redirect:/party/list";
+		}
+		
+		int partyId = settlementDTO.getPartyId();
+		
+		if(!partyDAO.isMember(partyId, loginId)) {
+			return "redirect:/party/detail?partyId=" + partyId;
+		}
+		
 		List<SettlementDTO> details = settlementDAO.findSettlementDetails(settlementId);
 
 		model.addAttribute("settlement", settlementDTO);
