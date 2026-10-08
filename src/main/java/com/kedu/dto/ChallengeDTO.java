@@ -17,6 +17,7 @@ public class ChallengeDTO {
 	private int member_count;    // 참여자 수
 	private int d_day;           // 종료까지 남은 날
 	private String status;       // 모집중 / 진행중 / 종료
+	private int progress;
 	
 	// ==== challege, challenge_member 테이블 조인 ====
 	private Timestamp joined_at;
@@ -49,7 +50,13 @@ public class ChallengeDTO {
 		this.status = status;
 	}
 
-
+	
+	public int getProgress() {
+		return progress;
+	}
+	public void setProgress(int progress) {
+		this.progress = progress;
+	}
 	public int getChallenge_id() {
 		return challenge_id;
 	}

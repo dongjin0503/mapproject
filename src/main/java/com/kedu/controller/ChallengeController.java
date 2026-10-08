@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.kedu.dao.ChallengeDAO;
 import com.kedu.dao.ChallengeReplyDAO;
@@ -139,5 +140,11 @@ public class ChallengeController {
 		}
 		dao.addMember(challenge_id, id);
 		return "redirect:/challenge/detail?challenge_id=" + challenge_id; 
+	}
+	
+	@ResponseBody
+	@RequestMapping("ajax/progress")
+	public List<ChallengeDTO> progress(){
+		return dao.listProgress();
 	}
 }

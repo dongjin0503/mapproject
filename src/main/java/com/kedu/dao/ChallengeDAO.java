@@ -81,4 +81,20 @@ public class ChallengeDAO {
 		return jdbc.update(sql, challengeId, memberId);
 	}
 	
+	// 폴링용: 목록 카드에서 주기적으로 갱신할 값만 가볍게 조회
+	public List<ChallengeDTO> listProgress() {
+		String sql = "select c.challenge_id, "
+				+ "(select count(*) from challenge_member m where m.challenge_id = c.challenge_id) as member_count, "
+				+ "trunc(c.end_date) - trunc(sysdate) as d_day, "
+				+ "case "
+				+ "when trunc(sysdate) < trunc(c.start_date) then '모집중' "
+				+ "when trunc(sysdate) > trunc(c.end_date) then '종료' "
+				+ "else '진행중' "
+				+ "end as status, "
+				+ "nvl(round(least(greatest((trunc(sysdate) - trunc(c.start_date)) "
+				+ "/ nullif(trunc(c.end_date) - trunc(c.start_date), 0) * 100, 0), 100)), 100) as progress "
+				+ "from challenge c";
+
+		return jdbc.query(sql, new BeanPropertyRowMapper<>(ChallengeDTO.class));
+	}
 }

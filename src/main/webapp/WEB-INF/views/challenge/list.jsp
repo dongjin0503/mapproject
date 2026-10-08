@@ -130,14 +130,17 @@
 	</c:if>
 	
 	<div class ="cards" >
-	<button type="button" class="bookmark-btn" data-id="${ch.challenge_id}">☆</button>
-	<c:forEach var="ch" items="${list}">
-		<div class ="card" data-status ="${ch.status }">
+	
+		<c:forEach var="ch" items="${list}">
+	    <div class ="card" data-status ="${ch.status }" data-id="${ch.challenge_id}">
+		<button type="button" class="bookmark-btn" data-id="${ch.challenge_id}">☆</button>
+		
 			<h3> ${ch.title }</h3>
 			${ch.start_date } ~ ${ch.end_date }
 			<div class="bar"><div class="fill"></div></div>
 			<div>
-			D-${ch.d_day } · 참여자 ${ch.member_count }명
+			<span class ="dday"> D-${ch.d_day } </span>
+			<span> · 참여자 <span class="cnt">${ch.member_count }</span>명 </span>
 			</div>
 			<a class = "detail" href = "/challenge/detail?challenge_id=${ch.challenge_id }" >상세보기</a>	
 		</div>
@@ -177,6 +180,40 @@
 				else btn.text(r === "added" ? "★" : "☆");
 			});
 		});
+		
+		// 진행률/참여자수/D-day 를 서버에서 받아와 카드에 반영
+		function refreshProgress() {
+			$.ajax({
+				url : "/challenge/ajax/progress",
+				type : "get",
+				dataType : "json",
+				success : function(list) {
+					// list 는 [{challenge_id:3, progress:54, ...}, {...}] 형태
+					for (var i = 0; i < list.length; i++) {
+						var item = list[i];
+
+						// data-id 가 같은 카드 하나를 찾는다
+						var card = $(".card[data-id='" + item.challenge_id + "']");
+
+						// 진행률 바 너비
+						card.find(".fill").css("width", item.progress + "%");
+
+						// 참여자 수
+						card.find(".cnt").text(item.member_count);
+
+						// D-day 글자 (종료면 '종료됨')
+						if (item.status == "종료") {
+							card.find(".dday").text("종료됨");
+						} else {
+							card.find(".dday").text("D-" + item.d_day);
+						}
+					}
+				}
+			});
+		}
+
+		refreshProgress();                     // 화면이 열리자마자 한 번 실행
+		setInterval(refreshProgress, 5000);    // 그 뒤로 5초(5000ms)마다 계속 실행
 	</script>
 	</body>
 </html>

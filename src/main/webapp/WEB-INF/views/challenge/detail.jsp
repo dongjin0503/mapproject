@@ -72,7 +72,7 @@
 			<a href="/challenge/apply?challenge_id=${ch.challenge_id}"> 참여하기 </a>
 			</c:otherwise>
 		</c:choose>
-		<button type ="button"> ★ </button>
+		<button type="button" class="bookmark-btn" data-id="${ch.challenge_id}">☆</button>
 		</div>
 		<div>
 		<span> ${ch.status } </span>
@@ -158,6 +158,29 @@
 		
 	    $(".delForm").on("submit", function(){
 		return confirm("정말 삭제할까요?");
+		});
+		
+		// 이 챌린지를 북마크했으면 ★ 로 표시
+		$.get("/member/bookmarkIds", { contentType : "CHALLENGE" }, function(ids) {
+			$(".bookmark-btn").each(function() {
+				if (ids.includes($(this).data("id"))) {
+					$(this).text("★");
+				}
+			});
+		});
+
+		// 클릭하면 북마크 켜기/끄기
+		$(document).on("click", ".bookmark-btn", function() {
+			var btn = $(this);
+			$.post("/member/bookmarkToggle", { contentType : "CHALLENGE", contentId : btn.data("id") }, function(r) {
+				if (r === "login") {
+					location.href = "/member/login";
+				} else if (r === "added") {
+					btn.text("★");
+				} else {
+					btn.text("☆");
+				}
+			});
 		});
 	</script>
 </body>
