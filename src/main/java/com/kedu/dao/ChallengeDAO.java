@@ -39,4 +39,23 @@ public class ChallengeDAO {
 
 		return jdbc.update(sql, memberId, dto.getTitle(), dto.getDescription(), dto.getStart_date(), dto.getEnd_date());
 	}
+	
+	// 챌린지 1건 조회 (상세 화면용)
+	public ChallengeDTO getChallenge(int challengeId) {
+		String sql = "select c.challenge_id, c.member_id, c.title, c.description, "
+				+ "to_char(c.start_date, 'YYYY-MM-DD') as start_date, "
+				+ "to_char(c.end_date, 'YYYY-MM-DD') as end_date, "
+				+ "(select count(*) from challenge_member m where m.challenge_id = c.challenge_id) as member_count, "
+				+ "trunc(c.end_date) - trunc(sysdate) as d_day, "
+				+ "case "
+				+ "when trunc(sysdate) < trunc(c.start_date) then '모집중' "
+				+ "when trunc(sysdate) > trunc(c.end_date) then '종료' "
+				+ "else '진행중' "
+				+ "end as status "
+				+ "from challenge c "
+				+ "where c.challenge_id = ?";
+
+		return jdbc.queryForObject(sql, new BeanPropertyRowMapper<>(ChallengeDTO.class), challengeId);
+	}
+	
 }

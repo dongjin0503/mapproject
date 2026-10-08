@@ -20,6 +20,23 @@ public class ChallengeDTO {
 	public ChallengeDTO() {
 	}
 
+	
+	public ChallengeDTO(int challenge_id, String member_id, String title, String description, String start_date,
+			String end_date, String created_at, int member_count, int d_day, String status) {
+		super();
+		this.challenge_id = challenge_id;
+		this.member_id = member_id;
+		this.title = title;
+		this.description = description;
+		this.start_date = start_date;
+		this.end_date = end_date;
+		this.created_at = created_at;
+		this.member_count = member_count;
+		this.d_day = d_day;
+		this.status = status;
+	}
+
+
 	public int getChallenge_id() {
 		return challenge_id;
 	}
