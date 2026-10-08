@@ -273,7 +273,7 @@ public class MemberController {
 	    String loginId = (String) session.getAttribute("loginId");
 	    if (loginId == null) return "redirect:/member/login";
 	    
-	    model.addAttribute("challengeList",cdao.MyChallengeRecord);
+	    model.addAttribute("challengeList",cdao.MyChallengeRecord(loginId));
 	    model.addAttribute("member", dao.selectMember(loginId));
 	    model.addAttribute("partyList", pdao.findJoinedParties(loginId));
 	    return "/member/participationHistory";

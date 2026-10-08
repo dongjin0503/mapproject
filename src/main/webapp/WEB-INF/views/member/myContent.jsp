@@ -204,7 +204,7 @@ body {
 										<c:if test="${i.replyCount > 0}">
 												<span class="reply-count">[${i.replyCount}]</span>
 										</c:if></td>
-										<td><fmt:formatDate value="${i.createdAt}" pattern="yyyy.MM.dd" /></td>
+										<td><fmt:formatDate value="${i.createdAt}" pattern="yy.MM.dd HH:mm" /></td>
 									</tr>
 								</c:forEach>
 							</c:otherwise>

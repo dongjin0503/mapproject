@@ -185,7 +185,7 @@ body {
 									<tr>
 										<td>${i.challenge_id }</td>
 										<td class="title"><a href="/challenge/detail?challenge_id=${i.challenge_id}"><c:out value="${i.title}" /></a></td>
-										<td>${i.joined_at}</td>
+										<td><fmt:formatDate value="${i.joined_at}" pattern="yyyy.MM.dd HH:mm" /></td>
 									</tr>
 								</c:forEach>
 							</c:otherwise>

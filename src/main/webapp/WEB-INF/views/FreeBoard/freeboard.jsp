@@ -2,6 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.css" integrity="sha512-x9WwyMYBnlXMNQ6kQ/Lyzu1NqIhLQKL5Oq6xByfXuRj7s9CskyCbLv/1IjqzJmXwFXWr0ov6jBV7Qbc0hh9nHg==" crossorigin="anonymous" referrerpolicy="no-referrer">
 <!DOCTYPE html>
 <html>
 <head>
@@ -327,6 +328,7 @@ body {
 						<th>번호</th>
 						<th>카테고리</th>
 						<th>제목</th>
+						<th><a href="/best/board">HOT 게시글</a></th>
 						<th>작성자</th>
 						<th>조회 수</th>
 						<th>작성일</th>
@@ -345,6 +347,7 @@ body {
 									<td class="title"><a href="/FreeBoard/detail?postId=${i.postId}&cpage=${cpage}"><c:out value="${i.title}"/></a>
 										<c:if test="${i.replyCount > 0}"><span class="reply-count">[${i.replyCount}]</span></c:if>
 									</td>
+									<td><c:if test="${i.likeCount > 5 }"><i class="fa-solid fa-burst"></i></c:if></td>
 									<td><c:out value="${i.username}"/>
 										<c:if test="${i.memberId == loginId}"><span class="meBadge">나</span></c:if>
 									</td>

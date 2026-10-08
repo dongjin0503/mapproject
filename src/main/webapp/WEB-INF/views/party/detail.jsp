@@ -349,6 +349,10 @@
             </C:choose>
 
          </C:if>
+         <C:if test="${isMember}">
+            <button type="button" id="chat-btn" onclick="location.href='/Chattingroom/chat?partyId=${party.partyId}'">
+               채팅방 입장</button>
+         </C:if>
          <button type="button" id="list-btn"
             onclick="location.href='/party/list'">목록으로 돌아가기</button>
       </div>
