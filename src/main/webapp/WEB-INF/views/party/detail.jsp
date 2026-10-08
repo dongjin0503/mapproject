@@ -398,6 +398,7 @@
 				</C:choose>
 
 
+
 			</C:if>
 			<C:if test="${isMember}">
 				<button type="button" id="chat-btn" class="apply-btn"
