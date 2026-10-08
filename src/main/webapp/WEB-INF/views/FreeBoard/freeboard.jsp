@@ -9,7 +9,7 @@
 <title>자유게시판</title>
 
 <style>
-```css
+
 * {
 	box-sizing: border-box;
 }
@@ -164,7 +164,7 @@ body {
 }
 
 .board-list th:nth-child(4) {
-	width: 120px;
+	width: 130px;
 }
 
 .board-list th:nth-child(5) {
@@ -181,6 +181,9 @@ body {
 	border-bottom: 1px solid #e8ecf3;
 	color: #8995a9;
 	text-align: center;
+}
+.board-list td:nth-child(4) {
+	white-space: nowrap; /* 작성자 컬럼 줄바꿈 방지 */
 }
 
 .board-list tr:last-child td {
@@ -277,7 +280,7 @@ body {
 	font-size: 11px;
 	font-weight: bold;
 }
-   .myRow { background-color: #f3f6ff; }
+.myRow { background-color: #f3f6ff; }
 
 </style>
 </head>
@@ -342,7 +345,7 @@ body {
 									<td class="title"><a href="/FreeBoard/detail?postId=${i.postId}&cpage=${cpage}"><c:out value="${i.title}"/></a>
 										<c:if test="${i.replyCount > 0}"><span class="reply-count">[${i.replyCount}]</span></c:if>
 									</td>
-									<td><c:out value="${i.memberId}"/>
+									<td><c:out value="${i.username}"/>
 										<c:if test="${i.memberId == loginId}"><span class="meBadge">나</span></c:if>
 									</td>
 									<td>${i.viewCount}</td>
@@ -375,11 +378,11 @@ body {
 
 				let navi = document.getElementById("navigation");
 				let searchWord = navi.dataset.search;
+				let categoryWord = navi.dataset.category;
 				// 카테고리 버튼: 검색어는 유지하고 1페이지부터
 				function goCategory(c) {
 					location.href = "/FreeBoard/freeboard?category=" + encodeURIComponent(c) + "&search=" + encodeURIComponent(searchWord);
 				}
-
 				function addLink(text, page, active) {
 					let a = document.createElement("a");
 					a.setAttribute("href", "/FreeBoard/freeboard?cpage=" + page + "&search=" + encodeURIComponent(searchWord) + "&category=" + encodeURIComponent(categoryWord));
