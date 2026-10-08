@@ -23,9 +23,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.google.gson.Gson;
 import com.kedu.dao.MemberDAO;
 import com.kedu.dao.PartyDAO;
+import com.kedu.dao.SettlementDAO;
 import com.kedu.dto.MemberDTO;
 import com.kedu.dto.PartyApplicationDTO;
 import com.kedu.dto.PartyDTO;
+import com.kedu.dto.SettlementDTO;
 
 @Controller
 @RequestMapping("/party")
@@ -36,6 +38,9 @@ public class PartyController {
 
    @Autowired
    private MemberDAO memberDAO;
+   
+   @Autowired
+   private SettlementDAO settlementDAO;
 
    @Autowired
    private Gson gson;
@@ -78,16 +83,20 @@ public class PartyController {
    @RequestMapping("/detail")
    public String derail(int partyId, HttpSession session, Model model) {
       PartyDTO party = partyDAO.findById(partyId);
-      
-      model.addAttribute(
-               "partyImages",
-               partyDAO.findPartyImages(partyId)
-         );
-      
-      
+     
       if (party == null) {
          return "redirect:/party/list";
       }
+      
+      model.addAttribute(
+              "partyImages",
+              partyDAO.findPartyImages(partyId)
+        );
+      
+      SettlementDTO settlement = settlementDAO.findByPartyId(partyId);;
+      
+      model.addAttribute("settlement", settlement);
+      
       int memberCount = partyDAO.countMembers(partyId);
       model.addAttribute("memberCount", memberCount);
 

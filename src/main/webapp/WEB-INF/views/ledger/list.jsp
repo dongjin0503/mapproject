@@ -25,8 +25,13 @@
 }
 
 .container {
-	max-width: 1100px;
+	max-width: 1200px;
 	margin: 30px auto;
+}
+
+.fc-toolbar-title {
+	font-size: 28px !important;
+	line-height: 1.3;
 }
 
 .ledger-wrap {
@@ -36,7 +41,7 @@
 }
 
 .ledger-form {
-	width: 360px;
+	width: 400px;
 	padding: 15px;
 	border: 1px solid #ccc;
 	border-radius: 8px;
@@ -190,7 +195,7 @@ textarea[name='memo'] {
 
 .day-detail {
 	margin-top: 15px;
-	min-height: 220px;
+	min-height: 244px;
 	padding: 20px;
 	border: 1px solid #ccc;
 	border-radius: 8px;
@@ -381,9 +386,36 @@ textarea[name='memo'] {
 				new FullCalendar.Calendar(calendarEl, {
 
 					initialView : "dayGridMonth",
+					
+					locale : "ko",
+					headerToolbar : {
+						left : "title",
+						center : "",
+						right : "today prev,next"
+					},
+					
+					
+					datesSet : function(info) {
+
+						let months = [
+							"January", "February", "March", "April",
+							"May", "June", "July", "August",
+							"September", "October", "November", "December"
+						];
+						
+						let date = info.view.currentStart;
+
+						let year = date.getFullYear();
+						let monthName = months[date.getMonth()];
+
+						$(".fc-toolbar-title").html(
+							year + "<br>" + monthName
+						);
+					},
+
 
 					dateClick : function(info) {
-
+						
 						$("#ledgerDate").val(info.dateStr);
 
 						$("#selected-date")
