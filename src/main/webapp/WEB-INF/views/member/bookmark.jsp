@@ -110,7 +110,11 @@ body {
   border-bottom: 1px solid var(--line);
 }
 .content-list { margin-top: 20px; max-height: 500px; overflow-y: auto; }
-.content-list table { width: 100%; border-collapse: collapse; }
+.content-list table {
+	width: 100%;
+	border-collapse: collapse;
+	table-layout: fixed;
+}
 .content-list th, .content-list td {
   padding: 12px 8px;
   border-bottom: 1px solid var(--fill-strong);
@@ -121,6 +125,15 @@ body {
 .content-list th:nth-child(2), .content-list td:nth-child(2) { text-align: left; }
 .content-list a { color: var(--text); text-decoration: none; }
 .content-list a:hover { text-decoration: underline; }
+.content-list th:first-child,
+.content-list td:first-child {
+	width: 25%;
+}
+
+.content-list th:nth-child(2),
+.content-list td:nth-child(2) {
+	width: 75%;
+}
 </style>
 
 </head>
@@ -216,7 +229,7 @@ body {
 									<c:forEach var="i" items="${challengeList}">
 										<tr>
 											<td>${i.contentId}</td>
-											<td class="title"><a href="/challenge/detail?challengeId=${i.contentId}"><c:out value="${i.title}" /></a></td>
+											<td class="title"><a href="/challenge/detail?challenge_id=${i.contentId}"><c:out value="${i.title}" /></a></td>
 										</tr>
 									</c:forEach>
 								</c:otherwise>

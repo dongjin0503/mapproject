@@ -15,8 +15,18 @@ public class FreeBoardDTO {
 	
 	// 1. username 필드 추가
 	private String username;
-
 	
+	// 2. is_hot (추천수 0 or 1) 필드 추가
+	private int isHot;
+	
+	public int getIsHot() {
+		return isHot;
+	}
+
+	public void setIsHot(int isHot) {
+		this.isHot = isHot;
+	}
+
 	public FreeBoardDTO() {};
 	
 	public FreeBoardDTO(int postId, String memberId, String title, String contentCategory, String content,

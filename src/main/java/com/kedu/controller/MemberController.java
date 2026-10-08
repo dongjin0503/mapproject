@@ -247,6 +247,17 @@ public class MemberController {
 		return "/member/myContent";
 		
 	}
+	@ResponseBody
+	@RequestMapping("/bookmarkIds")
+	public List<Integer> bookmarkIds(HttpSession session, String contentType) {
+		List<Integer> ids = new ArrayList<>();
+		String loginId = (String) session.getAttribute("loginId");
+		if (loginId == null) return ids;
+		for (BookMarkDTO b : bdao.bookmarkList(loginId)) {
+			if (contentType.equals(b.getContentType())) ids.add(b.getContentId());
+		}
+		return ids;
+	}
 	
 	@RequestMapping("/bookmark")
 	public String bookmark(HttpSession session,Model model) throws Exception{
