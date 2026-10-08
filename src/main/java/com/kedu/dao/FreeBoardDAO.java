@@ -70,12 +70,16 @@ public class FreeBoardDAO {
    	}
 
    public void likeCountPlus(int postId) {
-      String sql = "update freeboard set like_count=like_count+1 where post_id=?";
+      String sql = "update freeboard set like_count=like_count+1,"
+      		+ "is_hot = case when like_count+1 >= 5 then 1 else 0 end "
+      		+ "where post_id=?";
       jdbc.update(sql, postId);
    }
 
    public void likeCountMinus(int postId) {
-      String sql = "update freeboard set like_count=like_count-1 where post_id=?";
+      String sql = "update freeboard set like_count=like_count-1,"
+      		+ "is_hot = case when like_count-1 >= 5 then 1 else 0 end "
+      		+ "where post_id=?";
       jdbc.update(sql, postId);
    }
 

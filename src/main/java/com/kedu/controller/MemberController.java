@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.kedu.dao.BookMarkDAO;
+import com.kedu.dao.ChallengeDAO;
 import com.kedu.dao.FreeBoardDAO;
 import com.kedu.dao.MemberDAO;
 import com.kedu.dao.PartyDAO;
@@ -220,8 +221,8 @@ public class MemberController {
 	@Autowired
 	private PartyDAO pdao;
 	
-//	@Autowired
-//	private ChallengeDAO cdao;
+	@Autowired
+	private ChallengeDAO cdao;
 	
 	@ResponseBody
 	@RequestMapping("/bookmarkToggle")
@@ -245,6 +246,17 @@ public class MemberController {
 		model.addAttribute("myContentList",myContentList);
 		return "/member/myContent";
 		
+	}
+	@ResponseBody
+	@RequestMapping("/bookmarkIds")
+	public List<Integer> bookmarkIds(HttpSession session, String contentType) {
+		List<Integer> ids = new ArrayList<>();
+		String loginId = (String) session.getAttribute("loginId");
+		if (loginId == null) return ids;
+		for (BookMarkDTO b : bdao.bookmarkList(loginId)) {
+			if (contentType.equals(b.getContentType())) ids.add(b.getContentId());
+		}
+		return ids;
 	}
 	
 	@RequestMapping("/bookmark")
@@ -272,7 +284,7 @@ public class MemberController {
 	    String loginId = (String) session.getAttribute("loginId");
 	    if (loginId == null) return "redirect:/member/login";
 	    
-//	    model.addAttribute("challengeList",cdao.challengeList);
+	    model.addAttribute("challengeList",cdao.MyChallengeRecord(loginId));
 	    model.addAttribute("member", dao.selectMember(loginId));
 	    model.addAttribute("partyList", pdao.findJoinedParties(loginId));
 	    return "/member/participationHistory";

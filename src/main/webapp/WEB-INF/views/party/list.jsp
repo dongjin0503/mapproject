@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-   pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@taglib prefix="C" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <fmt:setLocale value="ko_KR" />
@@ -11,81 +10,85 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <style>
 * {
-   box-sizing: border-box;
+	box-sizing: border-box;
 }
 
 .container {
-   max-width: 1090px;
-   margin: 0 auto;
-   min-height: 100vh; /*브라우저 화면 높이의 100%*/
+	max-width: 1090px;
+	margin: 0 auto;
+	min-height: 100vh; /*브라우저 화면 높이의 100%*/
 }
 
 #create-btn {
-   height: 40px;
-   width: 120px;
-   background-color: black;
-   border: 1px solid black;
-   border-radius: 5px;
-   color: white;
-   font-size: 16px;
-   font-weight: bold;
-   text-align: center;
-   display: block;
-   margin-left: auto;
-   margin-top: 20px;
-   margin-bottom: 20px;
-   cursor: pointer;
-   transition: background-color 0.2s;
+	height: 40px;
+	width: 120px;
+	background-color: black;
+	border: 1px solid black;
+	border-radius: 5px;
+	color: white;
+	font-size: 16px;
+	font-weight: bold;
+	text-align: center;
+	display: block;
+	margin-left: auto;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	cursor: pointer;
+	transition: background-color 0.2s;
 }
 
 #create-btn:hover {
-   background-color: #333;
+	background-color: #333;
 }
 
 #party-list {
-   display: grid;
-   grid-template-columns: repeat(3, 1fr);
-   gap: 20px;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 20px;
 }
 
 #party-list a {
-   color: inherit;
-   text-decoration: none;
+	color: inherit;
+	text-decoration: none;
 }
 
 .card {
-   position: relative;
-   height: 300px;
-   width: 350px;
-   padding: 10px;
-   border: 1px solid #ccc;
-   border-radius: 5px;
-   cursor: pointer;
+	position: relative;
+	height: 300px;
+	width: 350px;
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	cursor: pointer;
 }
 
 .bookmark-btn {
-   position: absolute;
-   top: 15px;
-   right: 15px;
-   width: 36px; height : 36px; border : none; background : white;
-   border-radius : 50%; font-size : 24px; cursor : pointer;
-   z-index: 10;
-   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-   height: 36px;
-   border: none;
-   background: white;
-   border-radius: 50%;
-   font-size: 24px;
-   cursor: pointer;
+	position: absolute;
+	top: 15px;
+	right: 15px;
+	width: 36px;
+	height: 36px;
+	padding: 0;
+	border: 1px solid #ddd;
+	border-radius: 50%;
+	background: white;
+	color: #f59e0b;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 19px;
+	cursor: pointer;
+	z-index: 10;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .card:hover {
-   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .image {
 	width: 100%;
-	aspect-ratio: 16 / 9;
+	aspect-ratio: 16/9;
 	overflow: hidden;
 	border-radius: 5px;
 	background-color: #f5f5f5;
@@ -99,77 +102,75 @@
 }
 
 .store {
-   font-size: 13px;
-   color: #777;
-   margin-bottom: 8px;
+	font-size: 13px;
+	color: #777;
+	margin-bottom: 8px;
 }
 
 .title {
-   font-size: 18px;
-   font-weight: bold;
-   margin-bottom: 8px;
-   white-space: nowrap;
-   overflow: hidden;
-   text-overflow: ellipsis;
+	font-size: 18px;
+	font-weight: bold;
+	margin-bottom: 8px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .meet-date {
-   font-size: 14px;
-   color: #555;
+	font-size: 14px;
+	color: #555;
 }
 </style>
 </head>
 <body>
-   <jsp:include page="/WEB-INF/views/common/header.jsp" />
-   <div class="container">
-      <button type="button" id="create-btn"
-         onclick="location.href='/party/create'">모임 만들기</button>
-      <div id="party-list">
-         <C:forEach var="party" items="${parties}">
-            <div class="card"
-               onclick="location.href='/party/detail?partyId=${party.partyId}'">
+	<jsp:include page="/WEB-INF/views/common/header.jsp" />
+	<div class="container">
+		<button type="button" id="create-btn" onclick="location.href='/party/create'">모임 만들기</button>
+		<div id="party-list">
+			<C:forEach var="party" items="${parties}">
+				<div class="card" onclick="location.href='/party/detail?partyId=${party.partyId}'">
 
-               <button type="button" class="bookmark-btn"
-                  data-party-id="${party.partyId}">
-                  <C:choose>
+					<button type="button" class="bookmark-btn" data-party-id="${party.partyId}">
 
-                     <C:when test="${bookmarkedPartyIds.contains(party.partyId)}">
-         ★
-      </C:when>
+						<C:choose>
+							<C:when test="${bookmarkedPartyIds.contains(party.partyId)}">
+								<i class="fa-solid fa-star"></i>
+							</C:when>
 
-                     <C:otherwise>
-         ☆
-      </C:otherwise>
+							<C:otherwise>
+								<i class="fa-regular fa-star"></i>
+							</C:otherwise>
+						</C:choose>
 
-                  </C:choose>
-               </button>
+					</button>
 
-               <div class="image">   <C:choose>
-      <C:when test="${not empty party.imageSysName}">
-      <img src="/uploads/${party.imageSysName}">
-      </C:when>
+					<div class="image">
+						<C:choose>
+							<C:when test="${not empty party.imageSysName}">
+								<img src="/uploads/${party.imageSysName}">
+							</C:when>
 
-      <C:otherwise>
-         모임사진
-      </C:otherwise>
-   </C:choose>
-</div>
+							<C:otherwise>
+        						 모임사진
+      						</C:otherwise>
+						</C:choose>
+					</div>
 
-               <div class="store">${party.address}·${party.storeName}</div>
+					<div class="store">${party.address}·${party.storeName}</div>
 
-               <div class="title">${party.title}</div>
+					<div class="title">${party.title}</div>
 
-               <div class="meet-date">
-                  <fmt:formatDate value="${party.meetDate}"
-                     pattern="yyyy.MM.dd(E) HH:mm" />
-               </div>
+					<div class="meet-date">
+						<fmt:formatDate value="${party.meetDate}" pattern="yyyy.MM.dd(E) HH:mm" />
+					</div>
 
-            </div>
-         </C:forEach>
-      </div>
-   </div>
+				</div>
+			</C:forEach>
+		</div>
+	</div>
 
-   <script>
+	<script>
+   const bookmarkedIds = [<C:forEach var="b" items="${bookmarkedPartyIds}" varStatus="s">${b}<C:if test="${!s.last}">,</C:if></C:forEach>];
    let loading = false;
    let offset = 9;
    window.addEventListener("scroll", function(){
@@ -189,7 +190,9 @@
          bookmarkBtn.type = "button";
          bookmarkBtn.className = "bookmark-btn";
          bookmarkBtn.dataset.partyId = party.partyId;
-         bookmarkBtn.textContent = "☆";
+         bookmarkBtn.innerHTML = bookmarkedIds.includes(party.partyId)
+         ? '<i class="fa-solid fa-star"></i>'
+         : '<i class="fa-regular fa-star"></i>';
 
          card.appendChild(bookmarkBtn);
          
@@ -237,7 +240,7 @@
    
    $(document).on("click", ".bookmark-btn", function(e) {
       e.stopPropagation();
-
+      e.preventDefault();
       let btn = $(this);
       let partyId = btn.data("party-id");
 
@@ -256,12 +259,12 @@
 
             } else if (result === "INSERT") {
 
-               btn.text("★");
+            	   btn.html('<i class="fa-solid fa-star"></i>');
 
-            } else if (result === "DELETE") {
+            	} else if (result === "DELETE") {
 
-               btn.text("☆");
-            }
+            	   btn.html('<i class="fa-regular fa-star"></i>');
+            	}
          }
       });
    });

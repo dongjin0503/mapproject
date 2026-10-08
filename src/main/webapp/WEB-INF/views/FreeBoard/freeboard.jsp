@@ -2,6 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.css" integrity="sha512-x9WwyMYBnlXMNQ6kQ/Lyzu1NqIhLQKL5Oq6xByfXuRj7s9CskyCbLv/1IjqzJmXwFXWr0ov6jBV7Qbc0hh9nHg==" crossorigin="anonymous" referrerpolicy="no-referrer">
 <!DOCTYPE html>
 <html>
 <head>
@@ -150,30 +151,14 @@ body {
 	border-bottom: 1px solid #d5dce7;
 }
 
-.board-list th:nth-child(1) {
-	width: 70px;
-}
-
-.board-list th:nth-child(2) {
-	width: 90px;
-}
-
-.board-list th:nth-child(3) {
-	text-align: left;
-	padding-left: 15px;
-}
-
-.board-list th:nth-child(4) {
-	width: 130px;
-}
-
-.board-list th:nth-child(5) {
-	width: 80px;
-}
-
-.board-list th:nth-child(6) {
-	width: 110px;
-}
+/* [수정] 열 1개 삭제에 따른 th nth-child 순서 및 너비 재조정 */
+.board-list th:nth-child(1) { width: 70px; } /* 번호 */
+.board-list th:nth-child(2) { width: 90px; } /* 카테고리 */
+.board-list th:nth-child(3) { text-align: left; padding-left: 15px; } /* 제목 (나머지 너비 자동 할당) */
+/* [수정] 작성자 영역(130px -> 150px)을 약간 넓혀서 제목 공간을 줄이고 텍스트가 상대적으로 왼쪽으로 당겨지는 효과 부여 */
+.board-list th:nth-child(4) { width: 150px; } /* 작성자 */
+.board-list th:nth-child(5) { width: 80px; } /* 조회수 */
+.board-list th:nth-child(6) { width: 110px; } /* 작성일 */
 
 .board-list td {
 	height: 46px;
@@ -182,10 +167,6 @@ body {
 	color: #8995a9;
 	text-align: center;
 }
-.board-list td:nth-child(4) {
-	white-space: nowrap; /* 작성자 컬럼 줄바꿈 방지 */
-}
-
 .board-list tr:last-child td {
 	border-bottom: none;
 }
@@ -197,6 +178,11 @@ body {
 .board-list td:nth-child(2) {
 	color: #2457d6;
 	font-size: 12px;
+}
+
+/* [수정] 작성자 줄바꿈 방지 클래스 번호 변경 (5 -> 4) */
+.board-list td:nth-child(4) {
+	white-space: nowrap; 
 }
 
 .board-list td.title {
@@ -232,13 +218,46 @@ body {
 }
 
 /* =========================
-   페이지네이션
+   하단 도구 (HOT 버튼 + 페이지네이션) [수정됨]
 ========================= */
+.bottom-tools {
+	display: flex;
+	align-items: center;
+	justify-content: center; /* 페이지네이션을 중앙에 두기 위함 */
+	position: relative; /* HOT 버튼을 절대위치로 띄우기 위한 기준점 */
+	margin-top: 24px;
+}
+
+/* HOT 버튼 예쁘게 디자인 [새로 추가] */
+.hot-btn {
+	position: absolute; /* 왼쪽 끝 고정 */
+	left: 0;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 8px 16px;
+	background-color: #fff0f0; /* 연한 붉은 배경 */
+	color: #e91717; /* 강렬한 붉은 글씨 */
+	border: 1px solid #ffd6d6;
+	border-radius: 6px;
+	font-size: 13px;
+	font-weight: bold;
+	text-decoration: none;
+	transition: all 0.2s ease-in-out;
+}
+
+.hot-btn:hover {
+	background-color: #e91717;
+	color: #fff;
+	border-color: #e91717;
+}
+
+/* 페이지네이션 */
 .pagination {
 	display: flex;
 	justify-content: center;
 	gap: 6px;
-	margin-top: 24px;
+	/* margin-top은 부모(bottom-tools)에서 주므로 제거 */
 }
 
 .pagination a {
@@ -271,6 +290,7 @@ body {
 	color: #8995a9;
 	font-size: 12px;
 }
+
 .meBadge {
 	margin-left: 6px;
 	padding: 1px 8px;
@@ -342,21 +362,24 @@ body {
 								<tr>
 									<td>${i.postId}</td>
 									<td>${i.contentCategory}</td>
-									<td class="title"><a href="/FreeBoard/detail?postId=${i.postId}&cpage=${cpage}"><c:out value="${i.title}"/></a>
-										<c:if test="${i.replyCount > 0}"><span class="reply-count">[${i.replyCount}]</span></c:if>
-									</td>
+									<td class="title"><c:if test="${i.isHot == 1}"><i class="fa-solid fa-burst" style="color: rgb(233, 23, 23);"></i></c:if>
+									<a href="/FreeBoard/detail?postId=${i.postId}&cpage=${cpage}"><c:out value="${i.title}"/></a>
+										<c:if test="${i.replyCount > 0}"><span class="reply-count">[${i.replyCount}]</span></c:if></td>
 									<td><c:out value="${i.username}"/>
 										<c:if test="${i.memberId == loginId}"><span class="meBadge">나</span></c:if>
 									</td>
 									<td>${i.viewCount}</td>
-									<td><fmt:formatDate value="${i.createdAt}" pattern="yyyy.MM.dd"/></td>
+									<td><fmt:formatDate value="${i.createdAt}" pattern="yy.MM.dd hh:mm"/></td>
 								</tr>
 							</c:forEach>
 						</c:otherwise>
 					</c:choose>
 				</table>
 			</div>
-
+			<div class="bottom-tools">
+				<a href="/best/board" class="hot-btn">
+					<i class="fa-solid fa-fire"></i> HOT 베스트
+				</a>
 			<!-- 페이지네이션 -->
 			<div class="pagination" id="navigation" data-search="<c:out value='${search}'/>" data-category="<c:out value='${category}'/>"></div>
 			<script>
@@ -402,8 +425,9 @@ body {
 				if (needNext)
 					addLink(">", endNavi + 1, false);
 			</script>
-			<span>총 게시물 수: ${recordTotalCount }</span>
+		
 		</div>
+		<span>총 게시물 수: ${recordTotalCount }</span>
 	</div>
 
 </body>
