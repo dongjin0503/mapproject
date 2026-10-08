@@ -139,7 +139,7 @@ body {
 				</div>
 			</div>
 			<div class="right">
-				<div class="section-title">참여한 파티원 모집</div>
+				<div class="section-title">참여한 파티</div>
 				<div class="content-list">
 					<table>
 						<thead>
@@ -173,17 +173,19 @@ body {
 							<tr>
 								<th>번호</th>
 								<th>제목</th>
+								<th>참여일</th>
 							</tr>
 						</thead>
 						<c:choose>
 							<c:when test="${empty challengeList}">
-								<tr><td colspan="2">참여한 챌린지가 없습니다.</td></tr>
+								<tr><td colspan="3">참여한 챌린지가 없습니다.</td></tr>
 							</c:when>
 							<c:otherwise>
 								<c:forEach var="i" items="${challengeList}">
 									<tr>
-										<td>${i.challenge_id}</td>
+										<td>${i.challenge_id }</td>
 										<td class="title"><a href="/challenge/detail?challenge_id=${i.challenge_id}"><c:out value="${i.title}" /></a></td>
+										<td>${i.joined_at}</td>
 									</tr>
 								</c:forEach>
 							</c:otherwise>
