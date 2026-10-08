@@ -22,12 +22,30 @@ public class PartyDAO {
    @Autowired
    private NotificationDAO notificationDAO;
 
-   public List<PartyDTO> findAll(int offset) {
-      String sql = "SELECT * FROM ( " + "  SELECT t.*, ROWNUM rn FROM ( "
-            + "    SELECT p.PARTY_ID, p.STORE_ID, p.TITLE, p.MEET_DATE, s.STORE_NAME, "
-            + "           REGEXP_SUBSTR(s.ADDRESS, '^[^ ]+시 [^ ]+구') AS address " + "    FROM PARTY p "
-            + "    LEFT JOIN GOOD_STORE s ON p.STORE_ID = s.STORE_ID " + "    ORDER BY p.PARTY_ID DESC "
-            + "  ) t WHERE ROWNUM <= ? " + ") WHERE rn > ?";
+   public List<PartyDTO> findAll(int offset, String status) {
+      String sql =
+    			"select * from ( "
+    					+ "select rownum rn, a.* from ( "
+    					+ "select p.PARTY_ID, p.STORE_ID, p.TITLE, "
+    					+ "p.MEET_DATE, gs.STORE_NAME, gs.ADDRESS "
+    					+ "from PARTY p "
+    					+ "join GOOD_STORE gs on p.STORE_ID = gs.STORE_ID ";
+
+    			if ("recruiting".equals(status)) {
+
+    				sql += "where p.MEET_DATE > CURRENT_TIMESTAMP ";
+
+    			} else if ("ended".equals(status)) {
+
+    				sql += "where p.MEET_DATE <= CURRENT_TIMESTAMP ";
+    			}
+
+    			sql +=
+    					"order by p.PARTY_ID desc "
+    					+ ") a "
+    					+ "where rownum <= ? "
+    					+ ") "
+    					+ "where rn > ?";
 
       return jdbcTemplate.query(sql, (rs, rowNum) -> {
          PartyDTO party = new PartyDTO();
