@@ -19,24 +19,22 @@
 	padding: 30px;
 }
 
-.container h1 {
+.container h2 {
 	margin: 0 0 30px;
 	text-align: center;
 	font-size: 26px;
 }
 
 .notification-card {
+	position: relative;
 	display: flow-root;
-	max-width: 400px;
+	max-width: 420px;
 	margin: 0 auto 15px;
 	padding: 20px;
-	border: 1px solid #ddd;
+	padding-right: 50px;
+	border: 1px solid #c8d8f0;
 	border-radius: 8px;
-}
-
-.notification-card.unread {
 	background-color: #f2f6ff;
-	border-color: #c8d8f0;
 }
 
 .notification-card p {
@@ -48,40 +46,46 @@
 }
 
 .notification-message {
-    font-size: 16px;
-    font-weight: bold;
-    color: black;
-    margin-bottom: 12px;
-    line-height: 1.6;
-    overflow-wrap: anywhere;
+	font-size: 16px;
+	font-weight: bold;
+	color: black;
+	margin-bottom: 12px;
+	line-height: 1.6;
+	overflow-wrap: anywhere;
 }
 
 .notification-card button {
-    padding: 10px 16px;
-    border-radius: 5px;
-    font-size: 14px;
-    cursor: pointer;
+	padding: 10px 16px;
+	border-radius: 5px;
+	font-size: 14px;
+	cursor: pointer;
 }
 
-.notification-btns {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    margin-top: 20px;
+.delete-x {
+	position: absolute;
+	top: 12px;
+	right: 12px;
+	width: 28px;
+	height: 28px;
+	padding: 0;
+	border: none;
+	border-radius: 50%;
+	background-color: transparent;
+	color: #777;
+	font-size: 16px;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
-.notification-btns form {
-	margin: 0;
+.delete-x:hover {
+	background-color: #e5e7eb;
+	color: black;
 }
-
-.read-btn {
-	background-color: black;
-	color: white;
-	border: 1px solid black;
-}
-
 .view-btn {
+	display: block;
+	margin: 20px auto 0;
 	background-color: white;
 	color: black;
 	border: 1px solid #c8d8f0;
@@ -92,34 +96,35 @@
 	<jsp:include page="/WEB-INF/views/common/header.jsp" />
 
 	<div class="container">
-		<h1>알림</h1>
+		<h2>알림</h2>
 
 		<c:forEach var="notification" items="${notifications}">
-			<div
-				class="notification-card ${notification.readYn == 'N' ? 'unread' : ''}">
+			<div class="notification-card">
+
+
+				<form action="/notification/delete" method="post">
+					<input type="hidden" name="notificationId"
+						value="${notification.notificationId}">
+
+					<button type="submit" class="delete-x"
+						onclick="return confirm('알림을 삭제하시겠습니까?');">
+							<i class="fa-solid fa-xmark"></i>
+						</button>
+				</form>
+
 				<div class="notification-message">${notification.message}</div>
 				<p>
 					알림 시간 :
 					<fmt:formatDate value="${notification.regdate}"
 						pattern="yyyy.MM.dd HH:mm" />
 				</p>
-				<p>읽음 상태 : ${notification.readYn == 'N' ? '안 읽음' : '읽음'}</p>
 
-				<div class="notification-btns">
-					<c:if test="${notification.readYn == 'N'}">
-						<form action="/notification/read" method="post">
-							<input type="hidden" name="notificationId"
-								value="${notification.notificationId}">
-							<button type="submit" class="read-btn">읽음 처리</button>
-						</form>
-					</c:if>
-					<c:if
-						test="${notification.targetType == 'PARTY' and notification.targetId != null}">
-						<button type="button" class="view-btn"
-							onclick="location.href='/party/detail?partyId=${notification.targetId}'">
-							모임 보기</button>
-					</c:if>
-				</div>
+				<c:if
+					test="${notification.targetType == 'PARTY' and notification.targetId != null}">
+					<button type="button" class="view-btn"
+						onclick="location.href='/party/detail?partyId=${notification.targetId}'">
+						모임 보기</button>
+				</c:if>
 			</div>
 		</c:forEach>
 
