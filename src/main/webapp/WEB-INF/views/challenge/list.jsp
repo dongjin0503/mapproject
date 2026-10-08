@@ -64,6 +64,7 @@
 	border: 1px solid #ddd;
 	border-radius: 10px;
 	padding: 16px;
+	position: relative;
 }
 
 .card h3 {
@@ -96,6 +97,17 @@
 	text-decoration: none;
 	color: black;
 }
+/* 북마크 버튼 */
+.bookmark-btn {
+	position: absolute;
+	top: 12px;
+	right: 12px;
+	border: none;
+	background: none;
+	font-size: 22px;
+	color: #f59e0b;
+	cursor: pointer;
+}
 </style>
 </head>
 
@@ -118,6 +130,7 @@
 	</c:if>
 	
 	<div class ="cards" >
+	<button type="button" class="bookmark-btn" data-id="${ch.challenge_id}">☆</button>
 	<c:forEach var="ch" items="${list}">
 		<div class ="card" data-status ="${ch.status }">
 			<h3> ${ch.title }</h3>
@@ -148,7 +161,22 @@
 			
 			$(".card[data-status='" + $(this).data("f") + "']").show();
 
-		})
+		});
+		// 북마크한 챌린지는 ★로 표시
+		$.get("/member/bookmarkIds", { contentType: "CHALLENGE" }, function(ids) {
+			$(".bookmark-btn").each(function() {
+				if (ids.includes($(this).data("id"))) $(this).text("★");
+			});
+		});
+
+		// 클릭하면 토글
+		$(document).on("click", ".bookmark-btn", function() {
+			let btn = $(this);
+			$.post("/member/bookmarkToggle", { contentType: "CHALLENGE", contentId: btn.data("id") }, function(r) {
+				if (r === "login") location.href = "/member/login";
+				else btn.text(r === "added" ? "★" : "☆");
+			});
+		});
 	</script>
 	</body>
 </html>

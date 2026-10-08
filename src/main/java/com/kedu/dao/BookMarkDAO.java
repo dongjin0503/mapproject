@@ -47,5 +47,6 @@ public class BookMarkDAO {
 		           + "order by created_at desc";
 		return jdbc.query(sql, new BeanPropertyRowMapper<>(BookMarkDTO.class),loginId, loginId, loginId);
 	}
+	
 
 }

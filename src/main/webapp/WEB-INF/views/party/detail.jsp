@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@taglib prefix="C" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 
@@ -71,6 +70,7 @@
 .party-summary h1 {
 	margin: 0 0 20px;
 	font-size: 28px;
+	padding-right: 56px;
 }
 
 .party-summary p {
@@ -204,6 +204,31 @@
 	font-size: 15px;
 	cursor: pointer;
 }
+/* 북마크 버튼 (요약 카드 오른쪽 위, 목록 카드와 같은 모양) */
+#bookmark-btn {
+	position: absolute;
+	top: 20px;
+	right: 20px;
+	width: 44px;
+	height: 44px;
+	padding: 0;
+	border: 1px solid #ddd;
+	border-radius: 50%;
+	background: white;
+	color: #f59e0b;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 22px;
+	cursor: pointer;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+	transition: transform 0.15s, box-shadow 0.15s;
+}
+
+#bookmark-btn:hover {
+	transform: scale(1.08);
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+}
 </style>
 </head>
 <body>
@@ -215,8 +240,7 @@
 
 				<C:forEach var="image" items="${partyImages}" varStatus="status">
 
-					<img class="detail-image" src="/uploads/${image}"
-						style="${status.index == 0 ? '' : 'display:none;'}">
+					<img class="detail-image" src="/uploads/${image}" style="${status.index == 0 ? '' : 'display:none;'}">
 
 				</C:forEach>
 
@@ -229,6 +253,12 @@
 		</C:if>
 
 		<section class="party-summary">
+			<C:if test="${not empty sessionScope.loginId}">
+				<button type="button" id="bookmark-btn" data-party-id="${party.partyId}">${bookmarked
+		? '<i class="fa-solid fa-star"></i>'
+		: '<i class="fa-regular fa-star"></i>'}
+				</button>
+			</C:if>
 			<h1>${party.title}</h1>
 
 			<C:if test="${not empty message}">
@@ -236,8 +266,7 @@
 			</C:if>
 			<p>
 				모임 날짜:
-				<fmt:formatDate value="${party.meetDate}"
-					pattern="yyyy.MM.dd(E) HH:mm" />
+				<fmt:formatDate value="${party.meetDate}" pattern="yyyy.MM.dd(E) HH:mm" />
 			</p>
 			<p>모임장: ${hostName}</p>
 			<p>모임 장소: ${party.storeName}</p>
@@ -259,18 +288,15 @@
 
 					${member.memberName}
 
-					<C:if
-						test="${sessionScope.loginId == party.hostId 
+					<C:if test="${sessionScope.loginId == party.hostId 
          and member.memberId != party.hostId}">
 
 						<form action="/party/kick" method="post" style="display: inline;">
 
-							<input type="hidden" name="partyId" value="${party.partyId}">
+							<input type="hidden" name="partyId" value="${party.partyId}"> <input type="hidden" name="memberId"
+								value="${member.memberId}">
 
-							<input type="hidden" name="memberId" value="${member.memberId}">
-
-							<button type="submit"
-								onclick="return confirm('이 멤버를 내보내시겠습니까?');">내보내기</button>
+							<button type="submit" onclick="return confirm('이 멤버를 내보내시겠습니까?');">내보내기</button>
 
 						</form>
 
@@ -290,8 +316,7 @@
 
 			<C:if test="${not empty party.genderRule}">
 				<p>참여 성별: ${party.genderRule == 'male' ? '남자만' :
-          party.genderRule == 'female' ? '여자만' : '제한 없음'}
-				</p>
+          party.genderRule == 'female' ? '여자만' : '제한 없음'}</p>
 			</C:if>
 			<C:if test="${party.minAge != null}">
 				<p>최소 나이: ${party.minAge}세</p>
@@ -304,31 +329,25 @@
 			</C:if>
 		</section>
 		<div class="party-buttons">
-			<C:if
-				test="${not empty sessionScope.loginId 
+			<C:if test="${not empty sessionScope.loginId 
 	and sessionScope.loginId == party.hostId}">
 
-				<button type="button" id="edit-btn"
-					onclick="location.href='/party/edit?partyId=${party.partyId}'">
-					모임 수정</button>
+				<button type="button" id="edit-btn" onclick="location.href='/party/edit?partyId=${party.partyId}'">모임 수정</button>
 
-				<button type="button" id="manage-btn"
-					onclick="location.href='/party/applications?partyId=${party.partyId}'">
+				<button type="button" id="manage-btn" onclick="location.href='/party/applications?partyId=${party.partyId}'">
 					신청관리</button>
 				<C:choose>
 
 					<C:when test="${not empty settlement}">
 
 						<button type="button" id="settlement-btn"
-							onclick="location.href='/settlement/result?settlementId=${settlement.settlementId}'">
-							정산 결과</button>
+							onclick="location.href='/settlement/result?settlementId=${settlement.settlementId}'">정산 결과</button>
 
 					</C:when>
 
 					<C:otherwise>
 
-						<button type="button" id="settlement-btn"
-							onclick="location.href='/settlement/create?partyId=${party.partyId}'">
+						<button type="button" id="settlement-btn" onclick="location.href='/settlement/create?partyId=${party.partyId}'">
 							모임비 정산</button>
 
 					</C:otherwise>
@@ -347,8 +366,7 @@
 
 							<input type="hidden" name="partyId" value="${party.partyId}">
 
-							<button type="submit" class="apply-btn"
-								onclick="return confirm('참여 신청을 취소하시겠습니까?');">신청 취소</button>
+							<button type="submit" class="apply-btn" onclick="return confirm('참여 신청을 취소하시겠습니까?');">신청 취소</button>
 
 						</form>
 
@@ -359,23 +377,20 @@
 
 						<C:if test="${not empty settlement}">
 							<button type="button" class="apply-btn"
-								onclick="location.href='/settlement/result?settlementId=${settlement.settlementId}'">
-								정산 결과</button>
+								onclick="location.href='/settlement/result?settlementId=${settlement.settlementId}'">정산 결과</button>
 						</C:if>
 
 						<form action="/party/leave" method="post">
 							<input type="hidden" name="partyId" value="${party.partyId}">
 
-							<button type="submit" class="apply-btn"
-								onclick="return confirm('정말로 나가시겠습니까?');">모임 나가기</button>
+							<button type="submit" class="apply-btn" onclick="return confirm('정말로 나가시겠습니까?');">모임 나가기</button>
 						</form>
 					</C:when>
 
 
 					<C:otherwise>
 
-						<button type="button" class="apply-btn"
-							onclick="location.href='/party/apply?partyId=${party.partyId}'">
+						<button type="button" class="apply-btn" onclick="location.href='/party/apply?partyId=${party.partyId}'">
 							신청하기</button>
 
 					</C:otherwise>
@@ -383,19 +398,18 @@
 				</C:choose>
 
 
-         </C:if>
-         <C:if test="${isMember}">
-            <button type="button" id="chat-btn" onclick="location.href='/Chattingroom/chat?partyId=${party.partyId}'">
-               채팅방 입장</button>
-         </C:if>
-     
-			<button type="button" id="list-btn"
-				onclick="location.href='/party/list'">목록으로 돌아가기</button>
+
+			</C:if>
+			<C:if test="${isMember}">
+				<button type="button" id="chat-btn" class="apply-btn"
+					onclick="location.href='/Chattingroom/chat?partyId=${party.partyId}'">채팅방 입장</button>
+			</C:if>
+
+			<button type="button" id="list-btn" onclick="location.href='/party/list'">목록으로 돌아가기</button>
 		</div>
 	</div>
 	<script>
 		let currentImage = 0;
-
 
 		const detailImages = document.querySelectorAll(".detail-image");
 
@@ -431,6 +445,18 @@
 			}
 
 			detailImages[currentImage].style.display = "block";
+		});
+		$("#bookmark-btn").on("click", function() {
+			let btn = $(this);
+			$.post("/party/bookmark", {
+				partyId : btn.data("party-id")
+			}, function(r) {
+				if (r === "LOGIN")
+					location.href = "/member/login";
+				else btn.html(r === "INSERT"
+					? '<i class="fa-solid fa-star"></i>'
+					: '<i class="fa-regular fa-star"></i>');
+			});
 		});
 	</script>
 </body>
