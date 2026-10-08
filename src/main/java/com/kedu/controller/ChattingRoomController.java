@@ -41,14 +41,16 @@ public class ChattingRoomController {
 	        return "redirect:/party/detail?partyId=" + partyId;
 	    }
 		List<ChattingRoomDTO> chatList = dao.selectByPartyId(partyId);		// partyId로 채팅방 채팅기록 가져오기
-		List<String> memberList = dao.selectMemberList(partyId);		//파티참여 인원 아이디 가져오기
+		List<String> memberList = dao.selectMemberList(partyId);		//파티참여 인원 닉네임 가져오기
 		
 		String title = dao.selectTitle(partyId);				// partyId로 파티테이블에서 파티제목가져오기
-		int partyMem = dao.selectMemberCount(partyId);
+		int partyMem = dao.selectMemberCount(partyId);			// 파티참여인원수 가져오기
 		
+		
+		model.addAttribute("loginNickname", dao.selectNickname(loginId));		//memberid로 닉네임 저장
 		model.addAttribute("memberList", memberList);
 		model.addAttribute("partyTitle",title);
-		model.addAttribute("chatList",chatList);
+		model.addAttribute("chatList",chatList);				// 채팅 사용자 표시 memberid>nickname변경
 		model.addAttribute("partyMember",partyMem);
 		model.addAttribute("partyId",partyId);
 
@@ -60,6 +62,7 @@ public class ChattingRoomController {
 	public ChattingRoomDTO chatting(ChattingRoomDTO dto) throws Exception{
 		dto.setCreatedAt(new java.sql.Timestamp(System.currentTimeMillis())); //createdAt 오류날수있어서 추가함
 		dao.insert(dto);
+		dto.setUsername(dao.selectNickname(dto.getMemberId()));		//닉네임 가져와서 setter로 dto에 저장
 		
 		template.convertAndSend(				// convertAndSend(보낼목적지, 보낼 데이터);
 		        "/topic/chat/" + dto.getPartyId(),dto
