@@ -1,5 +1,7 @@
 package com.kedu.dto;
 
+import java.sql.Timestamp;
+
 public class ChallengeDTO {
 
 	// ===== DB 컬럼 (CHALLENGE 테이블) =====
@@ -15,6 +17,17 @@ public class ChallengeDTO {
 	private int member_count;    // 참여자 수
 	private int d_day;           // 종료까지 남은 날
 	private String status;       // 모집중 / 진행중 / 종료
+	
+	// ==== challege, challenge_member 테이블 조인 ====
+	private Timestamp joined_at;
+
+	public Timestamp getJoined_at() {
+		return joined_at;
+	}
+	public void setJoined_at(Timestamp joined_at) {
+		this.joined_at = joined_at;
+	}
+
 
 	// 기본 생성자 (BeanPropertyRowMapper 가 꼭 필요로 함)
 	public ChallengeDTO() {

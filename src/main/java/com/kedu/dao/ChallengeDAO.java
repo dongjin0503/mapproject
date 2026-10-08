@@ -58,4 +58,11 @@ public class ChallengeDAO {
 		return jdbc.queryForObject(sql, new BeanPropertyRowMapper<>(ChallengeDTO.class), challengeId);
 	}
 	
+	public List<ChallengeDTO> MyChallengeRecord(String loginId){
+		String sql = "SELECT c.challenge_id, c.title, cm.joined_at FROM challenge c "
+				+ "JOIN challenge_member cm ON c.challenge_id = cm.challenge_id "
+				+ "WHERE cm.member_id = ? ORDER BY cm.joined_at DESC";
+		return jdbc.query(sql, new BeanPropertyRowMapper<>(ChallengeDTO.class), loginId);
+	}
+	
 }
