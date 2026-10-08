@@ -53,6 +53,8 @@ public class FreeboardController {
 
 		int startRow = cpage * recordCountPerPage - (recordCountPerPage - 1);
 		int endRow = cpage * recordCountPerPage;
+		
+	
 
 		model.addAttribute("list", dao.boardList(startRow, endRow, search, category));
 		model.addAttribute("category", category);
