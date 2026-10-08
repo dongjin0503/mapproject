@@ -173,4 +173,26 @@ public class SettlementDAO {
 
 		}, settlementId);
 	}
+	
+	public SettlementDTO findByPartyId(int partyId) {
+		
+		String sql = "select * from "
+				+ "(select * from SETTLEMENT "
+				+ "where PARTY_ID = ? "
+				+ "order by SETTLEMENT_ID desc) "
+				+ "where rownum = 1";
+		
+		List<SettlementDTO> list = jdbcTemplate.query(sql, (rs, rowNum) -> {
+			SettlementDTO dto = new SettlementDTO();
+			
+			dto.setSettlementId(rs.getInt("SETTLEMENT_ID"));
+			dto.setPartyId(rs.getInt("PARTY_ID"));
+			dto.setSettlementType(rs.getString("SETTLEMENT_TYPE"));
+			dto.setTotalAmount(rs.getLong("TOTAL_AMOUNT"));
+			
+			return dto;
+		}, partyId);
+		
+		return list.isEmpty() ? null : list.get(0);
+	}
 }
