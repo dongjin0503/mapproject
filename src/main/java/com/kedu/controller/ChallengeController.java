@@ -59,9 +59,17 @@ public class ChallengeController {
 	}
 	
 	@RequestMapping("detail")
-	public String detail(int challenge_id , Model model) {
-		ChallengeDTO ch = dao.getChallenge(challenge_id);
-		model.addAttribute("ch", ch);
+	public String detail(int challenge_id , Model model ,HttpSession session) {
+		String id = (String) session.getAttribute("loginId");
+		
+		boolean joined = false;
+		
+		if(id != null) {
+			joined = dao.isJoined(challenge_id, id);
+		}
+		
+		model.addAttribute("joined", joined);
+		model.addAttribute("ch", dao.getChallenge(challenge_id));
 		model.addAttribute("replyList", rdao.listReply(challenge_id));
 		return "challenge/detail";
 	}
@@ -105,5 +113,31 @@ public class ChallengeController {
 			rdao.deleteReply(dto.getChallenge_reply_id(), id);
 		}
 		return "redirect:/challenge/detail?challenge_id=" + dto.getChallenge_id();
+	}
+	
+	@RequestMapping("apply")
+	public String apply(int challenge_id , Model model , HttpSession session) {
+		String id = (String) session.getAttribute("loginId");
+		if (id == null) {
+			return "redirect:/member/login";	
+		}
+		model.addAttribute("ch" , dao.getChallenge(challenge_id));
+		
+		return "challenge/apply";
+	}
+	
+	@RequestMapping("applyOk")
+	public String applyOk(int challenge_id , HttpSession session) {
+		String id = (String) session.getAttribute("loginId");
+		
+		if(id == null) {
+			return "redirect:/member/login";
+		}
+		
+		if(dao.isJoined(challenge_id, id)) {
+			return "redirect:/challenge/detail?challenge_id=" + challenge_id;
+		}
+		dao.addMember(challenge_id, id);
+		return "redirect:/challenge/detail?challenge_id=" + challenge_id; 
 	}
 }

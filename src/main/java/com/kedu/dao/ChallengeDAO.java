@@ -65,4 +65,20 @@ public class ChallengeDAO {
 		return jdbc.query(sql, new BeanPropertyRowMapper<>(ChallengeDTO.class), loginId);
 	}
 	
+	public boolean isJoined(int challengeId, String memberId) {
+		String sql = "select count(*) from challenge_member where challenge_id = ? and member_id = ?";
+		
+		int count = jdbc.queryForObject(sql,Integer.class , challengeId, memberId);
+		
+		return count > 0;
+		
+	}
+	
+	public int addMember(int challengeId , String memberId) {
+		String sql = "insert into challenge_member (challenge_member_id , challenge_id , member_id , joined_at)"
+				+ " values (challenge_member_seq.nextval , ? , ? , systimestamp)";
+		
+		return jdbc.update(sql, challengeId, memberId);
+	}
+	
 }

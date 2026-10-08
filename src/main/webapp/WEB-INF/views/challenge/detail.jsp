@@ -44,7 +44,7 @@
 	.reReplyForm {
 	display : none;
 	}
-		.reReplyForm { display : none; }
+	
 	.editForm { display : none; }
 	.delForm { display : inline; }
 	</style>
@@ -58,15 +58,28 @@
 		<span> 기간 참여자수</span> <br>
 		<span> ${ch.start_date } ~ ${ch.end_date }</span>
 		<span> ${ch.member_count } 명</span> <br>
-		<button> 참여하기 </button>
-		<button> ★ </button>
+		
+		<c:choose>
+			<c:when test ="${joined}">
+			<span> 참여중 </span>
+			</c:when>
+			
+			<c:when test = "${ch.status == '종료' }">
+			<span> 종료됨 </span>
+			</c:when>
+			
+			<c:otherwise>
+			<a href="/challenge/apply?challenge_id=${ch.challenge_id}"> 참여하기 </a>
+			</c:otherwise>
+		</c:choose>
+		<button type ="button"> ★ </button>
 		</div>
 		<div>
-		<span> 모집중 </span>
+		<span> ${ch.status } </span>
 		<div> ${ch.description }</div>
 		</div>
 		<div>
-		댓글 ' 참여자 응원/인증 <br>
+		댓글 · 참여자 응원/인증 <br>
 		<c:forEach var ="r" items="${replyList}">
 		<c:choose>
 			<c:when test ="${empty r.parent_reply_id }">
@@ -77,16 +90,16 @@
 			<c:if test = "${r.member_id == sessionScope.loginId }">
 			<button type ="button" class = "editBtn"> 수정</button>
 			
-			<form class = "delForm" action = "/challenge/delete">
-			<input type = "hidden" name ="challenge_reply_id value="$(r.reply_id)>
-			<input type = "hidden" name ="challenge_id " value = "${ch.challenge_id }">
+			<form class = "delForm" action ="/challenge/replyDelete" method ="post">
+			<input type = "hidden" name ="challenge_reply_id" value="${r.challenge_reply_id}">
+			<input type = "hidden" name ="challenge_id" value = "${ch.challenge_id }">
 			<button type ="submit"> 삭제</button>
 			</form>
 			
-			<form action = "/challenge/update">
-			<input type ="hidden" name ="challenge_reply_id" value="${r.reply_id }">
+			<form class = "editForm" action = "/challenge/replyUpdate" method = "post">
+			<input type ="hidden" name ="challenge_reply_id" value="${r.challenge_reply_id }">
 			<input type ="hidden" name ="challenge_id" value ="${ch.challenge_id }">
-			<input type ="text" name = "content"  value ="${r.content }">
+			<input type ="text" name = "content"  value ="${r.content }" required>
 			<button type ="submit"> 저장 </button>
 			</form>
 			</c:if>
@@ -97,39 +110,40 @@
 			<input type ="hidden" name = "parent_reply_id" value="${r.challenge_reply_id }">
 			<input type ="text" name = "content" placeholder ="답글을 입력하세요.">
 			<button type ="submit"> 등록</button>
-			
-			<c:if test = "${r.member_id == sessionScope.loginId }">
-			<button type ="button" class = "editBtn"> 수정</button>
-			
-			<form class = "delForm" action = "/challenge/delete">
-			<input type = "hidden" name ="challenge_reply_id value="$(r.reply_id)>
-			<input type = "hidden" name ="challenge_id " value = "${ch.challenge_id }">
-			<button type ="submit"> 삭제</button>
 			</form>
 			
-			<form action = "/challenge/update">
-			<input type ="hidden" name ="challenge_reply_id" value="${r.reply_id }">
-			<input type ="hidden" name ="challenge_id" value ="${ch.challenge_id }">
-			<input type ="text" name = "content"  value ="${r.content }">
-			<button type ="submit"> 저장 </button>
-			</form>
-			</c:if>
-			
-			</form>
  			</div>
 			</c:when>
 			<c:otherwise>
 			<div class ="reply re">
 			<b>${r.username }</b> ${r.content }<span class ="time"> ${r.created_at }</span>
+			<c:if test = "${r.member_id == sessionScope.loginId }">
+			<button type ="button" class = "editBtn"> 수정</button>
+			
+			<form class = "delForm" action ="/challenge/replyDelete" method ="post">
+			<input type = "hidden" name ="challenge_reply_id" value="${r.challenge_reply_id}">
+			<input type = "hidden" name ="challenge_id" value = "${ch.challenge_id }">
+			<button type ="submit"> 삭제</button>
+			</form>
+			
+			<form class = "editForm" action = "/challenge/replyUpdate" method = "post">
+			<input type ="hidden" name ="challenge_reply_id" value="${r.challenge_reply_id }">
+			<input type ="hidden" name ="challenge_id" value ="${ch.challenge_id }">
+			<input type ="text" name = "content"  value ="${r.content }" required>
+			<button type ="submit"> 저장 </button>
+			</form>
+			</c:if>
+			
 			</div>
 			</c:otherwise>
 		</c:choose>
 		</c:forEach>
 		<form action = "/challenge/replyOk" method ="post">
 		<input type ="hidden" name ="challenge_id" value = "${ch.challenge_id }">		
-		<input name ="content" type ="text" placeholder = "댓글입력"> 
+		<input name ="content" type ="text" placeholder = "댓글입력" required> 
 		<button type = "submit"> 등록 </button>
 		</form>
+		
 		</div>
 		</div>
 	
@@ -137,9 +151,14 @@
 		$(".replyBtn").on("click", function(){
 			$(this).closest(".reply").find(".reReplyForm").toggle();	
 		})
-		$(".editbtn").on("click", function(){
-			$(this).closest(".reply").fin(".editFrom").toggle();
+		
+		$(".editBtn").on("click", function(){
+			$(this).closest(".reply").find(".editForm").toggle();
 		})
+		
+	    $(".delForm").on("submit", function(){
+		return confirm("정말 삭제할까요?");
+		});
 	</script>
 </body>
 </html>
