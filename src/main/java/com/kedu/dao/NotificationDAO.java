@@ -41,19 +41,36 @@ public class NotificationDAO {
 			dto.setTargetId(rs.wasNull() ?  null : targetId);
 			
 			dto.setMessage(rs.getString("MESSAGE"));
-			dto.setReadYn(rs.getString("READ_YN"));
 			dto.setRegdate(rs.getTimestamp("REGDATE"));
 			
 			return dto;		
 		}, receiverId);
 	}
+	
+	public int delete(int notificationId, String receiverId) {
 
-	public int markAsRead(int notificationId, String receiverId) {
-		String sql = "update NOTIFICATION "
-				+ "set READ_YN = 'Y' "
-				+ "where NOTIFICATION_ID = ? and RECEIVER_ID = ?";
-		
-		return jdbcTemplate.update(sql, notificationId, receiverId);
+		String sql = "delete from NOTIFICATION "
+				+ "where NOTIFICATION_ID = ? "
+				+ "and RECEIVER_ID = ?";
+
+		return jdbcTemplate.update(
+				sql,
+				notificationId,
+				receiverId
+		);
+	}
+
+	public int countByReceiverId(String receiverId) {
+
+		String sql = "select count(*) "
+				+ "from NOTIFICATION "
+				+ "where RECEIVER_ID = ?";
+
+		return jdbcTemplate.queryForObject(
+				sql,
+				Integer.class,
+				receiverId
+		);
 	}
 	
 }

@@ -17,270 +17,247 @@
    채팅 전체
 ========================= */
 .chat {
-    width: 50%;
-    height: 700px;
-    margin: 50px auto;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    background-color: white;
-    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+	width: 50%;
+	height: 700px;
+	margin: 50px auto;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	border: 1px solid #ddd;
+	border-radius: 10px;
+	background-color: white;
+	box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
 }
-
 
 /* =========================
    채팅 헤더
 ========================= */
 .chatHeader {
-    padding: 15px;
-    box-sizing: border-box;
-    border-bottom: 1px solid #ddd;
+	padding: 15px;
+	box-sizing: border-box;
+	border-bottom: 1px solid #ddd;
 }
-
 
 /* 제목 */
-.chatHeader > span:first-child {
-    font-weight: bold;
-    font-size: 16px;
+.chatHeader>span:first-child {
+	font-weight: bold;
+	font-size: 16px;
 }
-
 
 /* 인원 */
-.chatHeader > span:nth-child(2) {
-    color: #888;
-    font-size: 13px;
-    margin-left: 6px;
+.chatHeader>span:nth-child(2) {
+	color: #888;
+	font-size: 13px;
+	margin-left: 6px;
 }
-
 
 /* =========================
    햄버거 버튼
 ========================= */
 #hamburgerbtn {
-    float: right;
-    border: none;
-    background: none;
-    font-size: 20px;
-    line-height: 1;
-    cursor: pointer;
+	float: right;
+	border: none;
+	background: none;
+	font-size: 20px;
+	line-height: 1;
+	cursor: pointer;
 }
-
 
 /* =========================
    참여자 사이드바
 ========================= */
 #memberList {
-    position: absolute;
-    top: 0;
-    left: 100%;
-    width: 200px;
-    height: 100%;
-    padding: 20px;
-    box-sizing: border-box;
-    background-color: white;
-    border: 1px solid #ddd;
-    border-radius: 0 10px 10px 0;
-    box-shadow: 3px 0 10px rgba(0, 0, 0, 0.15);
-    z-index: 10;
+	position: absolute;
+	top: 0;
+	left: 100%;
+	width: 200px;
+	height: 100%;
+	padding: 20px;
+	box-sizing: border-box;
+	background-color: white;
+	border: 1px solid #ddd;
+	border-radius: 0 10px 10px 0;
+	box-shadow: 3px 0 10px rgba(0, 0, 0, 0.15);
+	z-index: 10;
 }
-
 
 /* 참여자 한 명 */
 #memberList div {
-    padding: 8px;
-    border-bottom: 1px solid #eee;
+	padding: 8px;
+	border-bottom: 1px solid #eee;
 }
-
 
 /* 채팅 나가기 버튼 */
 #exitbtn {
-    width: 100%;
-    margin-top: 15px;
+	width: 100%;
+	margin-top: 15px;
 }
-
 
 /* =========================
    검색창
 ========================= */
 .searchMessage {
-    display: flex;
-    gap: 6px;
-    margin-top: 10px;
-    clear: both;
+	display: flex;
+	gap: 6px;
+	margin-top: 10px;
+	clear: both;
 }
-
 
 #searchText {
-    flex: 1;
-    padding: 6px 8px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
+	flex: 1;
+	padding: 6px 8px;
+	border: 1px solid #ddd;
+	border-radius: 6px;
 }
-
 
 .searchMessage input[type="button"] {
-    padding: 6px 10px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    background: white;
-    cursor: pointer;
+	padding: 6px 10px;
+	border: 1px solid #ddd;
+	border-radius: 6px;
+	background: white;
+	cursor: pointer;
 }
-
 
 /* =========================
    채팅 내용
 ========================= */
 .chatBody {
-    flex: 1;
-    overflow-y: auto;
-    padding: 15px;
-    box-sizing: border-box;
-    background: #f3f4f6;
+	flex: 1;
+	overflow-y: auto;
+	padding: 15px;
+	box-sizing: border-box;
+	background: #f3f4f6;
 }
-
 
 /* =========================
    입장 / 퇴장 메시지
 ========================= */
-.enterMessage,
-.leaveMessage {
-    text-align: center;
-    color: gray;
-    margin: 10px 0;
+.enterMessage, .leaveMessage {
+	text-align: center;
+	color: gray;
+	margin: 10px 0;
 }
-
 
 /* =========================
    내 메시지
 ========================= */
 .myMessage {
-    display: flex;
-    flex-direction: row-reverse;
-    align-items: flex-end;
-    gap: 6px;
-    margin: 10px 0;
+	display: flex;
+	flex-direction: row-reverse;
+	align-items: flex-end;
+	gap: 6px;
+	margin: 10px 0;
 }
-
 
 /* 내 메시지 말풍선 */
-.myMessage > div:nth-child(1) {
-    max-width: 70%;
-    padding: 8px 12px;
-    background: #111827;
-    color: white;
-    border-radius: 12px 12px 0 12px;
-    word-break: break-word;
-    text-align: left;
+.myMessage>div:nth-child(1) {
+	max-width: 70%;
+	padding: 8px 12px;
+	background: #111827;
+	color: white;
+	border-radius: 12px 12px 0 12px;
+	word-break: break-word;
+	text-align: left;
 }
-
 
 /* 내 메시지 시간 */
-.myMessage > div:nth-child(2) {
-    font-size: 11px;
-    color: #999;
+.myMessage>div:nth-child(2) {
+	font-size: 11px;
+	color: #999;
 }
-
 
 /* =========================
    다른 사람 메시지
 ========================= */
 .otherMessage {
-    display: grid;
-    grid-template-columns: minmax(0, max-content) max-content;
-    column-gap: 6px;
-    align-items: end;
-    justify-content: start;
-    max-width: 75%;
-    margin: 10px 0;
+	display: grid;
+	grid-template-columns: minmax(0, max-content) max-content;
+	column-gap: 6px;
+	align-items: end;
+	justify-content: start;
+	max-width: 75%;
+	margin: 10px 0;
 }
-
 
 /* 다른 사람 이름 */
-.otherMessage > div:nth-child(1) {
-    grid-column: 1 / -1;
-    font-size: 12px;
-    color: #666;
-    margin-bottom: 3px;
+.otherMessage>div:nth-child(1) {
+	grid-column: 1/-1;
+	font-size: 12px;
+	color: #666;
+	margin-bottom: 3px;
 }
-
 
 /* 다른 사람 말풍선 */
-.otherMessage > div:nth-child(2) {
-    padding: 8px 12px;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 0 12px 12px 12px;
-    word-break: break-word;
+.otherMessage>div:nth-child(2) {
+	padding: 8px 12px;
+	background: white;
+	border: 1px solid #ddd;
+	border-radius: 0 12px 12px 12px;
+	word-break: break-word;
 }
-
 
 /* 다른 사람 시간 */
-.otherMessage > div:nth-child(3) {
-    font-size: 11px;
-    color: #999;
+.otherMessage>div:nth-child(3) {
+	font-size: 11px;
+	color: #999;
 }
-
 
 /* =========================
    메시지 입력 영역
 ========================= */
 .chatBottom {
-    display: flex;
-    gap: 8px;
-    padding: 12px;
-    box-sizing: border-box;
-    border-top: 1px solid #ddd;
+	display: flex;
+	gap: 8px;
+	padding: 12px;
+	box-sizing: border-box;
+	border-top: 1px solid #ddd;
 }
-
 
 /* 메시지 입력창 */
 #message {
-    flex: 1;
-    height: 50px;
-    resize: none;
-    padding: 8px 10px;
-    box-sizing: border-box;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-family: inherit;
+	flex: 1;
+	height: 50px;
+	resize: none;
+	padding: 8px 10px;
+	box-sizing: border-box;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	font-family: inherit;
 }
-
 
 /* 전송 버튼 */
 #sendbtn {
-    width: 70px;
-    border: none;
-    border-radius: 8px;
-    background: #111827;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
+	width: 70px;
+	border: none;
+	border-radius: 8px;
+	background: #111827;
+	color: white;
+	font-weight: bold;
+	cursor: pointer;
 }
 </style>
 </head>
 <body>
-	<%@ include file="/WEB-INF/views/common/header.jsp" %>
+	<%@ include file="/WEB-INF/views/common/header.jsp"%>
 
 
 	<!-- 채팅방 -->
 	<div class="chat">
 		<div class="chatHeader">
-			<span>${partyTitle}<c:out value="${partyTitle}"/></span>
-			<span>${partyMember}<c:out value="${member}"/></span>
-			<input type="button" id="hamburgerbtn" value="☰">		<!-- 참여자목록, 채팅나가기버튼 -->
-				<div id="memberList" style="display: none;">
-    				<c:forEach var="member" items="${memberList}">
-       				 <div>${member}</div>
-    				</c:forEach>
-    				<input type="button" id="exitbtn" value="채팅 나가기">
-				</div>
-			
+			<span>${partyTitle}<c:out value="${partyTitle}" /></span> <span>${partyMember}<c:out value="${member}" /></span> <input
+				type="button" id="hamburgerbtn" value="☰">
+			<!-- 참여자목록, 채팅나가기버튼 -->
+			<div id="memberList" style="display: none;">
+				<c:forEach var="member" items="${memberList}">
+					<!-- 햄버거버튼 눌렀을 시 채팅참여자 닉네임 -->
+					<div>${member}</div>
+				</c:forEach>
+				<input type="button" id="exitbtn" value="채팅 나가기">
+			</div>
+
 			<div class="searchMessage">
-   				<input id="searchText" type="text" placeholder="내용 검색">
-    			<input id="searchbtn" type="button" value="검색">
-    			<input id="allbtn" type="button" value="전체보기">
+				<input id="searchText" type="text" placeholder="내용 검색"> <input id="searchbtn" type="button" value="검색">
+				<input id="allbtn" type="button" value="전체보기">
 			</div>
 		</div>
 		<script>
@@ -295,7 +272,7 @@
 		        body : JSON.stringify({
 		            partyId : partyId,
 		            memberId : "${loginId}",
-		            content : loginId+"님이 퇴장했습니다.",
+		            content : loginNickname+"님이 퇴장했습니다.",
 		            messageType : "LEAVE"
 		        })
 		    });
@@ -330,20 +307,44 @@
 
 		<!-- 채팅 내용 -->
 		<div class="chatBody" id="chat">
-			<c:forEach var="chat" items="${chatList}">		<!-- 채팅 기록 불러오기 -->
+			<c:forEach var="chat" items="${chatList}">
 				<c:choose>
-					<c:when test="${chat.memberId == loginId}">	<!-- 내 채팅 -->
+					<c:when test="${chat.messageType == 'ENTER'}">
+						<div class="enterMessage">
+							<c:out value="${chat.content}" />
+						</div>
+					</c:when>
+					<c:when test="${chat.messageType == 'LEAVE'}">
+						<div class="leaveMessage">
+							<c:out value="${chat.content}" />
+						</div>
+					</c:when>
+
+					<c:when test="${chat.memberId == loginId}">
+						<!-- 내 채팅 -->
 						<div class="myMessage">
-							<div><c:out value="${chat.content}"/></div>
-							<div><fmt:formatDate value="${chat.createdAt}" pattern="a h:mm"/></div>
-						</div>			<!-- fmt:formatDate >> Timestamp를 원하는 모양의 문자열로 변경 a(오전/오후) h(12시간제 시) mm(분) -->
+							<div>
+								<c:out value="${chat.content}" />
+							</div>
+							<div>
+								<fmt:formatDate value="${chat.createdAt}" pattern="a h:mm" />
+							</div>
+						</div>
+						<!-- fmt:formatDate >> Timestamp를 원하는 모양의 문자열로 변경 a(오전/오후) h(12시간제 시) mm(분) -->
 					</c:when>
 
 					<c:otherwise>
-						<div class="otherMessage">			<!-- 다른 사람 채팅 -->
-							<div><c:out value="${chat.memberId}"/></div>
-							<div><c:out value="${chat.content}"/></div>
-							<div><fmt:formatDate value="${chat.createdAt}" pattern="a h:mm"/></div>
+						<div class="otherMessage">
+							<!-- 다른 사람 채팅 -->
+							<div>
+								<c:out value="${chat.username}" />
+							</div>
+							<div>
+								<c:out value="${chat.content}" />
+							</div>
+							<div>
+								<fmt:formatDate value="${chat.createdAt}" pattern="a h:mm" />
+							</div>
 						</div>
 					</c:otherwise>
 				</c:choose>
@@ -372,6 +373,7 @@
 		$("#chat").scrollTop($("#chat")[0].scrollHeight);
 		const partyId = ${partyId};
 		const loginId = "${loginId}";
+		const loginNickname = "${loginNickname}";
 		
 		const stompClient = new StompJs.Client({
 			brokerURL : "ws://" + location.host + "/ws"
@@ -401,7 +403,7 @@
 					} else {
 					    $("#chat").append(					// 다른사람 메세지는 <otherwise>뒤로 넣기 
 					        "<div class='otherMessage'>" +
-					            "<div>" + esc(data.memberId) + "</div>" + "<div>" + esc(data.content) + "</div>" +
+					            "<div>" + esc(data.username) + "</div>" + "<div>" + esc(data.content) + "</div>" +
 					            "<div>" + formatTime(data.createdAt) + "</div>" + "</div>"
 					    );
 					}
@@ -422,7 +424,7 @@
 			        body : JSON.stringify({
 			            partyId : partyId,
 			            memberId : loginId,
-			            content : loginId + "님이 입장했습니다.",
+			            content : loginNickname + "님이 입장했습니다.",
 			            messageType : "ENTER"
 			        })
 			    });
@@ -464,7 +466,7 @@
 			    content : message,
 			    messageType : "TEXT"
 			}); */
-
+			
 			stompClient.publish({			//채팅 전송시 dto로 저장되면서 @MessageMapping매핑
 				destination : "/app/chat",
 				body : JSON.stringify({

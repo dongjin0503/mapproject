@@ -1,4 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
 <%@taglib prefix="C" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <fmt:setLocale value="ko_KR" />
@@ -19,6 +20,36 @@
 	min-height: 100vh; /*브라우저 화면 높이의 100%*/
 }
 
+.party-top {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin: 20px 0;
+}
+
+.filter-buttons {
+	display: flex;
+	gap: 10px;
+}
+
+.filter-buttons button {
+	padding: 8px 18px;
+	border: 1px solid #ccc;
+	border-radius: 16px;
+	background-color: white;
+	cursor: pointer;
+}
+
+.filter-buttons button:hover {
+	background-color: #f3f3f3;
+}
+
+.filter-buttons button.active {
+	background-color: black;
+	color: white;
+	border-color: black;
+}
+
 #create-btn {
 	height: 40px;
 	width: 120px;
@@ -29,10 +60,8 @@
 	font-size: 16px;
 	font-weight: bold;
 	text-align: center;
+	margin : 0;
 	display: block;
-	margin-left: auto;
-	margin-top: 20px;
-	margin-bottom: 20px;
 	cursor: pointer;
 	transition: background-color 0.2s;
 }
@@ -45,6 +74,7 @@
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
 	gap: 20px;
+	overflow: visible;
 }
 
 #party-list a {
@@ -54,12 +84,20 @@
 
 .card {
 	position: relative;
-	height: 300px;
+	height: 360px;
 	width: 350px;
 	padding: 10px;
 	border: 1px solid #ccc;
-	border-radius: 5px;
+	border-radius: 8px;
 	cursor: pointer;
+	transition: transform 0.25s ease, box-shadow 0.25s ease;
+	background-color: white;
+}
+
+.card:hover {
+	transform: scale(1.07);
+	box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+	z-index: 20;
 }
 
 .bookmark-btn {
@@ -82,22 +120,20 @@
 	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-.card:hover {
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
 .image {
 	width: 100%;
-	aspect-ratio: 16/9;
+	height: 250px;
 	overflow: hidden;
-	border-radius: 5px;
-	background-color: #f5f5f5;
+	background-color: transparent;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .image img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
+	max-width: 100%;
+	max-height: 100%;
+	object-fit: contain;
 	display: block;
 }
 
@@ -120,17 +156,40 @@
 	font-size: 14px;
 	color: #555;
 }
+
 </style>
 </head>
 <body>
 	<jsp:include page="/WEB-INF/views/common/header.jsp" />
 	<div class="container">
-		<button type="button" id="create-btn" onclick="location.href='/party/create'">모임 만들기</button>
+	<h2>모임 리스트</h2>
+		<div class="party-top">
+			<div class="filter-buttons">
+
+				<button type="button" class="${empty status ? 'active' : ''}"
+					onclick="location.href='/party/list'">전체</button>
+
+				<button type="button"
+					class="${status == 'recruiting' ? 'active' : ''}"
+					onclick="location.href='/party/list?status=recruiting'">
+					모집중</button>
+
+				<button type="button" class="${status == 'ended' ? 'active' : ''}"
+					onclick="location.href='/party/list?status=ended'">종료</button>
+			</div>
+
+			<button type="button" id="create-btn"
+				onclick="location.href='/party/create'">모임 만들기</button>
+
+		</div>
+
 		<div id="party-list">
 			<C:forEach var="party" items="${parties}">
-				<div class="card" onclick="location.href='/party/detail?partyId=${party.partyId}'">
+				<div class="card"
+					onclick="location.href='/party/detail?partyId=${party.partyId}'">
 
-					<button type="button" class="bookmark-btn" data-party-id="${party.partyId}">
+					<button type="button" class="bookmark-btn"
+						data-party-id="${party.partyId}">
 
 						<C:choose>
 							<C:when test="${bookmarkedPartyIds.contains(party.partyId)}">
@@ -161,7 +220,8 @@
 					<div class="title">${party.title}</div>
 
 					<div class="meet-date">
-						<fmt:formatDate value="${party.meetDate}" pattern="yyyy.MM.dd(E) HH:mm" />
+						<fmt:formatDate value="${party.meetDate}"
+							pattern="yyyy.MM.dd(E) HH:mm" />
 					</div>
 
 				</div>
@@ -178,7 +238,9 @@
       if ((window.innerHeight + window.scrollY >= document.documentElement.scrollHeight -100)&& !loading){
          loading = true;
          
-         fetch("/party/more?offset=" + offset)
+         
+         const status = "${status}";
+         fetch("/party/more?offset=" + offset + "&status=" + status)
          .then(response => response.json())
          .then(parties => {
          for(const party of parties){
@@ -224,13 +286,28 @@
          
          const meetDate = document.createElement("div");
          meetDate.className = "meet-date";
-         meetDate.textContent = new Date(party.meetDate).toLocaleString("ko-KR");
+         const date = new Date(party.meetDate);
+
+         const days = ["일", "월", "화", "수", "목", "금", "토"];
+
+         const year = date.getFullYear();
+         const month = String(date.getMonth() + 1).padStart(2, "0");
+         const day = String(date.getDate()).padStart(2, "0");
+         const dayName = days[date.getDay()];
+         const hour = String(date.getHours()).padStart(2, "0");
+         const minute = String(date.getMinutes()).padStart(2, "0");
+
+         meetDate.textContent =
+         	year + "." + month + "." + day
+         	+ "(" + dayName + ") "
+         	+ hour + ":" + minute;
          card.appendChild(meetDate);
          
-         const link = document.createElement("a");
-         link.href = "/party/detail?partyId=" + party.partyId;
-         link.appendChild(card);
-         document.getElementById("party-list").appendChild(link);
+         card.onclick = function() {
+        		location.href = "/party/detail?partyId=" + party.partyId;
+        	};
+
+        	document.getElementById("party-list").appendChild(card);
          }
          offset += parties.length;
          if(parties.length === 9) loading = false;

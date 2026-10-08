@@ -11,6 +11,17 @@ public class ChattingRoomDTO {
 	private String messageType;
 	private Timestamp createdAt;
 	
+	
+	// 채팅창에 띄울 nickname 필드추가
+	private String username;
+	
+	
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
+	}
 	public ChattingRoomDTO() {}
 	public ChattingRoomDTO(int messageId, int partyId, String memberId, String content, String messageType,
 			Timestamp createdAt) {

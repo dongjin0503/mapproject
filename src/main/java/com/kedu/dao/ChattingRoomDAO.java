@@ -23,7 +23,9 @@ public class ChattingRoomDAO {
 	}
 	
 	public List<ChattingRoomDTO> selectByPartyId(int partyId){
-		String sql = "select * from chattingroom where party_id=? order by message_id";
+		String sql = "select c.*, m.username from chattingroom c "
+		        + "join member m on c.member_id = m.member_id "
+		        + "where c.party_id=? order by c.message_id";
 		return jdbc.query(sql, new BeanPropertyRowMapper<>(ChattingRoomDTO.class), partyId);
 	}
 	
@@ -38,7 +40,13 @@ public class ChattingRoomDAO {
 	}
 	
 	public List<String> selectMemberList(int partyId){
-		String sql = "select member_id from party_member where party_id=? order by join_date";
+		String sql = "select m.username from party_member pm "
+	               + "join member m on pm.member_id = m.member_id "
+	               + "where pm.party_id=? order by pm.join_date";
 		return jdbc.queryForList(sql, String.class, partyId);
+	}
+	public String selectNickname(String memberId) {
+		String sql = "select username from member where member_id=?";
+	    return jdbc.queryForObject(sql, String.class, memberId);
 	}
 }

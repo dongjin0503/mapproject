@@ -21,8 +21,8 @@
 	padding: 0 20px;
 }
 
-container h2 {
-margin-bottom : 25px;
+.container h2 {
+	margin-bottom: 25px;
 }
 
 .dashboard {
@@ -44,7 +44,6 @@ margin-bottom : 25px;
 	font-size: 18px;
 }
 
-
 .chart-box canvas {
 	max-width: 100%;
 	max-height: 230px;
@@ -60,18 +59,24 @@ margin-bottom : 25px;
 
 		<h2>관리자 대시보드</h2>
 
+		<form action="/admin/dashboard" method="get"
+			style="margin-bottom: 20px;">
+			<input type="date" name="startDate" value="${startDate}"> ~ <input
+				type="date" name="endDate" value="${endDate}">
+			<button type="submit">조회</button>
+		</form>
+
 		<div class="dashboard">
 
 			<div class="chart-box">
-				<h3>월별 모임 생성 수</h3>
-				<canvas id="partyChart"></canvas>
+				<h3>파티 카테고리별 생성 / 참여 수</h3>
+				<canvas id="partyCategoryChart"></canvas>
 			</div>
 
 			<div class="chart-box">
-				<h3>월별 모임 참여 수</h3>
-				<canvas id="partyMemberChart"></canvas>
+				<h3>챌린지 카테고리별 생성 / 참여 수</h3>
+				<canvas id="challengeCategoryChart"></canvas>
 			</div>
-
 			<div class="chart-box">
 				<h3>성별 회원 비율</h3>
 				<canvas id="genderChart"></canvas>
@@ -86,82 +91,99 @@ margin-bottom : 25px;
 
 	</div>
 	<script>
-let partyLabels = [];
-let partyCounts = [];
+	let partyCategoryLabels = [];
+	let partyCreateCounts = [];
+	let partyJoinCounts = [];
 
-<c:forEach var="item" items="${monthlyPartyCount}">
-partyLabels.push("${item.month}");
-partyCounts.push(${item.count});
-</c:forEach>
+	<c:forEach var="item" items="${partyCategoryStats}">
+	partyCategoryLabels.push("${item.category}");
+	partyCreateCounts.push(${item.createCount});
+	partyJoinCounts.push(${item.joinCount});
+	</c:forEach>
 
-new Chart(document.getElementById("partyChart"),{
-	type : "line",
-	data : {
-		labels : partyLabels,
-		datasets : [{
-			label : "모임 생성 수",
-			data : partyCounts
-		}]
-	},
-	options : {
-		scales : {
-			y : {
-				beginAtZero : true,
-				ticks : {
-					precision : 0
+	new Chart(document.getElementById("partyCategoryChart"), {
+		type : "bar",
+		data : {
+			labels : partyCategoryLabels,
+			datasets : [
+				{
+					label : "생성 수",
+					data : partyCreateCounts
+				},
+				{
+					label : "참여 수",
+					data : partyJoinCounts
+				}
+			]
+		},
+		options : {
+			scales : {
+				y : {
+					beginAtZero : true,
+					ticks : {
+						precision : 0
+					}
 				}
 			}
 		}
-	}
-});
+	});
 
-let partyMemberLabels = [];
-let partyMemberCounts = [];
 
-<c:forEach var="item" items="${monthlyPartyMemberCount}">
-partyMemberLabels.push("${item.month}");
-partyMemberCounts.push(${item.count});
-</c:forEach>
+	let challengeCategoryLabels = [];
+	let challengeCreateCounts = [];
+	let challengeJoinCounts = [];
 
-new Chart(document.getElementById("partyMemberChart"),{
-	type : "line",
-	data : {
-		labels : partyMemberLabels,
-		datasets : [{
-			label : "모임 참여 수",
-			data : partyMemberCounts
-		}]
-	},
-	options : {
-		scales : {
-			y : {
-				beginAtZero : true,
-				ticks : {
-					precision : 0
+	<c:forEach var="item" items="${challengeCategoryStats}">
+	challengeCategoryLabels.push("${item.category}");
+	challengeCreateCounts.push(${item.createCount});
+	challengeJoinCounts.push(${item.joinCount});
+	</c:forEach>
+
+	new Chart(document.getElementById("challengeCategoryChart"), {
+		type : "bar",
+		data : {
+			labels : challengeCategoryLabels,
+			datasets : [
+				{
+					label : "생성 수",
+					data : challengeCreateCounts
+				},
+				{
+					label : "참여 수",
+					data : challengeJoinCounts
+				}
+			]
+		},
+		options : {
+			scales : {
+				y : {
+					beginAtZero : true,
+					ticks : {
+						precision : 0
+					}
 				}
 			}
 		}
-	}
-});
+	});
 
-let genderLabels = [];
-let genderCounts = [];
+	let genderLabels = [];
+	let genderCounts = [];
 
-<c:forEach var="item" items="${genderCount}">
-genderLabels.push("${item.gender}");
-genderCounts.push(${item.count});
-</c:forEach>
+	<c:forEach var="item" items="${genderCount}">
+	genderLabels.push("${item.gender}");
+	genderCounts.push(${item.count});
+	</c:forEach>
 
-new Chart(document.getElementById("genderChart"),{
-	type : "pie",
-	data : {
-		labels : genderLabels,
-		datasets : [{
-			data : genderCounts
-		}]
-	}
-});
-
+	new Chart(document.getElementById("genderChart"),{
+		type : "pie",
+		data : {
+			labels : genderLabels,
+			datasets : [{
+				data : genderCounts,
+				backgroundColor : ["#4A90E2", "#FF8FA3"]
+			}]
+		}
+	});
 let ageGroupLabels = [];
 let ageGroupCounts = [];
 
