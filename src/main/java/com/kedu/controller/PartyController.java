@@ -118,27 +118,27 @@ public class PartyController {
 
    @RequestMapping("/apply")
    public String apply(int partyId, HttpSession session, Model model) {
-      PartyDTO party = partyDAO.findById(partyId);
 
-      String loginId = (String) session.getAttribute("loginId");
+   	PartyDTO party = partyDAO.findById(partyId);
 
-      if (loginId == null) {
-         return "redirect:/member/login";
-      }
+   	String loginId =
+   			(String) session.getAttribute("loginId");
 
-      PartyDTO dto = partyDAO.findById(partyId);
+   	if (loginId == null) {
+   		return "redirect:/member/login";
+   	}
 
-      if (dto == null) {
-         return "redirect:/party/list";
-      }
+   	if (party == null) {
+   		return "redirect:/party/list";
+   	}
 
-      if (party == null) {
-         return "redirect:/party/list";
-      }
+   	String imageSysName =
+   			partyDAO.findFirstImage(partyId);
 
-      model.addAttribute("party", dto);
-      return "party/apply";
+   	model.addAttribute("party", party);
+   	model.addAttribute("imageSysName", imageSysName);
 
+   	return "party/apply";
    }
 
    @RequestMapping(value = "/createSubmit", method = RequestMethod.POST)
@@ -422,5 +422,108 @@ public class PartyController {
 
          return "INSERT";
       }
+   }
+   
+   @RequestMapping("/edit")
+   public String edit(
+   		@RequestParam("partyId") int partyId,
+   		HttpSession session,
+   		Model model) {
+
+   	String loginId =
+   			(String) session.getAttribute("loginId");
+
+   	if (loginId == null) {
+   		return "redirect:/member/login";
+   	}
+
+   	PartyDTO party =
+   			partyDAO.findById(partyId);
+
+   	if (party == null) {
+   		return "redirect:/party/list";
+   	}
+
+   	if (!loginId.equals(party.getHostId())) {
+   		return "redirect:/party/detail?partyId=" + partyId;
+   	}
+
+   	String meetDateText =
+   			party.getMeetDate()
+   				.toLocalDateTime()
+   				.toString()
+   				.substring(0, 16);
+
+   	model.addAttribute("party", party);
+   	model.addAttribute("meetDateText", meetDateText);
+
+   	return "party/edit";
+   }
+   
+   @RequestMapping(value = "/update", method = RequestMethod.POST)
+   public String update(
+   		PartyDTO dto,
+   		@RequestParam("meetDateText") String meetDateText,
+   		HttpSession session,
+   		Model model) {
+
+   	String loginId =
+   			(String) session.getAttribute("loginId");
+
+   	if (loginId == null) {
+   		return "redirect:/member/login";
+   	}
+
+   	PartyDTO original =
+   			partyDAO.findById(dto.getPartyId());
+
+   	if (original == null) {
+   		return "redirect:/party/list";
+   	}
+
+   	if (!loginId.equals(original.getHostId())) {
+   		return "redirect:/party/list";
+   	}
+
+   	dto.setHostId(loginId);
+
+   	LocalDateTime meetDate =
+   			LocalDateTime.parse(meetDateText);
+
+   	dto.setMeetDate(
+   			Timestamp.valueOf(meetDate)
+   	);
+
+   	if (dto.getTitle() == null
+   			|| dto.getTitle().trim().isEmpty()) {
+
+   		model.addAttribute(
+   				"message",
+   				"모임 제목을 입력해 주세요."
+   		);
+
+   		model.addAttribute("party", dto);
+   		model.addAttribute("meetDateText", meetDateText);
+
+   		return "party/edit";
+   	}
+
+   	if (!meetDate.isAfter(LocalDateTime.now())) {
+
+   		model.addAttribute(
+   				"message",
+   				"모임 날짜는 현재 시간 이후로 선택해 주세요."
+   		);
+
+   		model.addAttribute("party", dto);
+   		model.addAttribute("meetDateText", meetDateText);
+
+   		return "party/edit";
+   	}
+
+   	partyDAO.update(dto);
+
+   	return "redirect:/party/detail?partyId="
+   			+ dto.getPartyId();
    }
 }

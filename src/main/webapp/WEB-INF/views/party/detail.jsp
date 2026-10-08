@@ -21,19 +21,19 @@
 }
 
 .detail-image-box {
-   position: relative;
-   width: 100%;
-   height: 350px;
-   overflow: hidden;
-   border-radius: 8px;
-   margin-bottom: 20px;
+	position: relative;
+	width: 100%;
+	aspect-ratio: 16 / 9;
+	overflow: hidden;
+	border-radius: 8px;
+	margin-bottom: 20px;
 }
 
 .detail-image {
-   width: 100%;
-   height: 100%;
-   object-fit: cover;
-   display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
 }
 
 #prev-image-btn, #next-image-btn {
@@ -180,6 +180,18 @@
    cursor: pointer;
    vertical-align: middle;
 }
+
+#edit-btn {
+	width: 170px;
+	height: 45px;
+	padding: 12px 20px;
+	background-color: white;
+	color: black;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	font-size: 15px;
+	cursor: pointer;
+}
 </style>
 </head>
 <body>
@@ -281,10 +293,22 @@
       </section>
       <div class="party-buttons">
          <C:if
-            test="${not empty sessionScope.loginId and sessionScope.loginId == party.hostId}">
-            <button type="button" id="manage-btn"
-               onclick="location.href='/party/applications?partyId=${party.partyId}'">신청관리</button>
-         </C:if>
+	test="${not empty sessionScope.loginId 
+	and sessionScope.loginId == party.hostId}">
+
+	<button type="button"
+		id="edit-btn"
+		onclick="location.href='/party/edit?partyId=${party.partyId}'">
+		모임 수정
+	</button>
+
+	<button type="button"
+		id="manage-btn"
+		onclick="location.href='/party/applications?partyId=${party.partyId}'">
+		신청관리
+	</button>
+
+</C:if>
 
          <C:if test="${sessionScope.loginId != party.hostId}">
 
