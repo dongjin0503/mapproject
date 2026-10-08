@@ -168,4 +168,77 @@ public class LedgerDAO {
                month
          );
       }
+      
+      // 월별 예산 조회
+      public int getMonthlyBudget(String memberId, String month) {
+    	  
+    	  String sql = "select BUDGET_AMOUNT "
+    			   + "from MONTHLY_BUDGET "
+    			  + "where MEMBER_ID = ? "
+    			   + "and BUDGET_MONTH = ?";
+    	  
+    	  List<Integer> list = jdbcTemplate.query(
+    			  sql,
+    			  (rs, rowNum) -> rs.getInt("BUDGET_AMOUNT"),
+    			  memberId,
+    			  month
+    			  );
+    	  
+    	  return list.isEmpty() ? 0 : list.get(0);
+      }
+      
+      // 예산 등록
+      public void saveMonthlyBudget(String memberId, String month, int amount) {
+
+    		String countSql = "SELECT COUNT(*) "
+    				+ "FROM MONTHLY_BUDGET "
+    				+ "WHERE MEMBER_ID = ? "
+    				+ "AND BUDGET_MONTH = ?";
+
+    		int count = jdbcTemplate.queryForObject(
+    				countSql,
+    				Integer.class,
+    				memberId,
+    				month
+    		);
+
+    		if (count > 0) {
+
+    			String updateSql = "UPDATE MONTHLY_BUDGET "
+    					+ "SET BUDGET_AMOUNT = ? "
+    					+ "WHERE MEMBER_ID = ? "
+    					+ "AND BUDGET_MONTH = ?";
+
+    			jdbcTemplate.update(
+    					updateSql,
+    					amount,
+    					memberId,
+    					month
+    			);
+
+    		} else {
+
+    			String insertSql = "INSERT INTO MONTHLY_BUDGET "
+    					+ "(BUDGET_ID, MEMBER_ID, BUDGET_MONTH, BUDGET_AMOUNT) "
+    					+ "VALUES (MONTHLY_BUDGET_SEQ.NEXTVAL, ?, ?, ?)";
+
+    			jdbcTemplate.update(
+    					insertSql,
+    					memberId,
+    					month,
+    					amount
+    			);
+    		}
+    	}
+      
+      public int getPreviousBalance(String memberId, String previousMonth) {
+
+    		int income = getMonthlyIncome(memberId, previousMonth);
+
+    		int expense = getMonthlyExpense(memberId, previousMonth);
+
+    		int budget = getMonthlyBudget(memberId, previousMonth);
+
+    		return budget + income - expense;
+    	}
 }

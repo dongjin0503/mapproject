@@ -485,4 +485,27 @@ public class PartyDAO {
                partyId
          );
       }
+      
+      public int update(PartyDTO dto) {
+
+    		String sql = "UPDATE PARTY SET "
+    				+ "STORE_ID = ?, "
+    				+ "TITLE = ?, "
+    				+ "CONTENTS = ?, "
+    				+ "MEET_DATE = ?, "
+    				+ "QUESTION = ? "
+    				+ "WHERE PARTY_ID = ? "
+    				+ "AND HOST_ID = ?";
+
+    		return jdbcTemplate.update(
+    				sql,
+    				dto.getStoreId(),
+    				dto.getTitle(),
+    				dto.getContents(),
+    				dto.getMeetDate(),
+    				dto.getQuestion(),
+    				dto.getPartyId(),
+    				dto.getHostId()
+    		);
+    	}
 }

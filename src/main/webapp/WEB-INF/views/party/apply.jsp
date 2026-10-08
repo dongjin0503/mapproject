@@ -50,16 +50,23 @@ form h1 {
 }
 
 .party-image {
-	width: 140px;
-	height: 110px;
+	width: 160px;
+	aspect-ratio: 16 / 9;
 	flex-shrink: 0;
 	background-color: #eee;
 	border-radius: 5px;
+	overflow: hidden;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 }
 
+.party-image img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
 .party-text {
 	margin: 25px 0 0 15px;
 }
@@ -138,7 +145,21 @@ form h1 {
 	<form action="/party/applySubmit" method="post">
 		<h1>모임 신청</h1>
 		<div class="party-info">
-			<div class="party-image">모임 사진</div>
+		<div class="party-image">
+
+	<C:choose>
+
+		<C:when test="${not empty imageSysName}">
+			<img src="/uploads/${imageSysName}">
+		</C:when>
+
+		<C:otherwise>
+			모임 사진
+		</C:otherwise>
+
+	</C:choose>
+
+</div>
 
 			<div class="party-text">
 				<p class="party-title">${party.title}</p>
