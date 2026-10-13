@@ -265,17 +265,26 @@
 	genderLabels.push("${item.gender}");
 	genderCounts.push(${item.count});
 	</c:forEach>
+	let genderColors = genderLabels.map(function(gender) {
 
+		if (gender === "남성") {
+			return "#4A90E2";
+		}
+
+		return "#FF8FA3";
+	});
 	new Chart(document.getElementById("genderChart"),{
 		type : "pie",
 		data : {
 			labels : genderLabels,
 			datasets : [{
 				data : genderCounts,
-				backgroundColor : ["#4A90E2", "#FF8FA3"]
+				backgroundColor : genderColors
 			}]
 		}
 	});
+	
+	
 let ageGroupLabels = [];
 let ageGroupCounts = [];
 
