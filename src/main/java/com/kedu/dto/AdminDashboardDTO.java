@@ -8,12 +8,13 @@ package com.kedu.dto;
 		private String ageGroup;
 		private String category;
 		private int createCount;
-		private int joinCount;
+		private int progressCount;
+		private double successRate;
 
 		public AdminDashboardDTO() {
 		}
 
-		public AdminDashboardDTO(String month, int count, String gender, String ageGroup, String category, int createCount, int joinCount) {
+		public AdminDashboardDTO(String month, int count, String gender, String ageGroup, String category, int createCount, int progressCount, double successRate) {
 			super();
 			this.month = month;
 			this.count = count;
@@ -21,7 +22,9 @@ package com.kedu.dto;
 			this.ageGroup = ageGroup;
 			this.category = category;
 			this.createCount = createCount;
-			this.joinCount = joinCount;
+			this.progressCount = progressCount;
+			this.successRate = successRate;
+		
 		}
 
 		public String getMonth() {
@@ -72,12 +75,20 @@ package com.kedu.dto;
 			this.createCount = createCount;
 		}
 
-		public int getJoinCount() {
-			return joinCount;
+		public int getProgressCount() {
+			return progressCount;
 		}
 
-		public void setJoinCount(int joinCount) {
-			this.joinCount = joinCount;
+		public void setProgressCount(int progressCount) {
+			this.progressCount = progressCount;
+		}
+
+		public double getSuccessRate() {
+			return successRate;
+		}
+
+		public void setSuccessRate(double successRate) {
+			this.successRate = successRate;
 		}
 		
 	}
