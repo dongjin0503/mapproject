@@ -15,19 +15,14 @@
 	box-sizing: border-box;
 }
 
-body {
-	margin: 0;
-	padding: 0 0 40px;
-	font-family: "Noto Sans KR", "Malgun Gothic", Arial, sans-serif;
-	color: #1c2535;
-	background-color: #fff;
-}
+
 
 /* 글쓰기 카드 */
 .container {
 	width: 900px;
 	max-width: calc(100% - 40px);
 	margin: 0 auto;
+	margin-top: 20px;
 	padding: 28px 35px;
 	background: white;
 	border: 1px solid #d5dce7;
@@ -88,35 +83,141 @@ body {
 	gap: 8px;
 	margin: 10px 0;
 }
-/* 파일 업로드 */
 #fileBox {
-	margin-top: 20px;
-	padding: 14px 16px;
-	border: 1px solid #d5dce7;
-	border-radius: 8px;
-	font-size: 13px;
-	color: #39465c;
+    margin-top: 20px;
+    padding: 14px 16px;
+    border: 1px solid #d5dce7;
+    border-radius: 8px;
+    color: #39465c;
+    font-size: 13px;
 }
 
 #fileBox legend {
-	padding: 0 8px;
-	font-weight: bold;
+    padding: 0 8px;
+    font-weight: bold;
 }
 
+.fileUploadRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-width: 0;
+}
+
+/* 실제 파일 input 숨기기 */
+.fileInput {
+    display: none;
+}
+
+/* 파일 선택 버튼 */
+.fileBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex-shrink: 0;
+    padding: 10px 13px;
+    border: 1px solid #d5dce7;
+    border-radius: 8px;
+    background: white;
+    color: #39465c;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.fileBtn:hover {
+    background: #1c2535;
+    color: white;
+    border-color: #1c2535;
+}
+
+/* 파일명 */
+.fileName {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: #8995a9;
+}
+
+/* 추가 파일 버튼 */
 #add {
-	margin-left: 8px;
-	padding: 6px 12px;
-	border: 1px solid #d5dce7;
-	border-radius: 6px;
-	background: white;
-	font-size: 12px;
-	cursor: pointer;
+    flex-shrink: 0;
+    margin-left: auto;
+    padding: 10px 12px;
+    border: 1px solid #d5dce7;
+    border-radius: 8px;
+    background: #b0b0b0;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+    transition: 0.2s;
 }
 
 #add:hover {
-	border-color: #1c2535;
+    background: #1c2535;
+    color: white;
 }
 
+/* 추가 파일 영역 */
+#additionalFiles {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+/* 추가 파일 한 줄 */
+.additionalFileRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+/* 추가 파일 input의 파일 선택 버튼 */
+.additionalFile {
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+    font-size: 13px;
+    color: #39465c;
+}
+
+/* 브라우저 기본 파일 선택 버튼 스타일 */
+.additionalFile::file-selector-button {
+    padding: 9px 12px;
+    margin-right: 10px;
+    border: 1px solid #d5dce7;
+    border-radius: 8px;
+    background: white;
+    color: #39465c;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.additionalFile::file-selector-button:hover {
+    background: #1c2535;
+    color: white;
+    border-color: #1c2535;
+}
+
+/* 추가 파일 삭제 버튼 */
+.removeFile {
+    flex-shrink: 0;
+    padding: 8px 10px;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    background: white;
+    color: #dc2626;
+    cursor: pointer;
+}
+
+.removeFile:hover {
+    background: #fef2f2;
+}
 /* 하단 버튼 */
 .footer {
 	display: flex;
@@ -199,7 +300,7 @@ body {
 				<h2>게시글 작성</h2>
 			</div>
 			<div class="writer">
-				<input type="text" name="memberId" value="${loginId }" readonly>
+				<input type="text" name="memberId" value="${loginUsername}" readonly>
 			</div>
 			<div class="title">
 				<input type="text" name="title" placeholder="제목을 입력하세요 (최대 300바이트)">
@@ -224,16 +325,35 @@ body {
 			});
 			</script>
 			<fieldset id="fileBox">
-				<legend>파일 업로드</legend>
-				<br> <input type="file" name="files">
-				<input id="add" type="button" value="추가 파일 업로드">
+    			<legend>파일 업로드</legend>
+				<div class="fileUploadRow">
+        			<input id="selectFile" type="file" name="files" class="fileInput">
+					<label for="selectFile" class="fileBtn">파일 선택</label>
+
+        			<span id="firstFileName" class="fileName">선택된 파일 없음</span>
+        			<input id="add" type="button" value="+">
+    			</div>
+				<div id="additionalFiles"></div>
 			</fieldset>
+
 			<script>
-				$("#add").click(
-						function() {
-							$("#fileBox").append(
-									'<br><input type="file" name="files">');
-						});
+			$("#selectFile").on("change", function() {
+			    const file = this.files[0];
+
+			    $("#firstFileName").text(
+			        file ? file.name : "선택된 파일 없음"
+			    );
+			});
+			
+			$("#add").on("click", function() {
+			    $("#additionalFiles").append(
+			        $('<input>', {
+			            type: 'file',
+			            name: 'files',
+			            class: 'additionalFile'
+			        })
+			    );
+			});
 			</script>
 			<div class="footer">
 				<a href="/FreeBoard/freeboard?cpage=1"><input type="button"

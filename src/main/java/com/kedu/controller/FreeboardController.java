@@ -18,6 +18,7 @@ import com.kedu.dao.FreeBoardDAO;
 import com.kedu.dao.FreeBoardFileDAO;
 import com.kedu.dao.FreeBoardLikeDAO;
 import com.kedu.dao.FreeBoardReplyDAO;
+import com.kedu.dao.MemberDAO;
 import com.kedu.dto.FreeBoardDTO;
 import com.kedu.dto.FreeBoardFileDTO;
 
@@ -36,6 +37,9 @@ public class FreeboardController {
 
 	@Autowired
 	private FreeBoardFileDAO fdao;
+	
+	@Autowired
+	private MemberDAO mdao;
 
 	@RequestMapping("/freeboard")
 	public String boardList(@RequestParam(defaultValue = "") String category,@RequestParam(defaultValue = "1") int cpage, @RequestParam(defaultValue = "") String search,
@@ -77,8 +81,11 @@ public class FreeboardController {
 //	}
 
 	@RequestMapping("/write")
-	public String write() throws Exception {
-
+	public String write(HttpSession session, Model model) throws Exception {
+		String loginId = (String) session.getAttribute("loginId");
+		if (loginId != null) {
+			model.addAttribute("loginUsername", mdao.selectMember(loginId).getUsername());
+		}
 		return "/FreeBoard/write";
 	}
 
@@ -118,6 +125,9 @@ public class FreeboardController {
 		model.addAttribute("cpage", cpage);
 		
 		String loginId = (String) session.getAttribute("loginId");
+		if (loginId != null) {
+			model.addAttribute("loginUsername", mdao.selectMember(loginId).getUsername());
+		}
 		model.addAttribute("liked", loginId != null && ldao.likeCheck(postId, loginId));	// 내가 추천했는지
 
 		return "/FreeBoard/detail";

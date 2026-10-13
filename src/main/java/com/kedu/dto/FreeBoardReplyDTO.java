@@ -14,6 +14,12 @@ public class FreeBoardReplyDTO {
 	
 	private int replyCount;
 	
+	// username필드 추가
+	private String username;
+
+	public String getUsername() { return username; }
+	public void setUsername(String username) { this.username = username; }
+	
 	public FreeBoardReplyDTO() {};
 	public FreeBoardReplyDTO(int replyId, int postId, String memberId, Integer parentReplyId, String content, int likeCount,
 			Timestamp createdAt) {
