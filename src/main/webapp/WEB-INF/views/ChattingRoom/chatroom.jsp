@@ -11,7 +11,7 @@
 <!-- STOMP -->
 <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.1.1/bundles/stomp.umd.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/WebAsset/FontAwesome@pro/css/all.min.css">
 <style>
 /* =========================
    채팅 전체
@@ -67,18 +67,39 @@
    참여자 사이드바
 ========================= */
 #memberList {
-	position: absolute;
-	top: 0;
-	left: 100%;
-	width: 200px;
-	height: 100%;
-	padding: 20px;
-	box-sizing: border-box;
-	background-color: white;
-	border: 1px solid #ddd;
-	border-radius: 0 10px 10px 0;
-	box-shadow: 3px 0 10px rgba(0, 0, 0, 0.15);
-	z-index: 10;
+    position: absolute;
+    top: 0;
+    left: 100%;
+    width: 250px;
+    height: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 0 10px 10px 0;
+    box-shadow: 3px 0 10px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+
+    display: block;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateX(-15px);
+
+    transition:
+        opacity 0.3s ease,
+        transform 0.3s ease,
+        visibility 0.3s ease;
+
+    pointer-events: none;
+}
+
+
+/* 사이드바 열림 */
+#memberList.active {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
 }
 
 /* 참여자 한 명 */
@@ -89,33 +110,127 @@
 
 /* 채팅 나가기 버튼 */
 #exitbtn {
-	width: 100%;
-	margin-top: 15px;
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+    padding: 10px 12px;
+    background-color: #fff;
+    color: #666;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
 }
 
+/* 마우스 오버 */
+#exitbtn:hover {
+    background-color: #fef2f2;
+    color: #dc2626;
+    border-color: #fecaca;
+}
+
+/* 클릭 효과 */
+#exitbtn:active {
+    background-color: #fee2e2;
+}
 /* =========================
-   검색창
+   검색창 (기본적으로 숨김)
 ========================= */
+
 .searchMessage {
-	display: flex;
-	gap: 6px;
-	margin-top: 10px;
-	clear: both;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 0;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    visibility: hidden;
+    transform: translateY(-8px);
+
+    transition:
+        max-height 0.35s ease,
+        margin-top 0.35s ease,
+        opacity 0.25s ease,
+        transform 0.35s ease,
+        visibility 0.35s ease;
 }
 
+/* 검색창 열림 */
+.searchMessage.active {
+    max-height: 50px;
+    margin-top: 10px;
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    overflow: visible;
+}
+
+/* 검색창 + 돋보기 아이콘 영역 */
+.searchBox {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+}
+
+/* 검색 입력창 */
 #searchText {
-	flex: 1;
-	padding: 6px 8px;
-	border: 1px solid #ddd;
-	border-radius: 6px;
+    display: block;
+    width: 100%;
+    height: 34px;
+    padding: 6px 36px 6px 10px;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    outline: none;
+    font-size: 13px;
 }
 
-.searchMessage input[type="button"] {
-	padding: 6px 10px;
-	border: 1px solid #ddd;
-	border-radius: 6px;
-	background: white;
-	cursor: pointer;
+/* 검색창 포커스 */
+#searchText:focus {
+    border-color: #999;
+}
+
+/* 돋보기 버튼 */
+#searchbtn {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border: none;
+    background: transparent;
+    color: #777;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+/* 돋보기 마우스 오버 */
+#searchbtn:hover {
+    color: #111827;
+}
+
+/* 전체보기 버튼 */
+#allbtn {
+    flex-shrink: 0;
+    height: 34px;
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: white;
+    color: #333;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+#allbtn:hover {
+    background: #f3f4f6;
 }
 
 /* =========================
@@ -244,27 +359,34 @@
 	<!-- 채팅방 -->
 	<div class="chat">
 		<div class="chatHeader">
-			<span>${partyTitle}<c:out value="${partyTitle}" /></span> <span>${partyMember}<c:out value="${member}" /></span> <input
-				type="button" id="hamburgerbtn" value="☰">
+			<span>${partyTitle}<c:out value="${partyTitle}" /></span>
+			<span>${partyMember}<c:out value="${member}" /></span>
+			<input type="button" id="hamburgerbtn" value="☰">
 			<!-- 참여자목록, 채팅나가기버튼 -->
-			<div id="memberList" style="display: none;">
+			<div id="memberList">
 				<c:forEach var="member" items="${memberList}">
 					<!-- 햄버거버튼 눌렀을 시 채팅참여자 닉네임 -->
-					<div>${member}</div>
+					<div><i class="fa-solid fa-user"></i>  ${member}</div>
 				</c:forEach>
 				<input type="button" id="exitbtn" value="채팅 나가기">
 			</div>
 
 			<div class="searchMessage">
-				<input id="searchText" type="text" placeholder="내용 검색"> <input id="searchbtn" type="button" value="검색">
-				<input id="allbtn" type="button" value="전체보기">
+    			<div class="searchBox">
+        			<input id="searchText" type="text" placeholder="내용 검색">
+        			<button type="button" id="searchbtn" aria-label="검색">
+            			<i class="fa-solid fa-magnifying-glass"></i>
+        			</button>
+    			</div>
+    			<input id="allbtn" type="button" value="전체보기">
 			</div>
 		</div>
 		<script>
 		
-		$("#hamburgerbtn").on("click",function(){
-			$("#memberList").toggle();
-		})
+		$("#hamburgerbtn").on("click", function() {
+			$("#memberList").toggleClass("active");
+		    $(".searchMessage").toggleClass("active");
+		});
 		
 		$("#exitbtn").on("click", async function(){		// 채팅나가기 버튼 클릭	(async) -> await사용
 			await stompClient.publish({				// await는 publish작업 끝날때까지 기다리기

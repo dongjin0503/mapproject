@@ -39,7 +39,8 @@ public class FreeBoardReplyDAO {
 	}
 	
 	public List<FreeBoardReplyDTO> selectByPostId(int postId) {
-		String sql = "select r.*, r.freeboard_reply_id as reply_id from freeboard_reply r "
+		String sql = "select r.*, r.freeboard_reply_id as reply_id, m.username from freeboard_reply r "
+		           + "left join member m on r.member_id = m.member_id "
 		           + "where r.post_id=? order by nvl(r.parent_reply_id, r.freeboard_reply_id), r.freeboard_reply_id";
 	    return jdbc.query(sql, new BeanPropertyRowMapper<>(FreeBoardReplyDTO.class), postId);
 	}

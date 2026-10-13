@@ -16,13 +16,7 @@
 	box-sizing: border-box;
 }
 
-body {
-	margin: 0;
-	padding-bottom: 40px;
-	background-color: #fff;
-	font-family: "Noto Sans KR", "Malgun Gothic", Arial, sans-serif;
-	color: #1c2535;
-}
+
 
 input, textarea, button {
 	font-family: inherit;
@@ -191,18 +185,132 @@ input, textarea, button {
 }
 
 /* 첨부파일 */
-.fileContent {
-	padding: 10px 4px;
+#fileBox {
+	margin-top: 20px;
+	padding: 14px 16px;
+	border: 1px solid #d5dce7;
+	border-radius: 8px;
+	color: #39465c;
 	font-size: 13px;
 }
 
-.fileContent a {
+#fileBox legend {
+	padding: 0 8px;
+	font-weight: bold;
+}
+
+#fileBox a {
 	color: #2457d6;
 	text-decoration: none;
 }
 
-.fileContent a:hover {
+#fileBox a:hover {
 	text-decoration: underline;
+}
+
+/* 기존 첨부파일 한 줄 */
+.fileItem {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 4px 0;
+}
+
+.fileUploadRow {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+	min-width: 0;
+	margin-top: 10px;
+}
+
+/* 실제 파일 input 숨기기 */
+.fileInput {
+	display: none;
+}
+
+/* 파일 선택 버튼 */
+.fileBtn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	flex-shrink: 0;
+	padding: 10px 13px;
+	border: 1px solid #d5dce7;
+	border-radius: 8px;
+	background: white;
+	color: #39465c;
+	cursor: pointer;
+	transition: 0.2s;
+}
+
+.fileBtn:hover {
+	background: #1c2535;
+	color: white;
+	border-color: #1c2535;
+}
+
+/* 파일명 */
+.fileName {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	color: #8995a9;
+}
+
+/* 추가 파일 버튼 */
+#add {
+	flex-shrink: 0;
+	margin-left: auto;
+	padding: 10px 12px;
+	border: 1px solid #d5dce7;
+	border-radius: 8px;
+	background: #b0b0b0;
+	color: white;
+	font-size: 12px;
+	cursor: pointer;
+	transition: 0.2s;
+}
+
+#add:hover {
+	background: #1c2535;
+	color: white;
+}
+
+/* 추가 파일 영역 */
+#additionalFiles {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin-top: 10px;
+}
+
+.additionalFile {
+	width: 100%;
+	min-width: 0;
+	font-size: 13px;
+	color: #39465c;
+}
+
+.additionalFile::file-selector-button {
+	padding: 9px 12px;
+	margin-right: 10px;
+	border: 1px solid #d5dce7;
+	border-radius: 8px;
+	background: white;
+	color: #39465c;
+	cursor: pointer;
+	transition: 0.2s;
+}
+
+.additionalFile::file-selector-button:hover {
+	background: #1c2535;
+	color: white;
+	border-color: #1c2535;
 }
 
 /* 하단 버튼 (목록으로/수정/수정완료/수정취소/삭제) */
@@ -341,40 +449,99 @@ hr {
 
 /* 댓글 목록 */
 .replyList {
-	margin-top: 0;
+	margin-top: 10px;
 }
 
+/* 일반 댓글: 얇은 테두리 카드 (그림자 없음) */
 .reply {
-	padding: 16px 12px;
-	border-bottom: 1px solid #e8ecf3;
+	padding: 0;
+	background: white;
+	border: 1px solid #d8dfea;
+	border-radius: 10px;
+	overflow: hidden;
 }
 
-/* 대댓글: 간격 좁게 + 왼쪽 선으로 구분 */
-.replyList.childReply {
-	margin-top: 0;
-}
-
-.replyList.childReply .reply {
-	padding: 8px 12px;
-	background-color: #fafbfe;
-	border-left: 3px solid #d5dce7;
-}
-
-/* 작성자 + 작성일 + 버튼 */
+/* 헤더 띠: 아주 연한 배경 + 얇은 구분선 */
 .replyInfo {
 	display: flex;
 	align-items: center;
 	gap: 8px;
-	margin-bottom: 4px;
+	margin: 0;
+	padding: 10px 20px;
+	background: #f0f3f8;
+	border-bottom: 1px solid #e0e6ef;
 	font-size: 13px;
 }
 
-.replyWriter {
-	font-size: 15px;
-	font-weight: bold;
+/* 댓글 내용 */
+.replyContents {
+	display: block;
+	width: 100%;
+	min-height: 0;
+	padding: 18px 22px;
+	font-size: 14px;
+	line-height: 1.6;
+	color: #39465c;
+	border: none;
+	background: transparent;
+	overflow: hidden;
+	resize: none;
+	outline: none;
+}
+
+/* 수정 중일 때만 살짝 강조 */
+.replyContents:not([readonly]) {
+	background: #fffef8;
+}
+
+/* 수정/삭제/답글 버튼: 조용한 알약 버튼 */
+.replyInfo input,
+.reply > input[type="button"] {
+	padding: 3px 10px;
+	border: 1px solid #e3e8f0;
+	border-radius: 20px;
+	background: white;
+	color: #6b7790;
+	font-size: 12px;
+	cursor: pointer;
+}
+
+.replyInfo input:hover,
+.reply > input[type="button"]:hover {
+	border-color: #1c2535;
 	color: #1c2535;
 }
 
+.replyInfo input[id^="replyDel"]:hover {
+	border-color: #c0392b;
+	color: #c0392b;
+}
+
+/* 답글 버튼: 카드 안쪽 아래 여백 */
+.reply > input[type="button"] {
+	margin: 0 0 16px 20px;
+}
+
+/* 대댓글: 같은 카드인데 헤더 띠만 살짝 푸른빛 + ↳ */
+.replyList.childReply {
+	margin-top: 6px;
+}
+
+.replyList.childReply .reply {
+	background: white;
+	border-color: #d3dcee;
+}
+
+.replyList.childReply .replyInfo {
+	background: #eaf0fb;
+	border-bottom-color: #d8e2f4;
+}
+
+.replyList.childReply .replyWriter::before {
+	content: "↳ ";
+	color: #aab3c4;
+}
+/* 대댓글 */
 .writerBadge {
 	padding: 1px 8px;
 	border-radius: 10px;
@@ -389,47 +556,10 @@ hr {
 	color: #8995a9;
 	font-size: 12px;
 }
-
-.replyInfo input,
-.reply > input[type="button"] {
-	padding: 4px 12px;
-	border: 1px solid #d5dce7;
-	border-radius: 5px;
-	background-color: white;
-	color: #39465c;
-	font-size: 12px;
-	cursor: pointer;
-}
-
-.replyInfo input:hover,
-.reply > input[type="button"]:hover {
-	border-color: #1c2535;
-}
-
-/* 댓글 내용: 평소엔 글자처럼, 수정 중에만 입력창처럼 */
-.replyContents {
-	width: 100%;
-	height: 44px;
-	padding: 6px 0;
-	font-size: 14px;
-	line-height: 1.6;
-	color: #39465c;
-	border: 1px solid transparent;
-	border-radius: 6px;
-	background-color: transparent;
-	overflow: hidden;
-	resize: none;
-	outline: none;
-}
-
+/* 수정 중일 때만 입력창처럼 */
 .replyContents:not([readonly]) {
-	padding: 10px;
-	border-color: #d5dce7;
-	background-color: white;
-}
-
-.replyContents:not([readonly]):focus {
-	border-color: #1c2535;
+	background: #fffef8;
+	box-shadow: inset 0 0 0 2px #1c2535;
 }
 </style>
 
@@ -447,7 +577,7 @@ hr {
 			<div class="detail">
 				<span>번호: ${post.postId}</span>
 				<span>카테고리: <c:out value="${post.contentCategory}" /></span>
-				<span>작성자: <c:out value="${post.memberId}" /></span>
+				<span>작성자: <c:out value="${post.username}" /></span>
 				<span>조회수: ${post.viewCount}</span>
 				<span>작성일: <fmt:formatDate value="${post.createdAt}" pattern="yyyy.MM.dd HH:mm"/></span>
 				<div class="likeBox">
@@ -494,37 +624,55 @@ hr {
 			</div>
 
 			<div class="content">
-				<c:choose>
-					<c:when test="${post.memberId != loginId}">
-						<div class="viewContent">${post.content}</div>
-					</c:when>
-					<c:otherwise>
-						<textarea id="textArea" name="content" readonly><c:out
-								value="${post.content}" /></textarea>
-					</c:otherwise>
-				</c:choose>
-			</div>
-			<div class="fileContent">
-    		<c:forEach var="i" items="${fileList}">
-      			<label class="fileDelChk" style="display: none;"><input type="checkbox" name="deleteFileId" value="${i.fileId}"> 삭제</label>
-        		<a href="/FreeBoardFile/download?sysname=${i.sysname }&oriname=${i.oriname}"><c:out value="${i.oriname}"/></a>
-        		<br>
-    		</c:forEach>
-    			<div id="updateFile" style="display: none;">
-       			 	<input type="file" name="files">
-				 	<input type="button" value="추가 파일 업로드" onclick="addFileInput()">
-    			</div>
-			</div>
-			<script>
-			<c:if test="${post.memberId == loginId}">
-			$('#textArea').summernote({ height: 400, lang: 'ko-KR' });
-			$('#textArea').summernote('disable');
+	<div id="viewContent" class="viewContent">${post.content}</div>
+	<c:if test="${post.memberId == loginId}">
+		<textarea id="textArea" name="content" style="display: none;"><c:out value="${post.content}" /></textarea>
+	</c:if>
+</div>
+			<c:if test="${not empty fileList or post.memberId == loginId}">
+			<fieldset id="fileBox" style="${empty fileList ? 'display: none;' : ''}">
+				<legend>첨부파일</legend>
+
+				<c:forEach var="i" items="${fileList}">
+					<div class="fileItem"><i class="fa-solid fa-paperclip"></i>
+						<a href="/FreeBoardFile/download?sysname=${i.sysname }&oriname=${i.oriname}"><c:out value="${i.oriname}"/></a>
+						<label class="fileDelChk" style="display: none;"><input type="checkbox" name="deleteFileId" value="${i.fileId}"> 삭제</label>
+					</div>
+				</c:forEach>
+
+				<div id="updateFile" style="display: none;">
+					<div class="fileUploadRow">
+						<input id="selectFile" type="file" name="files" class="fileInput">
+						<label for="selectFile" class="fileBtn">파일 선택</label>
+						<span id="firstFileName" class="fileName">선택된 파일 없음</span>
+						<input id="add" type="button" value="+">
+					</div>
+					<div id="additionalFiles"></div>
+				</div>
+			</fieldset>
 			</c:if>
-				const originFileHtml = document.getElementById("updateFile").innerHTML;
-				function addFileInput() {
-    				$("#updateFile").append('<br><input type="file" name="files">');
-				}
-				
+			
+			<script>
+			
+
+			const hasFiles = ${not empty fileList};
+
+			$("#selectFile").on("change", function() {
+				const file = this.files[0];
+				$("#firstFileName").text(file ? file.name : "선택된 파일 없음");
+			});
+
+			$("#add").on("click", function() {
+				$("#additionalFiles").append(
+					$('<input>', { type: 'file', name: 'files', class: 'additionalFile' })
+				);
+			});
+
+			function resetFileInputs() {
+				$("#selectFile").val("");
+				$("#firstFileName").text("선택된 파일 없음");
+				$("#additionalFiles").empty();
+			}
 			</script>
 			<c:choose>
 				<c:when test="${post.memberId != loginId}">
@@ -549,28 +697,32 @@ hr {
 
 						document.getElementById("updatebtn").onclick = function() {
 							document.getElementById("titleText").readOnly = false;
-							$('#textArea').summernote('enable');
+							document.getElementById("viewContent").style.display = "none";
+							$('#textArea').summernote({ height: 400, lang: 'ko-KR' });
 							document.getElementById("updateCategory").style.display = "flex";
 							document.getElementById("deletebtn").style.display = "none";
 							document.getElementById("updatebtn").style.display = "none";
 							document.getElementById("updateOkbtn").style.display = "inline-block";
 							document.getElementById("updateCancelbtn").style.display = "inline-block";
+							document.getElementById("fileBox").style.display = "block";
 							document.getElementById("updateFile").style.display = "block";
 							document.querySelectorAll(".fileDelChk").forEach(function(e) { e.style.display = "inline"; });
 						};
 
 						document.getElementById("updateCancelbtn").onclick = function() {
 							document.getElementById("titleText").readOnly = true;
-							$('#textArea').summernote('disable');
 							document.getElementById("updateCategory").style.display = "none";
 							document.getElementById("deletebtn").style.display = "inline-block";
 							document.getElementById("updatebtn").style.display = "inline-block";
 							document.getElementById("updateOkbtn").style.display = "none";
 							document.getElementById("updateCancelbtn").style.display = "none";
 							document.getElementById("titleText").value = originTitle;
-							$('#textArea').summernote('code', originContent);
+							$('#textArea').summernote('destroy');
+							$('#textArea').val(originContent).hide();
+							document.getElementById("viewContent").style.display = "block";
 							document.getElementById("updateFile").style.display = "none";
-							document.getElementById("updateFile").innerHTML = originFileHtml;
+							resetFileInputs();
+							if (!hasFiles) document.getElementById("fileBox").style.display = "none";
 							document.querySelectorAll(".fileDelChk").forEach(function(e) {
 							    e.style.display = "none";
 							    e.querySelector("input").checked = false;
@@ -606,8 +758,7 @@ hr {
 		<br>
 		<div class="commentPlace">
 			<textarea name="content" placeholder="댓글을 입력하세요 (최대 1000바이트)"></textarea>
-			<input type="text" name="memberId" readonly
-					value="<c:out value='${loginId}'/>">
+			<input type="text" name="memberId" readonly value="<c:out value='${loginUsername}'/>">
 			<input type="submit" value="댓글 등록">
 		</div>
 	</form>
@@ -621,7 +772,7 @@ hr {
 				<div class="reply" style="${(not empty reply.parentReplyId and reply.parentReplyId != 0) ? 'margin-left: 40px;' : ''}">
 
 					<div class="replyInfo">
-						<span class="replyWriter"><c:out value="${reply.memberId}" /></span>
+						<span class="replyWriter"><c:out value="${reply.username}" /></span>
 						<c:if test="${reply.memberId == post.memberId}"><span class="writerBadge">글쓴이</span></c:if>
 						<span class="replyDate"><fmt:formatDate value="${reply.createdAt}" pattern="yyyy.MM.dd HH:mm"/></span>
 						<c:if test="${reply.memberId == loginId}">
@@ -732,7 +883,7 @@ hr {
     		document.getElementById("recommentCancel").onclick = function() {
         		document.getElementById("recommentForm").style.display = "none";
     		};
-</script>
-</div>
+		</script>
+	</div>
 </body>
 </html>

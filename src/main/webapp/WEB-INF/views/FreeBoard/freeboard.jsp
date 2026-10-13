@@ -15,18 +15,16 @@
 	box-sizing: border-box;
 }
 
-body {
-	margin: 0;
-	font-family: "Noto Sans KR", "Malgun Gothic", Arial, sans-serif;
-	color: #1c2535;
-	background-color: #fff;
-}
+
 
 /* 전체 컨테이너 */
 .container {
 	width: 1200px;
 	max-width: calc(100% - 40px);
 	margin: auto;
+	font-family: "Noto Sans KR", "Malgun Gothic", Arial, sans-serif;
+	color: #1c2535;
+	background-color: #fff;
 }
 
 /* 게시판 전체 */

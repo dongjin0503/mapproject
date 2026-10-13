@@ -46,7 +46,8 @@ public class FreeBoardDAO {
       String sql1 = "update freeboard set view_count=view_count+1 where post_id = ?";
       jdbc.update(sql1, postId);
 
-      String sql = "select * from freeboard where post_id=?";
+      String sql = "select f.*, m.username from freeboard f "
+              + "left join member m on f.member_id = m.member_id where f.post_id=?";
       return jdbc.queryForObject(sql, new BeanPropertyRowMapper<>(FreeBoardDTO.class), postId);
    }
 
