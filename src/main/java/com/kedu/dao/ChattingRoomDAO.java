@@ -49,4 +49,13 @@ public class ChattingRoomDAO {
 		String sql = "select username from member where member_id=?";
 	    return jdbc.queryForObject(sql, String.class, memberId);
 	}
+	// 내 마지막 입장/퇴장 기록이 ENTER면 이미 입장한 상태
+	public boolean isEntered(int partyId, String memberId) {
+		String sql = "select message_type from ("
+		           + "select message_type from chattingroom "
+		           + "where party_id = ? and member_id = ? and message_type in ('ENTER','LEAVE') "
+		           + "order by message_id desc) where rownum = 1";
+		List<String> result = jdbc.queryForList(sql, String.class, partyId, memberId);
+		return !result.isEmpty() && result.get(0).equals("ENTER");
+	}
 }

@@ -46,7 +46,7 @@ public class ChattingRoomController {
 		String title = dao.selectTitle(partyId);				// partyId로 파티테이블에서 파티제목가져오기
 		int partyMem = dao.selectMemberCount(partyId);			// 파티참여인원수 가져오기
 		
-		
+		model.addAttribute("needEnter", !dao.isEntered(partyId, loginId));		//마지막 기록이 enter인지 확인
 		model.addAttribute("loginNickname", dao.selectNickname(loginId));		//memberid로 닉네임 저장
 		model.addAttribute("memberList", memberList);
 		model.addAttribute("partyTitle",title);
