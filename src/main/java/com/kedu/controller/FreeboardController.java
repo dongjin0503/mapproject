@@ -8,6 +8,7 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -48,39 +49,31 @@ public class FreeboardController {
 		int recordCountPerPage = 10;
 		int naviCountPerPage = 5;
 
-		int recordTotalCount = dao.getTotalCount(search, category);
-		int pageTotalCount = Math.max(1, (int) Math.ceil(recordTotalCount / (double) recordCountPerPage));
+		int recordTotalCount = dao.getTotalCount(search, category);		//검색조건과 카테고리가 설정되어있으면 개수 뽑기 
+		int pageTotalCount = Math.max(1, (int) Math.ceil(recordTotalCount / (double) recordCountPerPage));	//전체 글 수로 총 페이지 수를 계산
+		//Math.ceil = 반올림 / max(1 ...) = 최소값 1(글이 11개아래로 0개포함) 
 		if (cpage < 1)
 			cpage = 1;
 		if (cpage > pageTotalCount)
 			cpage = pageTotalCount;
 
-		int startRow = cpage * recordCountPerPage - (recordCountPerPage - 1);
-		int endRow = cpage * recordCountPerPage;
-		
-	
+		int startRow = cpage * recordCountPerPage - (recordCountPerPage - 1);	//한 페이지의 시작레코드
+		int endRow = cpage * recordCountPerPage;								//한 페이지의 끝레코드
 
 		model.addAttribute("list", dao.boardList(startRow, endRow, search, category));
-		model.addAttribute("category", category);
+		model.addAttribute("category", category);	//선택한 카테고리 고정
 		model.addAttribute("recordTotalCount", recordTotalCount);
 		model.addAttribute("recordCountPerPage", recordCountPerPage);
 		model.addAttribute("naviCountPerPage", naviCountPerPage);
 		model.addAttribute("cpage", cpage);
-		model.addAttribute("search", search);
+		model.addAttribute("search", search);	//검색 후 검색한 value 화면에 고정
 
 		return "/FreeBoard/freeboard";
 	}
 
-//	@RequestMapping("/search")		boardList 메소드에서 검색까지 처리(필요없단소리)
-//	public String search(String search, Model model) throws Exception {
-//
-//		List<FreeBoardDTO> searchList = dao.searchTitle(search);
-//		model.addAttribute("searchList", searchList);
-//
-//		return "/FreeBoard/freeboard";
-//	}
-
-	@RequestMapping("/write")
+	
+	
+	@RequestMapping("/write")		//글 작성 페이지로 이동
 	public String write(HttpSession session, Model model) throws Exception {
 		String loginId = (String) session.getAttribute("loginId");
 		if (loginId != null) {
@@ -89,7 +82,7 @@ public class FreeboardController {
 		return "/FreeBoard/write";
 	}
 
-	@RequestMapping("/writeup")
+	@RequestMapping("/writeup")		//작성완료 버튼 클릭시
 	public String writeUp(FreeBoardDTO dto, HttpSession session, MultipartFile[] files) throws Exception {
 		String loginId = (String) session.getAttribute("loginId");
 
@@ -99,18 +92,20 @@ public class FreeboardController {
 		
 		dto.setMemberId(loginId);
 		
-		int thisSeq = dao.getNextSeq();
-		dao.writeUp(thisSeq, dto);
-		String path = "d:/uploads/";
+		int thisSeq = dao.getNextSeq();		//다음 글번호 미리 뽑는다
+		dao.writeUp(thisSeq, dto);			//뽑은 글번호로 글을 저장(seq.nextval사용안함)
+		
+		
+		String path = "d:/uploads/";		//첨부파일 저장
 
 		for (MultipartFile file : files) {
 			if (file.isEmpty()) {
-				continue;
+				continue;		//파일이 비어있으면 files배열에서 빈 항목 저장 안하고 건너뜀
 			}
-			String oriName = file.getOriginalFilename();
-			String sysName = UUID.randomUUID() + "_" + oriName;
-			file.transferTo(new File(path + sysName));
-			fdao.insert(oriName, sysName, thisSeq);
+			String oriName = file.getOriginalFilename();		//파일명 (사용자에게 보여줄 이름)
+			String sysName = UUID.randomUUID() + "_" + oriName;	//실제로 저장할 이름. 앞에 랜덤문자열 붙혀서 겹치지 않게함(덮어씌워지지않게)
+			file.transferTo(new File(path + sysName));			//업로드된 파일을 폴더에 저장
+			fdao.insert(oriName, sysName, thisSeq);				// DB에 저장용.(detail.jsp)에서 뽑아쓰기 위함
 		}
 		return "redirect:/FreeBoard/freeboard?cpage=1";
 	}
@@ -119,17 +114,17 @@ public class FreeboardController {
 	public String detail(HttpSession session,int postId, Model model, @RequestParam(defaultValue = "1") int cpage) throws Exception {
 
 		model.addAttribute("post", dao.detail(postId)); // viewCount+1포함
-		model.addAttribute("replyList", rdao.selectByPostId(postId));
-		model.addAttribute("commentCount", rdao.countByPostId(postId));
-		model.addAttribute("fileList", fdao.fileList(postId));
+		model.addAttribute("replyList", rdao.selectByPostId(postId));	//게시글 번호로 댓글조회
+		model.addAttribute("commentCount", rdao.countByPostId(postId));	//조회한 댓글 수
+		model.addAttribute("fileList", fdao.fileList(postId));	//게시글 번호로 파일 조회
 		model.addAttribute("cpage", cpage);
 		
 		String loginId = (String) session.getAttribute("loginId");
 		if (loginId != null) {
 			model.addAttribute("loginUsername", mdao.selectMember(loginId).getUsername());
 		}
-		model.addAttribute("liked", loginId != null && ldao.likeCheck(postId, loginId));	// 내가 추천했는지
-
+		model.addAttribute("liked", loginId != null && ldao.likeCheck(postId, loginId));
+							// 게시글 번호&로그인 아이디 로 추천이 눌러져 있는지 체크
 		return "/FreeBoard/detail";
 	}
 
@@ -173,12 +168,12 @@ public class FreeboardController {
 		
 		
 		String loginId = (String) session.getAttribute("loginId");
-	    if (loginId == null || !dao.isWriter(postId, loginId)) {
+	    if (loginId == null || !dao.isWriter(postId, loginId)) {	//로그인하지 않았거나 로그인한 사람과 작성자가 다르면 detail화면으로 돌려보냄
 	        return "redirect:/FreeBoard/detail?postId=" + postId + "&cpage=" + cpage;
 	    }
 		
 		
-		for (FreeBoardFileDTO f : fdao.fileList(postId)) {
+		for (FreeBoardFileDTO f : fdao.fileList(postId)) {	//postid로 게시글에 첨부된 파일정보 하나씩 가져옴
 		    new File("d:/uploads/" + f.getSysname()).delete();   // 실제 파일 삭제
 		    fdao.delete(f.getFileId());                          // DB 정보 삭제
 		}
@@ -197,17 +192,17 @@ public class FreeboardController {
 		    return "-1";
 		}
 
-		boolean likeCheckResult = ldao.likeCheck(postId, memberId);
+		boolean likeCheckResult = ldao.likeCheck(postId, memberId);	//ajax로 추천버튼 눌렀을때 이미 누른상태인지 체크
 
-		if (likeCheckResult) {
-			dao.likeCountMinus(postId);
-			ldao.likeCountMinus(postId, memberId);
+		if (likeCheckResult) {	//추천을 이미 눌렀다면
+			dao.likeCountMinus(postId);	//추천 내리기
+			ldao.likeCountMinus(postId, memberId);	//추천 기록 삭제
 		} else {
-			dao.likeCountPlus(postId);
-			ldao.likeCountPlus(postId, memberId);
+			dao.likeCountPlus(postId);	//추천 누르기
+			ldao.likeCountPlus(postId, memberId);	//추천 기록 추가
 		}
 
-		int liked = dao.getLikeCount(postId);
+		int liked = dao.getLikeCount(postId);	//최신 추천수
 		return liked + "," + (likeCheckResult ? 0 : 1);	// "추천수,내추천상태(1=눌림)"
 	}
 }

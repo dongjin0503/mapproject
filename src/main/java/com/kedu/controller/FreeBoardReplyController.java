@@ -43,8 +43,8 @@ public class FreeBoardReplyController {
 	@RequestMapping(value = "/deleteReply", method = RequestMethod.POST)
 	public String deleteReply(HttpSession session, int replyId, int postId, @RequestParam(defaultValue = "1") int cpage) throws Exception {
 		String loginId = (String) session.getAttribute("loginId");
-	    if (loginId != null && dao.isWriter(replyId, loginId)) {
-	        dao.deleteReply(replyId);
+	    if (loginId != null && dao.isWriter(replyId, loginId)) {	//로그인 검증/댓글작성자와 유저 비교검증
+	        dao.deleteReply(replyId);	//조건 트루면 댓글삭제
 	    }
 		return "redirect:/FreeBoard/detail?postId=" + postId + "&cpage=" + cpage;
 	}
