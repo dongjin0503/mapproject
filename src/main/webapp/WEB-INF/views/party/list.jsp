@@ -185,8 +185,9 @@
 
 		<div id="party-list">
 			<C:forEach var="party" items="${parties}">
-				<div class="card"
-					onclick="location.href='/party/detail?partyId=${party.partyId}'">
+		<div class="card"
+	onclick="if(event.target.closest('.bookmark-btn')) return;
+	         location.href='/party/detail?partyId=${party.partyId}'">
 
 					<button type="button" class="bookmark-btn"
 						data-party-id="${party.partyId}">
@@ -303,10 +304,14 @@
          	+ hour + ":" + minute;
          card.appendChild(meetDate);
          
-         card.onclick = function() {
+         card.onclick = function(e) {
+
+        		if (e.target.closest(".bookmark-btn")) {
+        			return;
+        		}
+
         		location.href = "/party/detail?partyId=" + party.partyId;
         	};
-
         	document.getElementById("party-list").appendChild(card);
          }
          offset += parties.length;
