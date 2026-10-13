@@ -359,7 +359,7 @@
 	<!-- 채팅방 -->
 	<div class="chat">
 		<div class="chatHeader">
-			<span>${partyTitle}<c:out value="${partyTitle}" /></span>
+			<span><c:out value="${partyTitle}" /></span>
 			<span>${partyMember}<c:out value="${member}" /></span>
 			<input type="button" id="hamburgerbtn" value="☰">
 			<!-- 참여자목록, 채팅나가기버튼 -->
