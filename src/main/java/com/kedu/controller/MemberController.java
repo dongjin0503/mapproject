@@ -242,7 +242,7 @@ public class MemberController {
 	public String myContent(HttpSession session, Model model) throws Exception{
 		String loginId = (String)session.getAttribute("loginId");
 		List<FreeBoardDTO> myContentList= fdao.myContentList(loginId);
-		
+		model.addAttribute("member", dao.selectMember(loginId));
 		model.addAttribute("myContentList",myContentList);
 		return "/member/myContent";
 		
@@ -273,6 +273,7 @@ public class MemberController {
 		    else if ("PARTY".equals(b.getContentType())) partyList.add(b);
 		    else if ("CHALLENGE".equals(b.getContentType())) challengeList.add(b);
 		}
+		model.addAttribute("member", dao.selectMember(loginId));
 		model.addAttribute("storeList", storeList);
 		model.addAttribute("partyList", partyList);
 		model.addAttribute("challengeList", challengeList);
