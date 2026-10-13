@@ -401,7 +401,7 @@ public class PartyDAO {
    public int insertBookmark(int partyId, String memberId) {
 
       String sql = "insert into BOOKMARK " + "(BOOKMARK_ID, MEMBER_ID, CONTENT_TYPE, CONTENT_ID) "
-            + "values (seq_bookmark.nextval, ?, 'PARTY', ?)";
+            + "values (bookmark_seq.nextval, ?, 'PARTY', ?)";
 
       return jdbcTemplate.update(sql, memberId, partyId);
    }

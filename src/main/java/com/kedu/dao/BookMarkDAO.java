@@ -17,7 +17,7 @@ public class BookMarkDAO {
 	
 	public int insertBookmark(String memberId, String contentType, int contentId) {
 	    String sql = "insert into bookmark (bookmark_id, member_id, content_type, content_id) "
-	               + "values (seq_bookmark.nextval, ?, ?, ?)";
+	               + "values (bookmark_seq.nextval, ?, ?, ?)";
 	    return jdbc.update(sql, memberId, contentType, contentId);
 	}
 	public boolean existsBookmark(String memberId, String contentType, int contentId) {

@@ -68,7 +68,7 @@ public class Good_StoreDAO {
 	}
 	
 	public int addBookmark(String memberId , int storeId) {
-		String sql = "insert into bookmark(bookmark_id, member_id, content_type, content_id) values(seq_bookmark.nextval ,? ,'STORE' ,?) ";
+		String sql = "insert into bookmark(bookmark_id, member_id, content_type, content_id) values(bookmark_seq.nextval ,? ,'STORE' ,?) ";
 		return  jdbc.update(sql , memberId, storeId);			
 	}
 	
