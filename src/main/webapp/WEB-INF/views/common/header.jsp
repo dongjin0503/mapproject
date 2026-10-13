@@ -151,7 +151,7 @@
 		<nav class="sh-nav">
 			<a href="/map/main">지도</a> <a href="/party/list">파티원모집</a> <a
 				href="/challenge/list">챌린지</a> <a href="/ledger/list">가계부</a> <a
-				href="/FreeBoard/freeboard">자유게시판</a> <a href="#">Q&amp;A게시판</a>
+				href="/FreeBoard/freeboard">자유게시판</a> <a href="/qna/list">Q&amp;A게시판</a>
 
 			<%-- ★ 관리자 버튼: admin 계정일 때만 --%>
 			<c:if test="${sessionScope.loginId == 'admin'}">
