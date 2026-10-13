@@ -402,14 +402,21 @@
 			await stompClient.deactivate();				//stomp/websocket 연결 종료
 			location.href="/party/detail?partyId=" + partyId;	//파티페이지로 이동
 		});
-		
+		$("#searchText").on("keydown", function (e) {		// enter키로 검색가능
+		    if (e.key === "Enter") {
+		        e.preventDefault();
+		        $("#searchbtn").click();
+		    }
+		});
 		
 		
 		$("#searchbtn").on("click", function(){
 			let searchText = $("#searchText").val().trim();		// 검색버튼 눌렀을때 검색내용공백 제거하고
-			if(searchText == ""){								// 공백제거한 문자가 빈칸이면 return		
+			if(searchText == ""){
+				$("#allbtn").click();// 공백제거한 문자가 빈칸이면 전체보기	
 				return;
 			}
+			$("#chat .enterMessage, #chat .leaveMessage").hide();	// 입퇴장 메세지는 검색 중 숨김
 			$("#chat .myMessage, #chat .otherMessage").each(function() {	// 모든 메세지 각각 검사하면서
 																			// 검색내용이랑 비교
 		        let content = $(this).text();
@@ -422,8 +429,9 @@
 		});
 		
 		$("#allbtn").on("click", function(){
-			$("#chat .myMessage, #chat .otherMessage").show();				// 검색하느라 숨겼던 채팅 보기
-			$("#searchText").val("");										// 검색창 비우기
+			$("#chat .myMessage, #chat .otherMessage, #chat .enterMessage, #chat .leaveMessage").show();	// 입퇴장 포함 전체 다시 보기
+			$("#searchText").val("");		// 검색창 비우기
+			$("#chat").scrollTop($("#chat")[0].scrollHeight);
 		})
 		</script>
 
@@ -496,6 +504,7 @@
 		const partyId = ${partyId};
 		const loginId = "${loginId}";
 		const loginNickname = "${loginNickname}";
+		const needEnter = ${needEnter};
 		
 		const stompClient = new StompJs.Client({
 			brokerURL : "ws://" + location.host + "/ws"
@@ -529,7 +538,9 @@
 					            "<div>" + formatTime(data.createdAt) + "</div>" + "</div>"
 					    );
 					}
-					$("#chat").scrollTop($("#chat")[0].scrollHeight);	// 전체 채팅의 높이를 가져와서 스크롤위치 변경
+					$(window).on("load", function(){			// 전체 채팅의 높이를 가져와서 스크롤위치 변경
+						$("#chat").scrollTop($("#chat")[0].scrollHeight);
+					});
 					
 			});	
 				function esc(s) { return $("<div>").text(s).html(); }
@@ -540,16 +551,18 @@
 				}
 			
 			
-			// 입장 메세지
-				stompClient.publish({
-			        destination : "/app/chat",
-			        body : JSON.stringify({
-			            partyId : partyId,
-			            memberId : loginId,
-			            content : loginNickname + "님이 입장했습니다.",
-			            messageType : "ENTER"
-			        })
-			    });
+				// 입장 메세지 (처음 입장하거나 나가기 후 재입장일 때만)
+				if (needEnter) {
+					stompClient.publish({
+						destination : "/app/chat",
+						body : JSON.stringify({
+							partyId : partyId,
+							memberId : loginId,
+							content : loginNickname + "님이 입장했습니다.",
+							messageType : "ENTER"
+						})
+					});
+				}
 		};
 		
 	//	퇴장시 Websocket 연결 끊기기 전에 퇴장메세지

@@ -21,9 +21,9 @@ public class FreeBoardDAO {
 	            + "row_number() over(order by f.post_id desc) rn "
 	            + "from freeboard f "
 	            + "left join member m on f.member_id = m.member_id " // member 테이블과 조인
-	            + "where f.title like ? and f.content_category like ?) " // 컬럼 충돌 방지를 위해 f. 명시
+	            + "where (f.title like ? or f.content like ?) and f.content_category like ?) " // 컬럼 충돌 방지를 위해 f. 명시
 	            + "where rn between ? and ?";
-		return jdbc.query(sql, new BeanPropertyRowMapper<>(FreeBoardDTO.class), "%" + search + "%", categoryFilter(category), start, end);
+		return jdbc.query(sql, new BeanPropertyRowMapper<>(FreeBoardDTO.class), "%" + search + "%", "%" + search + "%", categoryFilter(category), start, end);
 	}
 
 //   public List<FreeBoardDTO> searchTitle(String search) throws Exception {
@@ -62,8 +62,8 @@ public class FreeBoardDAO {
    }
 
    public int getTotalCount(String search, String category) {
-		String sql = "select count(*) from freeboard where title like ? and content_category like ?";
-		return jdbc.queryForObject(sql, Integer.class, "%" + search + "%", categoryFilter(category));
+	   String sql = "select count(*) from freeboard where (title like ? or content like ?) and content_category like ?";
+	   return jdbc.queryForObject(sql, Integer.class, "%" + search + "%", "%" + search + "%", categoryFilter(category));
 	}
    	// 전체(빈 값)면 "%"로 모든 글, 값이 있으면 그 카테고리만
    private String categoryFilter(String category) {

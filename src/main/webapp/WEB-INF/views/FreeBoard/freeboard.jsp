@@ -326,7 +326,7 @@
 				
 					<form action="/FreeBoard/freeboard">
 					<input type="hidden" name="category" value="<c:out value='${category}'/>">
-						<input type="text" name="search" value="<c:out value='${search}'/>" placeholder="제목으로 게시글 검색">
+						<input type="text" name="search" value="<c:out value='${search}'/>" placeholder="제목이나 내용으로 게시글 검색">
 						<input type="submit" value="검색">
 					</form>
 				</div>
