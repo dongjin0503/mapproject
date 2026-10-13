@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.kedu.dto.ChallengeDTO;
 
@@ -15,7 +16,10 @@ public class ChallengeDAO {
 
 	@Autowired
 	private JdbcTemplate jdbc;
-
+	
+	@Autowired
+	private NotificationDAO notificationDAO;
+	
 	// 챌린지 목록 (참여자 수, D-day, 상태까지 같이 계산해서 가져옴)
 	public List<ChallengeDTO> listChallenge() {
 		String sql = "select c.challenge_id, c.member_id, c.title, c.description, "
@@ -116,4 +120,21 @@ public class ChallengeDAO {
 	    String sql = "select goal, pledge, cert_cycle from challenge_member where challenge_id = ? and  member_id = ?"; 
 	    return jdbc.queryForMap(sql, challengeId, memberId);
 	}
+	
+	@Transactional
+	public void joinChallenge(int challengeId, String memberId,
+	      String goal, String pledge, String cycle) {
+
+	   ChallengeDTO challenge = getChallenge(challengeId);
+
+	   addMember(challengeId, memberId, goal, pledge, cycle);
+
+	   notificationDAO.insert(
+	         challenge.getMember_id(),
+	         "CHALLENGE_JOIN",
+	         "CHALLENGE",
+	         challengeId,
+	         challenge.getTitle() + " 챌린지에 새로운 멤버가 참여했습니다."
+	   );
+	} 
 }

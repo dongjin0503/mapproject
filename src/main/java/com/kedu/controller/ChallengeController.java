@@ -143,7 +143,7 @@ public class ChallengeController {
 		if(dao.isJoined(challenge_id, id)) {
 			return "redirect:/challenge/detail?challenge_id=" + challenge_id;
 		}
-		dao.addMember(challenge_id, id , goal , pledge , cycle);
+		dao.joinChallenge(challenge_id, id , goal , pledge , cycle);
 		return "redirect:/challenge/detail?challenge_id=" + challenge_id; 
 	}
 	
