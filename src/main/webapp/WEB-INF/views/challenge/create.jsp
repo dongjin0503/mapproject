@@ -12,31 +12,147 @@
 </head>
 	
 	<style>
-	* {
-	box-sizing : border-box;
-	}
-	.container {
-	margin : auto;
-	width : 800px;
-	height : 900px; 
-	}
-	div {
-	border : 1px solid black;
-	}
-	</style>
+* { box-sizing: border-box; }
+
+.container {
+	--line: #9ca3af;
+	--line-strong: #4b5563;
+	--fill: #f3f4f6;
+	--fill-strong: #e5e7eb;
+	--text: #374151;
+	--dim: #9ca3af;
+	--accent: #111827;
+	width: 440px;
+	margin: 36px auto;
+	font-family: Arial, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+	color: var(--text);
+}
+
+.container .box {
+	border: 1.5px solid var(--line);
+	border-radius: 6px;
+	background: #fff;
+	padding: 20px;
+}
+
+.container h2 {
+	margin: 0 0 14px;
+	font-size: 17px;
+	color: var(--accent);
+}
+
+.field { margin-bottom: 14px; }
+
+.lbl {
+	font-size: 12px;
+	font-weight: 700;
+	margin-bottom: 6px;
+}
+
+.lbl em {
+	color: #dc2626;
+	font-style: normal;
+}
+
+.field input[type=text],
+.field input[type=date],
+.field textarea {
+	width: 100%;
+	border: 1.5px solid var(--line);
+	border-radius: 4px;
+	padding: 8px 10px;
+	font-size: 12px;
+	font-family: inherit;
+	color: var(--text);
+	background: #fff;
+}
+
+.field textarea {
+	height: 110px;
+	resize: none;
+}
+
+.field input:focus,
+.field textarea:focus {
+	outline: none;
+	border-color: var(--line-strong);
+}
+
+/* 시작일/종료일 나란히 */
+.row2 { display: flex; gap: 10px; }
+.row2 .field { flex: 1; }
+
+.btns { display: flex; gap: 10px; margin-top: 18px; }
+
+.btn-cancel, .btn-primary {
+	padding: 9px 16px;
+	border-radius: 4px;
+	font-size: 12.5px;
+	font-family: inherit;
+	text-align: center;
+	cursor: pointer;
+}
+
+.btn-cancel {
+	width: 120px;
+	border: 1.5px solid var(--line-strong);
+	background: #fff;
+	color: var(--accent);
+}
+
+.btn-primary {
+	flex: 1;
+	border: 1.5px solid var(--accent);
+	background: var(--accent);
+	color: #fff;
+}
+</style>
 <body>
 	<jsp:include page="/WEB-INF/views/common/header.jsp" />
-	<div class="container"> 
-	<h2> 챌린지 개설 </h2>
-	<form action = "/challenge/createOk" method = "post">
-	<p> 제목 <input type ="text" name ="title" > </p>
-	<p> 시작일 <input type ="date" name = "start_date"> </p>
-	<p> 종료일 <input type = "date" name = "end_date"> </p>
-	<p> 설명 <br>
-	<textarea name = "description" rows="5" cols ="50"> </textarea></p>
-	<button type ="button"  onclick ="history.back()">취소 </button>
-	<button type = "submit" > 개설 </button>
-	</form> 
+		<div class="container">
+		<div class="box">
+			<h2>챌린지 개설</h2>
+			<form action="/challenge/createOk" method="post">
+				<div class="field">
+					<div class="lbl">제목 <em>*</em></div>
+					<input type="text" name="title" required>
+				</div>
+
+				<div class="row2">
+					<div class="field">
+						<div class="lbl">시작일 <em>*</em></div>
+						<input type="date" name="start_date" required>
+					</div>
+					<div class="field">
+						<div class="lbl">종료일 <em>*</em></div>
+						<input type="date" name="end_date" required>
+					</div>
+				</div>
+
+				<div class="field">
+					<div class="lbl">설명</div>
+					<textarea name="description"></textarea>
+				</div>
+
+				<div class="btns">
+					<button type="button" class="btn-cancel" onclick="history.back()">취소</button>
+					<button type="submit" class="btn-primary">개설</button>
+				</div>
+			</form>
+		</div>
 	</div>
+	
+	<Script>
+	
+	$("form").on("submit", function(){
+	    var start = $("input[name='start_date']").val();
+	    var end   = $("input[name='end_date']").val();
+
+	    if(end < start){                                // 1번 빈칸 (종료일이 시작일보다 빠른 조건)
+	        alert("종료일은 시작일보다 빠를 수 없어요.");
+	        return false;                            // 제출 막기
+	    }
+	});
+	</Script>
 </body>
 </html>

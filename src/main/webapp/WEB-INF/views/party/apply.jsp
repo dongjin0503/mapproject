@@ -50,10 +50,10 @@ form h1 {
 }
 
 .party-image {
-	width: 160px;
-	aspect-ratio: 16 / 9;
+width: 160px;
+	height: 160px;
 	flex-shrink: 0;
-	background-color: #eee;
+	background-color: transparent;
 	border-radius: 5px;
 	overflow: hidden;
 	display: flex;
@@ -62,9 +62,9 @@ form h1 {
 }
 
 .party-image img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
+		max-width: 100%;
+	max-height: 100%;
+	object-fit: contain;
 	display: block;
 }
 .party-text {

@@ -5,6 +5,10 @@
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
 .site-header {
+	position: sticky;
+	top: 0;
+	z-index: 1000;
+
 	--line: #9ca3af;
 	--line-strong: #4b5563;
 	--fill: #f3f4f6;
@@ -60,8 +64,7 @@
 	border-bottom: 2px solid transparent;
 }
 
-.sh-nav a:hover,
-.sh-nav a.active {
+.sh-nav a:hover, .sh-nav a.active {
 	color: var(--accent);
 	border-bottom-color: var(--accent);
 }
@@ -106,12 +109,29 @@
 }
 
 .sh-notification {
+	position: relative;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	width: 36px;
 	height: 36px;
 	text-decoration: none;
+}
+
+#notification-count {
+	position: absolute;
+	top: -3px;
+	right: -3px;
+	min-width: 18px;
+	height: 18px;
+	padding: 0 5px;
+	border-radius: 9px;
+	background-color: red;
+	color: white;
+	font-size: 11px;
+	line-height: 18px;
+	text-align: center;
+	display: none;
 }
 
 .sh-notification i {
@@ -132,11 +152,11 @@
 			<a href="/map/main">지도</a> <a href="/party/list">파티원모집</a> <a
 				href="/challenge/list">챌린지</a> <a href="/ledger/list">가계부</a> <a
 				href="/FreeBoard/freeboard">자유게시판</a> <a href="#">Q&amp;A게시판</a>
-				
-				<%-- ★ 관리자 버튼: admin 계정일 때만 --%>
-				<c:if test="${sessionScope.loginId == 'admin'}">
-					<a href="/admin/dashboard">관리자</a>
-				</c:if>
+
+			<%-- ★ 관리자 버튼: admin 계정일 때만 --%>
+			<c:if test="${sessionScope.loginId == 'admin'}">
+				<a href="/admin/dashboard">관리자</a>
+			</c:if>
 		</nav>
 	</div>
 
@@ -148,8 +168,9 @@
 					class="fa-solid fa-right-from-bracket"></i>
 				</a>
 
-				<a class="sh-notification" href="/notification/list" title="알림">
-					<i class="fa-solid fa-bell"></i>
+				<a class="sh-notification" href="/notification/list" title="알림"
+					id="notification-link"> <i class="fa-solid fa-bell"></i> <span
+					id="notification-count"></span>
 				</a>
 
 				<a class="sh-avatar" href="/member/mypage" title="마이페이지"> <i
@@ -176,4 +197,29 @@
 			}
 		}
 	})();
+	fetch("/notification/count")
+	.then(response => response.text())
+	.then(count => {
+
+		count = Number(count);
+
+		const notificationCount =
+				document.getElementById("notification-count");
+
+		const notificationLink =
+				document.getElementById("notification-link");
+
+		if (count > 0) {
+			notificationCount.textContent = count;
+			notificationCount.style.display = "block";
+		}
+
+		notificationLink.addEventListener("click", function(e) {
+
+			if (count === 0) {
+				e.preventDefault();
+				alert("새로운 알림이 없습니다.");
+			}
+		});
+	});
 </script>
