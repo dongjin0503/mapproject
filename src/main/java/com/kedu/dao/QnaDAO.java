@@ -39,8 +39,11 @@ public class QnaDAO {
 		return jdbc.queryForObject(sql, Integer.class , qna_id);
 	}
 	
-	public int addQna(QnaDTO dto) {
-		
-		String sql = "insert into qna(" 
-	}
+//	public int addQna(QnaDTO dto) {
+//		
+//		String sql = "insert into qna(qna_id , title , contents , writer_date , secret , view_count)"
+//				+ " values (Qna_seq.nextval, ? , ? ,systimestamp , ? , 0 );	  
+//				
+//		return jdbc.update(sql , dto);
+//	}
 }

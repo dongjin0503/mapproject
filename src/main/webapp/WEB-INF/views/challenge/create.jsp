@@ -56,6 +56,7 @@
 
 .field input[type=text],
 .field input[type=date],
+.field select,
 .field textarea {
 	width: 100%;
 	border: 1.5px solid var(--line);
@@ -67,12 +68,19 @@
 	background: #fff;
 }
 
+/* 카테고리 드롭다운 */
+.field select {
+	height: 36px;
+	cursor: pointer;
+}
+
 .field textarea {
 	height: 110px;
 	resize: none;
 }
 
 .field input:focus,
+.field select:focus,
 .field textarea:focus {
 	outline: none;
 	border-color: var(--line-strong);
@@ -128,7 +136,19 @@
 						<input type="date" name="end_date" required>
 					</div>
 				</div>
-
+				
+				<div class="field">
+    			<div class="lbl">카테고리 <em>*</em></div>
+    			<select name="category" required>
+        		<option value="">선택하세요</option>
+        		<option value="식비">식비</option>
+		        <option value="교통">교통</option>
+        		<option value="쇼핑">쇼핑</option>
+        		<option value="저축">저축</option>
+        		<option value="기타">기타</option>
+    			</select>
+				</div>
+				
 				<div class="field">
 					<div class="lbl">설명</div>
 					<textarea name="description"></textarea>

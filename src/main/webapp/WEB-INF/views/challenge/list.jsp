@@ -166,6 +166,17 @@
 	color: #f59e0b;
 	cursor: pointer;
 }
+
+.cat {
+	display: inline-block;
+	padding: 2px 8px;
+	margin-bottom: 6px;
+	border: 1px solid var(--line);
+	border-radius: 10px;
+	font-size: 11px;
+	color: var(--text);
+	background: var(--fill);
+}
 </style>
 
 </head>
@@ -193,7 +204,8 @@
 		<c:forEach var="ch" items="${list}">
 	    <div class ="card" data-status ="${ch.status }" data-id="${ch.challenge_id}">
 		<button type="button" class="bookmark-btn" data-id="${ch.challenge_id}">☆</button>
-		
+			
+			<c:if test="${not empty ch.category}"><span class="cat">${ch.category}</span></c:if>
 			<h3> ${ch.title }</h3>
 			<div class="period">${ch.start_date } ~ ${ch.end_date }</div>
 			<div class="bar"><div class="fill"></div></div>

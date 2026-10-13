@@ -22,7 +22,7 @@ public class ChallengeDAO {
 	
 	// 챌린지 목록 (참여자 수, D-day, 상태까지 같이 계산해서 가져옴)
 	public List<ChallengeDTO> listChallenge() {
-		String sql = "select c.challenge_id, c.member_id, c.title, c.description, "
+		String sql = "select c.challenge_id, c.member_id, c.title, c.description, c.category , "
 				+ "to_char(c.start_date, 'YYYY-MM-DD') as start_date, "
 				+ "to_char(c.end_date, 'YYYY-MM-DD') as end_date, "
 				+ "(select count(*) from challenge_member m where m.challenge_id = c.challenge_id) as member_count, "
@@ -48,10 +48,10 @@ public class ChallengeDAO {
 	public int addChallenge(String memberId, ChallengeDTO dto) {
 		
 		int id = jdbc.queryForObject("select challenge_seq.nextval from dual ", Integer.class);
-		String sql = "insert into challenge(challenge_id, member_id, title, description, start_date, end_date) "
-				+ "values(?, ?, ?, ?, to_date(?, 'YYYY-MM-DD'), to_date(?, 'YYYY-MM-DD'))";
+		String sql = "insert into challenge(challenge_id, member_id, title, description, start_date, end_date , category ) "
+				+ "values(?, ?, ?, ?, to_date(?, 'YYYY-MM-DD'), to_date(?, 'YYYY-MM-DD') , ? )";
 		
-		jdbc.update(sql,id , memberId, dto.getTitle(), dto.getDescription(), dto.getStart_date(), dto.getEnd_date());
+		jdbc.update(sql,id , memberId, dto.getTitle(), dto.getDescription(), dto.getStart_date(), dto.getEnd_date(),dto.getCategory());
 		
 		addMember(id, memberId, null, null , null);
 		
@@ -60,7 +60,7 @@ public class ChallengeDAO {
 	
 	// 챌린지 1건 조회 (상세 화면용)
 	public ChallengeDTO getChallenge(int challengeId) {
-		String sql = "select c.challenge_id, c.member_id, c.title, c.description, "
+		String sql = "select c.challenge_id, c.member_id, c.title, c.description, c.category , "
 				+ "to_char(c.start_date, 'YYYY-MM-DD') as start_date, "
 				+ "to_char(c.end_date, 'YYYY-MM-DD') as end_date, "
 				+ "(select count(*) from challenge_member m where m.challenge_id = c.challenge_id) as member_count, "

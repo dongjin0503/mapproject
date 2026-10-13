@@ -12,6 +12,7 @@ public class ChallengeDTO {
 	private String start_date;   // 쿼리에서 to_char 로 글자로 바꿔 받음
 	private String end_date;
 	private String created_at;
+	private String category;
 
 	// ===== 쿼리에서 계산해서 받는 값 (DB 컬럼 아님) =====
 	private int member_count;    // 참여자 수
@@ -36,7 +37,8 @@ public class ChallengeDTO {
 
 	
 	public ChallengeDTO(int challenge_id, String member_id, String title, String description, String start_date,
-			String end_date, String created_at, int member_count, int d_day, String status) {
+			String end_date, String created_at, String category, int member_count, int d_day, String status,
+			int progress, Timestamp joined_at) {
 		super();
 		this.challenge_id = challenge_id;
 		this.member_id = member_id;
@@ -45,12 +47,21 @@ public class ChallengeDTO {
 		this.start_date = start_date;
 		this.end_date = end_date;
 		this.created_at = created_at;
+		this.category = category;
 		this.member_count = member_count;
 		this.d_day = d_day;
 		this.status = status;
+		this.progress = progress;
+		this.joined_at = joined_at;
 	}
-
 	
+	
+	public String getCategory() {
+		return category;
+	}
+	public void setCategory(String category) {
+		this.category = category;
+	}
 	public int getProgress() {
 		return progress;
 	}
