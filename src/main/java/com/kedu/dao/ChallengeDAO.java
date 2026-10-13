@@ -1,6 +1,7 @@
 package com.kedu.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -28,16 +29,29 @@ public class ChallengeDAO {
 				+ "else '진행중' "
 				+ "end as status "
 				+ "from challenge c "
-				+ "order by c.challenge_id desc";
+				+ "order by "
+				+ "case when trunc(sysdate) > trunc(c.end_date) then 2 "
+				+ "when trunc(sysdate) < trunc(c.start_date) then 1 "
+				+ "else 0 end, "
+				+ "case when trunc(sysdate) > trunc(c.end_date) then trunc(sysdate) - trunc(c.end_date) "
+				+ "when trunc(sysdate) < trunc(c.start_date) then trunc(c.start_date) - trunc(sysdate) "
+				+ "else trunc(c.end_date) - trunc(sysdate) end, "
+				+ "c.challenge_id desc";
 
 		return jdbc.query(sql, new BeanPropertyRowMapper<>(ChallengeDTO.class));
 	}
 	
 	public int addChallenge(String memberId, ChallengeDTO dto) {
+		
+		int id = jdbc.queryForObject("select challenge_seq.nextval from dual ", Integer.class);
 		String sql = "insert into challenge(challenge_id, member_id, title, description, start_date, end_date) "
-				+ "values(challenge_seq.nextval, ?, ?, ?, to_date(?, 'YYYY-MM-DD'), to_date(?, 'YYYY-MM-DD'))";
-
-		return jdbc.update(sql, memberId, dto.getTitle(), dto.getDescription(), dto.getStart_date(), dto.getEnd_date());
+				+ "values(?, ?, ?, ?, to_date(?, 'YYYY-MM-DD'), to_date(?, 'YYYY-MM-DD'))";
+		
+		jdbc.update(sql,id , memberId, dto.getTitle(), dto.getDescription(), dto.getStart_date(), dto.getEnd_date());
+		
+		addMember(id, memberId, null, null , null);
+		
+		return id ;
 	}
 	
 	// 챌린지 1건 조회 (상세 화면용)
@@ -74,11 +88,11 @@ public class ChallengeDAO {
 		
 	}
 	
-	public int addMember(int challengeId , String memberId) {
-		String sql = "insert into challenge_member (challenge_member_id , challenge_id , member_id , joined_at)"
-				+ " values (challenge_member_seq.nextval , ? , ? , systimestamp)";
+	public int addMember(int challengeId , String memberId, String goal, String pledge , String cycle) {
+		String sql = "insert into challenge_member (challenge_member_id , challenge_id , member_id , joined_at , goal, pledge , cert_cycle)"
+				+ " values (challenge_member_seq.nextval , ? , ? , systimestamp , ? ,? ,?)";
 		
-		return jdbc.update(sql, challengeId, memberId);
+		return jdbc.update(sql, challengeId, memberId , goal , pledge , cycle);
 	}
 	
 	// 폴링용: 목록 카드에서 주기적으로 갱신할 값만 가볍게 조회
@@ -96,5 +110,10 @@ public class ChallengeDAO {
 				+ "from challenge c";
 
 		return jdbc.query(sql, new BeanPropertyRowMapper<>(ChallengeDTO.class));
+	}
+	
+	public Map<String, Object> getMyJoin(int challengeId, String memberId) {
+	    String sql = "select goal, pledge, cert_cycle from challenge_member where challenge_id = ? and  member_id = ?"; 
+	    return jdbc.queryForMap(sql, challengeId, memberId);
 	}
 }

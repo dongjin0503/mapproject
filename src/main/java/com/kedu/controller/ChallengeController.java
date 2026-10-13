@@ -69,6 +69,11 @@ public class ChallengeController {
 			joined = dao.isJoined(challenge_id, id);
 		}
 		
+		if (joined) {
+			model.addAttribute("my" , dao.getMyJoin(challenge_id, id));
+		}
+		
+		
 		model.addAttribute("joined", joined);
 		model.addAttribute("ch", dao.getChallenge(challenge_id));
 		model.addAttribute("replyList", rdao.listReply(challenge_id));
@@ -128,7 +133,7 @@ public class ChallengeController {
 	}
 	
 	@RequestMapping("applyOk")
-	public String applyOk(int challenge_id , HttpSession session) {
+	public String applyOk(int challenge_id , String goal, String pledge , String cycle , HttpSession session) {
 		String id = (String) session.getAttribute("loginId");
 		
 		if(id == null) {
@@ -138,7 +143,7 @@ public class ChallengeController {
 		if(dao.isJoined(challenge_id, id)) {
 			return "redirect:/challenge/detail?challenge_id=" + challenge_id;
 		}
-		dao.addMember(challenge_id, id);
+		dao.addMember(challenge_id, id , goal , pledge , cycle);
 		return "redirect:/challenge/detail?challenge_id=" + challenge_id; 
 	}
 	
