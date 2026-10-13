@@ -117,7 +117,18 @@ p {
 #image-add-btn{
 margin-bottom : 10px;
 }
+.store-info {
+	width: 260px;
+	padding: 10px;
+	font-size: 12px;
+	line-height: 1.5;
+	white-space: normal;
+	word-break: break-all;
+}
 
+.store-info strong {
+	font-size: 14px;
+}
 </style>
 </head>
 <body>
@@ -218,16 +229,32 @@ margin-bottom : 10px;
 
          success: function(stores) {
 
-            for (const store of stores) {
+        	 for (const store of stores) {
+        		
+        			let marker = new kakao.maps.Marker({
+        				map: map,
+        				position: new kakao.maps.LatLng(
+        					store.latitude,
+        					store.longitude
+        				),
+        			});
 
-               var marker = new kakao.maps.Marker({
-                  map: map,
-                  position: new kakao.maps.LatLng(
-                     store.latitude,
-                     store.longitude
-                  )
-               });
+               let infoWindow = new kakao.maps.InfoWindow({
+            		content:
+            			'<div class="store-info">' +
+            			'<strong>' + store.store_name + '</strong><br>' +
+            			'카테고리 : ' + store.category + '<br>' +
+            			'주소 : ' + store.address +
+            			'</div>'
+            	});
+            	kakao.maps.event.addListener(marker, 'mouseover', function() {
+            		infoWindow.open(map, marker);
+            	});
 
+            	kakao.maps.event.addListener(marker, 'mouseout', function() {
+            		infoWindow.close();
+            	});
+               
                kakao.maps.event.addListener(
                   marker,
                   "click",
