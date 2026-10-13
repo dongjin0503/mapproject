@@ -142,6 +142,10 @@ public class ChallengeController {
 		
 		if(dao.isJoined(challenge_id, id)) {
 			return "redirect:/challenge/detail?challenge_id=" + challenge_id;
+				
+		}
+		if(dao.getChallenge(challenge_id).getStatus().equals("종료")) {
+		    return "redirect:/challenge/detail?challenge_id=" + challenge_id;
 		}
 		dao.joinChallenge(challenge_id, id , goal , pledge , cycle);
 		return "redirect:/challenge/detail?challenge_id=" + challenge_id; 

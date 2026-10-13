@@ -39,8 +39,6 @@ public class QnaDAO {
 		return jdbc.queryForObject(sql, Integer.class , qna_id);
 	}
 	
-//	public int addQna(QnaDTO dto) {
-//		
-//		String sql = "insert into qna(" 
-//	}
+
+
 }

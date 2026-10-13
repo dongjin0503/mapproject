@@ -35,6 +35,18 @@
 	margin-bottom: 14px;
 }
 
+/* 카테고리 칩 */
+.cat {
+	display: inline-block;
+	padding: 2px 8px;
+	margin-bottom: 6px;
+	border: 1px solid var(--line);
+	border-radius: 10px;
+	font-size: 11px;
+	color: var(--text);
+	background: var(--fill);
+}
+
 .title {
 	font-size: 17px;
 	font-weight: 700;
@@ -152,7 +164,7 @@
 	cursor: pointer;
 }
 
-/* 답글 버튼은 파란 글씨 (와이어프레임 "답글 달기") */
+/* 답글 버튼은 파란 글씨 */
 .reply .replyBtn {
 	border: none;
 	background: none;
@@ -204,7 +216,10 @@
 		<jsp:include page="/WEB-INF/views/common/header.jsp" />
 		<div class = "container">
 				<div class="box">
+				
+				<c:if test="${not empty ch.category}"><span class="cat">${ch.category}</span></c:if>
 			<div class="title">${ch.title}</div>
+
 			<div class="info">
 				<div>⏳ 기간<br><b>${ch.start_date} ~ ${ch.end_date}</b></div>
 				<div>👥 참여자수<br><b>${ch.member_count}명</b></div>
