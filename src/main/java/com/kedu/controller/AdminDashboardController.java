@@ -49,6 +49,10 @@ public class AdminDashboardController {
 
 		model.addAttribute("partyCategoryStats", adminDashboardDAO.getPartyCategoryStats(startDate, endDate));
 
+		model.addAttribute("startDate", startDate);
+		model.addAttribute("endDate", endDate);
+
+		
 		return "admin/dashboard";
 	}
 
