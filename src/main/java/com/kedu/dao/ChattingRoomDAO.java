@@ -49,13 +49,18 @@ public class ChattingRoomDAO {
 		String sql = "select username from member where member_id=?";
 	    return jdbc.queryForObject(sql, String.class, memberId);
 	}
+	
 	// 내 마지막 입장/퇴장 기록이 ENTER면 이미 입장한 상태
+	// select를 두번 감싼 이유 : rownum은 정렬보다 먼저 번호를 매긴다. desc전에 rownum이 정해짐
 	public boolean isEntered(int partyId, String memberId) {
 		String sql = "select message_type from ("
 		           + "select message_type from chattingroom "
 		           + "where party_id = ? and member_id = ? and message_type in ('ENTER','LEAVE') "
-		           + "order by message_id desc) where rownum = 1";
+		           + "order by message_id desc) "
+		           + "where rownum = 1";
 		List<String> result = jdbc.queryForList(sql, String.class, partyId, memberId);
 		return !result.isEmpty() && result.get(0).equals("ENTER");
+		// 처음 입장하는 사람은 입퇴장 기록이없어서 queryForObject를 쓰면 예외가 발생한다.
+		// 결과가 없을 수도 있기에 queryForList를 쓴다.(빈 리스트 돌려줌)
 	}
 }
