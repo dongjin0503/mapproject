@@ -914,6 +914,7 @@ hr {
         		document.getElementById("recommentForm").style.display = "none";	// 답글 폼 숨김
     		};
 		</script>
+		<jsp:include page="/WEB-INF/views/common/footer.jsp" />
 	</div>
 </body>
 </html>

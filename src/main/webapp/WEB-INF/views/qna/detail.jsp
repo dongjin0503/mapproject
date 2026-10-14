@@ -162,5 +162,6 @@ textarea:focus { outline:none; border-color:#1c2535; }
 		$(this).closest(".reply").find(".reply-edit-form").toggle();
 	});
 	</script>
+	<jsp:include page="/WEB-INF/views/common/footer.jsp" />
 </body>
 </html>
