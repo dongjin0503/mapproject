@@ -142,7 +142,7 @@
 
 			<div class="chart-box">
 				<h3>파티 카테고리별 생성 / 실제 진행 수</h3>
-				<p class="chart-desc">조회기간 내 생성된 모임 중 실제 진행된 모임을 비교합니다.</p>
+				<p class="chart-desc">조회 기간 내 생성된 모임 중 모임 날짜가 지난 모임의 실제 진행 여부를 비교합니다.</p>
 				<canvas id="partyCategoryChart"></canvas>
 
 				<div class="success-rate">
@@ -200,7 +200,7 @@
 			labels : partyCategoryLabels,
 			datasets : [
 				{
-					label : "생성 수",
+					label : "지난 모임 수",
 					data : partyCreateCounts
 				},
 				{
