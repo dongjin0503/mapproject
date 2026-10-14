@@ -101,7 +101,7 @@
 
 .card h3 {
 	margin: 0 0 4px;
-	padding-right: 30px;
+	padding-right: 44px;
 	font-size: 15px;
 	color: var(--accent);
 }
@@ -155,18 +155,26 @@
 	font-size: 13px;
 }
 
-/* 북마크 버튼 (팀원 코드 그대로) */
+/* 북마크 버튼 (파티원 목록과 같은 모양) */
 .bookmark-btn {
 	position: absolute;
 	top: 12px;
 	right: 12px;
-	border: none;
-	background: none;
-	font-size: 22px;
+	width: 36px;
+	height: 36px;
+	padding: 0;
+	border: 1px solid #ddd;
+	border-radius: 50%;
+	background: white;
 	color: #f59e0b;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 19px;
 	cursor: pointer;
+	z-index: 10;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
-
 .cat {
 	display: inline-block;
 	padding: 2px 8px;
@@ -203,7 +211,7 @@
 	
 		<c:forEach var="ch" items="${list}">
 	    <div class ="card" data-status ="${ch.status }" data-id="${ch.challenge_id}">
-		<button type="button" class="bookmark-btn" data-id="${ch.challenge_id}">☆</button>
+					<button type="button" class="bookmark-btn" data-id="${ch.challenge_id}"><i class="fa-regular fa-star"></i></button>
 			
 			<c:if test="${not empty ch.category}"><span class="cat">${ch.category}</span></c:if>
 			<h3> ${ch.title }</h3>
@@ -239,7 +247,7 @@
 		// 북마크한 챌린지는 ★로 표시
 		$.get("/member/bookmarkIds", { contentType: "CHALLENGE" }, function(ids) {
 			$(".bookmark-btn").each(function() {
-				if (ids.includes($(this).data("id"))) $(this).text("★");
+				if (ids.includes($(this).data("id"))) $(this).html('<i class="fa-solid fa-star"></i>');
 			});
 		});
 
@@ -248,7 +256,7 @@
 			let btn = $(this);
 			$.post("/member/bookmarkToggle", { contentType: "CHALLENGE", contentId: btn.data("id") }, function(r) {
 				if (r === "login") location.href = "/member/login";
-				else btn.text(r === "added" ? "★" : "☆");
+				else btn.html(r === "added" ? '<i class="fa-solid fa-star"></i>' : '<i class="fa-regular fa-star"></i>');
 			});
 		});
 		
