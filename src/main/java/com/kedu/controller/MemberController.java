@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.kedu.commons.MailUtil;
 import com.kedu.dao.BookMarkDAO;
 import com.kedu.dao.ChallengeDAO;
 import com.kedu.dao.FreeBoardDAO;
@@ -153,14 +154,79 @@ public class MemberController {
 		return masked;
 	}
 	
+	
+	// 1단계: 정보 확인 → 가입 이메일로 인증번호 발송
 	@ResponseBody
-	@RequestMapping("/ajax/checkpw")
-	public boolean checkForReset(String id, String name, String phone, HttpSession session) {
-	    boolean ok = dao.matchmember(id, name, phone);
-	    if (ok) {
-	        session.setAttribute("resetId", id);
-	    }
-	    return ok;
+	@RequestMapping("/ajax/sendcode")
+	public String sendCode(String id, String name, String phone, HttpSession session) {
+
+		// 1) 정보가 맞는지
+		if (!dao.matchmember(id, name, phone)) {
+			return "nomatch";
+		}
+
+		// 2) 30초 안에 다시 요청하면 막기 (메일 폭탄 방지)
+		Long last = (Long) session.getAttribute("authTime");
+		if (last != null && System.currentTimeMillis() - last < 30000) {
+			return "wait";
+		}
+
+		// 3) 6자리 인증번호 (100000 ~ 999999)
+		int num = (int) (Math.random() * 900000) + 100000;
+		String code = String.valueOf(num);
+
+		// 4) 가입할 때 저장한 이메일로 발송
+		String email = dao.selectEmail(id);
+		try {
+			MailUtil.send(email, "[짠내맵] 비밀번호 찾기 인증번호", "인증번호는 [" + code + "] 입니다. 3분 안에 입력해주세요.");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "fail";
+		}
+
+		// 5) 세션에 보관
+		session.setAttribute("authId", id);
+		session.setAttribute("authCode", code);
+		session.setAttribute("authTime", System.currentTimeMillis());
+		session.setAttribute("authFail", 0);
+
+		// 6) 화면에 보여줄 가린 이메일 (abc***@gmail.com)
+		int at = email.indexOf("@");
+		int show = 3;
+		if (at <= 3) {
+			show = 1;
+		}
+		return email.substring(0, show) + "***" + email.substring(at);
+	}
+
+	// 2단계: 인증번호 확인 → 맞으면 비밀번호 변경 허용
+	@ResponseBody
+	@RequestMapping("/ajax/verifycode")
+	public boolean verifyCode(String code, HttpSession session) {
+		String authId = (String) session.getAttribute("authId");
+		String authCode = (String) session.getAttribute("authCode");
+		Long authTime = (Long) session.getAttribute("authTime");
+		Integer fail = (Integer) session.getAttribute("authFail");
+
+		if (authId == null || authCode == null || authTime == null || fail == null) {
+			return false;
+		}
+
+		// 3분(180000ms) 지났거나 5번 틀렸으면 무효
+		if (System.currentTimeMillis() - authTime > 180000 || fail >= 5) {
+			session.removeAttribute("authCode");
+			return false;
+		}
+
+		if (!authCode.equals(code)) {
+			session.setAttribute("authFail", fail + 1);
+			return false;
+		}
+
+		// 인증 성공: 이제서야 비밀번호 변경 허용
+		session.setAttribute("resetId", authId);
+		session.removeAttribute("authCode");
+		return true;
 	}
 
 	@ResponseBody

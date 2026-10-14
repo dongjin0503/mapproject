@@ -90,5 +90,8 @@ public class MemberDAO {
 	}
 	
 	
-	
+	public String selectEmail(String id) {
+		String sql = "select email from member where member_id = ?";
+		return jdbc.queryForObject(sql, String.class, id);
+	}
 }

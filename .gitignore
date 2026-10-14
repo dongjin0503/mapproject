@@ -141,3 +141,4 @@ $RECYCLE.BIN/
 .settings/
 .springBeans
 target/
+src/main/resources/mail.properties

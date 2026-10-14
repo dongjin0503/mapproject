@@ -72,7 +72,7 @@ body {
 }
 
 /* 2단계는 처음에 숨김 */
-#step2 {
+#step2 , #stepCode{
 	display: none;
 }
 
@@ -85,7 +85,7 @@ fieldset {
 }
 
 legend {
-	padding: 0 6px;
+	padding: 0 6px; 
 	font-size: 11.5px;
 	color: var(--text);
 }
@@ -175,6 +175,20 @@ button:hover {
 	<button id="btncheck" type = "button"> 비밀번호 찾기 </button>
 	</div>
 	
+	<div id="stepCode">
+	<div class="title">이메일 인증</div>
+	<div class="desc" id="mailDesc"></div>
+
+	<fieldset>
+	<legend>인증번호</legend>
+	<input id="code" type="text" maxlength="6" placeholder="인증번호 6자리를 입력해주세요">
+	</fieldset>
+
+	<div class="msg" id="msgCode"></div>
+	<button type="button" id="btnVerify">인증 확인</button>
+	<button type="button" class="close-btn" id="btnResend">인증번호 다시 받기</button>
+	</div>
+	
 	<div id="step2">
 	<div class="title">새 비밀번호 설정</div>
 	<div class="desc">새로 사용할 비밀번호를 입력해주세요</div>
@@ -200,58 +214,108 @@ button:hover {
 	
 	let pwReg = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!-\/:-@\[-`{-~])[A-Za-z\d!-\/:-@\[-`{-~]{8,16}$/;
 	
-	$("#btncheck").on("click",function(){
+	// 지금 보이는 칸에 오류 메시지 표시
+	function showError(text) {
+		if ($("#stepCode").is(":visible")) {
+			$("#msgCode").addClass("error").text(text);
+		} else {
+			$("#msg1").addClass("error").text(text);
+		}
+	}
+	
+	// 인증번호 발송 (처음 + 다시 받기 공용)
+	function sendCode() {
 		let id = $("#id").val().trim();
 		let name = $("#name").val().trim();
 		let phone = $("#phone").val().trim();
 		
-		if(id == "" || name == ""|| phone == "") {
+		if (id == "" || name == "" || phone == "") {
 			$("#msg1").addClass("error").text("모든 항목을 입력해주세요.");
 			return;
 		}
+		$("#msg1").removeClass("error").text("인증번호를 보내는 중입니다...");
+		
 		$.ajax({
-			url : "/member/ajax/checkpw",
-			type : "get",
-			data : {id : id , name : name , phone : phone},
-			dataType : "json"
-		}).done(function(resp){
-			if(resp) {
+			url : "/member/ajax/sendcode",
+			type : "post",
+			data : {id : id, name : name, phone : phone},
+			dataType : "text"
+		}).done(function(resp) {
+			if (resp == "nomatch") {
+				showError("일치하는 회원 정보가 없습니다");
+			} else if (resp == "wait") {
+				showError("30초 후에 다시 시도해주세요.");
+			} else if (resp == "fail") {
+				showError("메일 발송에 실패했습니다. 잠시 후 다시 시도해주세요.");
+			} else {
+				// 성공: resp 는 가려진 이메일 (abc***@gmail.com)
 				$("#step1").hide();
+				$("#stepCode").show();
+				$("#mailDesc").text(resp + " 로 인증번호를 보냈습니다. (3분 안에 입력)");
+				$("#msgCode").removeClass("error").text("");
+				$("#code").val("").focus();
+			}
+		}).fail(function() {
+			showError("서버 오류가 발생했습니다.");
+		});
+	}
+	
+	$("#btncheck").on("click", sendCode);
+	$("#btnResend").on("click", sendCode);
+	
+	// 인증번호 확인
+	$("#btnVerify").on("click", function() {
+		let code = $("#code").val().trim();
+		
+		if (code == "") {
+			$("#msgCode").addClass("error").text("인증번호를 입력해주세요.");
+			return;
+		}
+		
+		$.ajax({
+			url : "/member/ajax/verifycode",
+			type : "post",
+			data : {code : code},
+			dataType : "json"
+		}).done(function(resp) {
+			if (resp) {
+				$("#stepCode").hide();
 				$("#step2").show();
 			} else {
-				$("#msg1").addClass("error").text ("일치하는 회원 정보가 없습니다");
+				$("#msgCode").addClass("error").text("인증번호가 틀렸거나 만료되었습니다.");
 			}
 		});
-		});
+	});
 	
-		$("#btnReset").on("click",function(){
-			let pw = $("#pw").val();
-			let pw1 =$("#pw1").val();
-			
-			if(!pwReg.test(pw)){
+	// 새 비밀번호 변경
+	$("#btnReset").on("click", function() {
+		let pw = $("#pw").val();
+		let pw1 = $("#pw1").val();
+		
+		if (!pwReg.test(pw)) {
 			$("#msg2").addClass("error").text("영문/숫자/특수문자를 포함하여 8~16자로 입력해주세요");
 			return;
-			}
-			
-			if (pw != pw1) {
-				$("#msg2").addClass("error").text("비밀번호가 일치하지 않습니다.");
-				return;
-			}
-			$.ajax({
-				url : "/member/ajax/resetpw",
-				type : "post",
-				data : {pw : pw},
-				dataType : "json"
-			}).done(function(resp){
-				if(resp) {
-					alert("비밀번호가 변경되었습니다. 새 비밀번호로 로그인 해주세요.");
-					window.close();
-				} else {
-					$("#msg2").addClass("error").text("변경에 실패했습니다. 처음부터 다시 시도해주세요");
-				}
-			});
-			});
+		}
 		
+		if (pw != pw1) {
+			$("#msg2").addClass("error").text("비밀번호가 일치하지 않습니다.");
+			return;
+		}
+		$.ajax({
+			url : "/member/ajax/resetpw",
+			type : "post",
+			data : {pw : pw},
+			dataType : "json"
+		}).done(function(resp) {
+			if (resp) {
+				alert("비밀번호가 변경되었습니다. 새 비밀번호로 로그인 해주세요.");
+				window.close();
+			} else {
+				$("#msg2").addClass("error").text("변경에 실패했습니다. 처음부터 다시 시도해주세요");
+			}
+		});
+	});
+	
 	</script>
 	<jsp:include page="/WEB-INF/views/common/footer.jsp" />
 </body>
