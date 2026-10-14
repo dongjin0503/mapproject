@@ -199,36 +199,44 @@ public class MemberController {
 		return email.substring(0, show) + "***" + email.substring(at);
 	}
 
-	// 2단계: 인증번호 확인 → 맞으면 비밀번호 변경 허용
+	// 2단계: 인증번호 확인 → 결과를 글자로 돌려줌
+	// "ok" 성공 / "wrong:남은횟수" 틀림 / "locked" 5회 실패 / "expired" 만료·없음
 	@ResponseBody
 	@RequestMapping("/ajax/verifycode")
-	public boolean verifyCode(String code, HttpSession session) {
+	public String verifyCode(String code, HttpSession session) {
 		String authId = (String) session.getAttribute("authId");
 		String authCode = (String) session.getAttribute("authCode");
 		Long authTime = (Long) session.getAttribute("authTime");
 		Integer fail = (Integer) session.getAttribute("authFail");
 
+		// 인증번호를 받은 적이 없거나 이미 폐기됨
 		if (authId == null || authCode == null || authTime == null || fail == null) {
-			return false;
+			return "expired";
 		}
 
-		// 3분(180000ms) 지났거나 5번 틀렸으면 무효
-		if (System.currentTimeMillis() - authTime > 180000 || fail >= 5) {
+		// 3분(180000ms) 지남
+		if (System.currentTimeMillis() - authTime > 180000) {
 			session.removeAttribute("authCode");
-			return false;
+			return "expired";
 		}
 
+		// 번호가 틀림
 		if (!authCode.equals(code)) {
-			session.setAttribute("authFail", fail + 1);
-			return false;
+			fail = fail + 1;
+			session.setAttribute("authFail", fail);
+
+			if (fail >= 5) {
+				session.removeAttribute("authCode");   // 5회 실패 → 번호 폐기
+				return "locked";
+			}
+			return "wrong:" + (5 - fail);
 		}
 
 		// 인증 성공: 이제서야 비밀번호 변경 허용
 		session.setAttribute("resetId", authId);
 		session.removeAttribute("authCode");
-		return true;
+		return "ok";
 	}
-
 	@ResponseBody
 	@RequestMapping("/ajax/resetpw")
 	public boolean resetPw(String pw, HttpSession session) {

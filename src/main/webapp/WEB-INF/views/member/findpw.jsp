@@ -147,6 +147,22 @@ button:hover {
 .close-btn:hover {
 	background: var(--fill);
 }
+
+/* 남은 시간 */
+.timer {
+	margin-bottom: 8px;
+	font-size: 22px;
+	font-weight: 700;
+	text-align: center;
+	color: #b91c1c;
+}
+
+button:disabled {
+	background: #9ca3af;
+	border-color: #9ca3af;
+	cursor: not-allowed;
+}
+
 	</style>
 </head>
 <body>
@@ -178,6 +194,7 @@ button:hover {
 	<div id="stepCode">
 	<div class="title">이메일 인증</div>
 	<div class="desc" id="mailDesc"></div>
+	<div class="timer" id="timer">3:00</div>
 
 	<fieldset>
 	<legend>인증번호</legend>
@@ -213,6 +230,8 @@ button:hover {
 	<script>
 	
 	let pwReg = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!-\/:-@\[-`{-~])[A-Za-z\d!-\/:-@\[-`{-~]{8,16}$/;
+	let timer = null;   // 카운트다운 타이머
+	let remain = 0;     // 남은 시간(초)
 	
 	// 지금 보이는 칸에 오류 메시지 표시
 	function showError(text) {
@@ -221,6 +240,34 @@ button:hover {
 		} else {
 			$("#msg1").addClass("error").text(text);
 		}
+	}
+	
+	// 남은 시간을 m:ss 로 화면에 표시 (예: 2:05)
+	function showTime() {
+		let m = Math.floor(remain / 60);
+		let s = remain % 60;
+		if (s < 10) {
+			s = "0" + s;
+		}
+		$("#timer").text(m + ":" + s);
+	}
+	
+	// 3분 카운트다운 시작
+	function startTimer() {
+		clearInterval(timer);
+		remain = 180;
+		showTime();
+		$("#btnVerify").prop("disabled", false);
+		
+		timer = setInterval(function() {
+			remain--;
+			showTime();
+			if (remain <= 0) {
+				clearInterval(timer);
+				$("#btnVerify").prop("disabled", true);
+				$("#msgCode").addClass("error").text("인증 시간이 만료되었습니다. 인증번호를 다시 받아주세요.");
+			}
+		}, 1000);
 	}
 	
 	// 인증번호 발송 (처음 + 다시 받기 공용)
@@ -251,9 +298,10 @@ button:hover {
 				// 성공: resp 는 가려진 이메일 (abc***@gmail.com)
 				$("#step1").hide();
 				$("#stepCode").show();
-				$("#mailDesc").text(resp + " 로 인증번호를 보냈습니다. (3분 안에 입력)");
+				$("#mailDesc").text(resp + " 로 인증번호를 보냈습니다.");
 				$("#msgCode").removeClass("error").text("");
 				$("#code").val("").focus();
+				startTimer();
 			}
 		}).fail(function() {
 			showError("서버 오류가 발생했습니다.");
@@ -276,13 +324,25 @@ button:hover {
 			url : "/member/ajax/verifycode",
 			type : "post",
 			data : {code : code},
-			dataType : "json"
+			dataType : "text"
 		}).done(function(resp) {
-			if (resp) {
+			if (resp == "ok") {
+				clearInterval(timer);
 				$("#stepCode").hide();
 				$("#step2").show();
+			} else if (resp == "locked") {
+				clearInterval(timer);
+				$("#btnVerify").prop("disabled", true);
+				$("#code").val("");
+				$("#msgCode").addClass("error").text("인증번호를 다시 받아주세요.");
+				alert("인증번호를 5회 잘못 입력했습니다.\n보안을 위해 인증번호가 폐기되었습니다.\n'인증번호 다시 받기'를 눌러주세요.");
+			} else if (resp == "expired") {
+				clearInterval(timer);
+				$("#btnVerify").prop("disabled", true);
+				$("#msgCode").addClass("error").text("인증 시간이 만료되었습니다. 인증번호를 다시 받아주세요.");
 			} else {
-				$("#msgCode").addClass("error").text("인증번호가 틀렸거나 만료되었습니다.");
+				// "wrong:남은횟수" 에서 남은 횟수만 꺼냄 (앞 6글자 "wrong:" 제외)
+				$("#msgCode").addClass("error").text("인증번호가 틀렸습니다. (남은 횟수 " + resp.substring(6) + "회)");
 			}
 		});
 	});
