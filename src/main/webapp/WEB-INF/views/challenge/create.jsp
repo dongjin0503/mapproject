@@ -161,7 +161,7 @@
 			</form>
 		</div>
 	</div>
-	
+
 	<Script>
 	
 	$("form").on("submit", function(){
@@ -174,5 +174,6 @@
 	    }
 	});
 	</Script>
+		<jsp:include page="/WEB-INF/views/common/footer.jsp" />
 </body>
 </html>

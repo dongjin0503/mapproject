@@ -218,7 +218,7 @@
 	</c:forEach>
 	</div>
 	</div>
-	
+
 	<script>
 		$(".filter").on("click", function(){
 			
@@ -286,5 +286,6 @@
 		refreshProgress();                     // 화면이 열리자마자 한 번 실행
 		setInterval(refreshProgress, 5000);    // 그 뒤로 5초(5000ms)마다 계속 실행
 	</script>
+		<jsp:include page="/WEB-INF/views/common/footer.jsp" />
 	</body>
 </html>

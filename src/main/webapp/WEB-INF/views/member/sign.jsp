@@ -551,6 +551,6 @@ button:hover { background: var(--fill); }
 	    return true;
 	}
 	</script>
-	
+	<jsp:include page="/WEB-INF/views/common/footer.jsp" />
 </body>
 </html>

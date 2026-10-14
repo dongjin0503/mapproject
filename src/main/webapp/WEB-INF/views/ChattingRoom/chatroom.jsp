@@ -381,6 +381,7 @@
     			<input id="allbtn" type="button" value="전체보기">
 			</div>
 		</div>
+	
 		<script>
 		
 		$("#hamburgerbtn").on("click", function() {
@@ -614,7 +615,7 @@
 			$("#message").val("");
 		});
 	</script>
-
+	<jsp:include page="/WEB-INF/views/common/footer.jsp" />
 
 </body>
 </html>

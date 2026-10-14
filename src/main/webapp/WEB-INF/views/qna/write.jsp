@@ -132,5 +132,6 @@ textarea { width:100%; padding:12px; border:1px solid #d5dce7; border-radius:6px
 	</div>
 		
 	</div>
+	<jsp:include page="/WEB-INF/views/common/footer.jsp" />
 </body>
 </html>

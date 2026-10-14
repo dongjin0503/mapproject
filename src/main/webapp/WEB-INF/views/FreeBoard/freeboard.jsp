@@ -441,6 +441,7 @@
 				</a>
 			<!-- 페이지네이션 -->
 			<div class="pagination" id="navigation" data-search="<c:out value='${search}'/>" data-category="<c:out value='${category}'/>"></div>
+			
 			<script>
 				let recordTotalCount = ${recordTotalCount};
 				let recordCountPerPage = ${recordCountPerPage};
@@ -489,6 +490,6 @@
 			</div>
 		<span>총 게시물 수: ${recordTotalCount }</span>
 		</div>
-
+<jsp:include page="/WEB-INF/views/common/footer.jsp" />
 </body>
 </html>
