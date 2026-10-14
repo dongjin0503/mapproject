@@ -15,14 +15,14 @@ public class ChattingRoomDAO {
 	@Autowired
 	private JdbcTemplate jdbc;
 	
-	public void insert(ChattingRoomDTO dto) {
+	public void insert(ChattingRoomDTO dto) {	// 메세지 저장
 		String sql = "insert into chattingroom(message_id, party_id, member_id, content, message_type)"
 				+ " values(seq_chattingroom.nextval,?,?,?,?)";
 		jdbc.update(sql,dto.getPartyId(),dto.getMemberId(),dto.getContent(),dto.getMessageType());
 				
 	}
 	
-	public List<ChattingRoomDTO> selectByPartyId(int partyId){
+	public List<ChattingRoomDTO> selectByPartyId(int partyId){	//지난 대화 불러오기
 		String sql = "select c.*, m.username from chattingroom c "
 		        + "join member m on c.member_id = m.member_id "
 		        + "where c.party_id=? order by c.message_id";
