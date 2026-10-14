@@ -20,16 +20,11 @@ public class FreeBoardDAO {
 	            + "(select count(*) from freeboard_reply r where r.post_id = f.post_id) reply_count, "
 	            + "row_number() over(order by f.post_id desc) rn "
 	            + "from freeboard f "
-	            + "left join member m on f.member_id = m.member_id " // member 테이블과 조인
-	            + "where (f.title like ? or f.content like ?) and f.content_category like ?) " // 컬럼 충돌 방지를 위해 f. 명시
-	            + "where rn between ? and ?";
+	            + "left join member m on f.member_id = m.member_id " // member 테이블과 조인 (freeboard에 member테이블 조인)
+	            + "where (f.title like ? or f.content like ?) and f.content_category like ?) " // 검색어가 제목이나 내용에 있고, 카테고리도 맞는 글만 남
+	            + "where rn between ? and ?";	//페이지 자르기. ex 11 and 20 (2페이지분량)
 		return jdbc.query(sql, new BeanPropertyRowMapper<>(FreeBoardDTO.class), "%" + search + "%", "%" + search + "%", categoryFilter(category), start, end);
 	}
-
-//   public List<FreeBoardDTO> searchTitle(String search) throws Exception {
-//      String sql = "select * from freeboard where title like ? order by post_id desc";
-//      return jdbc.query(sql, new BeanPropertyRowMapper<>(FreeBoardDTO.class), "%" + search + "%");
-//   }
 
    public int getNextSeq() {
       String sql = "select seq_freeboard.nextval from dual";
@@ -41,12 +36,12 @@ public class FreeBoardDAO {
           jdbc.update(sql, postId, dto.getMemberId(), dto.getTitle(), dto.getContentCategory(), dto.getContent());
       }
 
-   public FreeBoardDTO detail(int postId) {
+   public FreeBoardDTO detail(int postId) {		//조회수 증가 & 게시글 번호로 조회해서 FreeBoardDTO에 저장
 
       String sql1 = "update freeboard set view_count=view_count+1 where post_id = ?";
       jdbc.update(sql1, postId);
 
-      String sql = "select f.*, m.username from freeboard f "
+      String sql = "select f.*, m.username from freeboard f "		//member테이블과 조인해서 username가져오기
               + "left join member m on f.member_id = m.member_id where f.post_id=?";
       return jdbc.queryForObject(sql, new BeanPropertyRowMapper<>(FreeBoardDTO.class), postId);
    }
