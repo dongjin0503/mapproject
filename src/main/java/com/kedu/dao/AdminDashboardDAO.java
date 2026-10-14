@@ -84,14 +84,18 @@ public class AdminDashboardDAO {
 
 	public List<AdminDashboardDTO> getChallengeCategoryStats(String startDate, String endDate) {
 
-		String sql = "select c.CATEGORY, " + "sum(case " +
-				"when c.START_DATE <= sysdate " +
-				"then 1 else 0 end) CREATE_COUNT, " + "sum(case " + "when c.START_DATE <= sysdate "
-				+ "and nvl(cm.MEMBER_COUNT, 0) >= 1 " + "then 1 else 0 end) PROGRESS_COUNT " + "from CHALLENGE c "
-				+ "left join ( " + "select CHALLENGE_ID, count(*) MEMBER_COUNT " + "from CHALLENGE_MEMBER "
-				+ "group by CHALLENGE_ID " + ") cm on c.CHALLENGE_ID = cm.CHALLENGE_ID "
-				+ "where c.CREATED_AT >= to_date(?, 'YYYY-MM-DD') " + "and c.CREATED_AT < to_date(?, 'YYYY-MM-DD') + 1 "
-				+ "group by c.CATEGORY " + "order by c.CATEGORY";
+		String sql = "select c.CATEGORY, "
+				+ "count(*) CREATE_COUNT, "
+				+ "sum(case when nvl(cm.MEMBER_COUNT, 0) >= 2 then 1 else 0 end) PROGRESS_COUNT "
+				+ "from CHALLENGE c "
+				+ "left join ( "
+				+ "select CHALLENGE_ID, count(*) MEMBER_COUNT "
+				+ "from CHALLENGE_MEMBER "
+				+ "group by CHALLENGE_ID "
+				+ ") cm on c.CHALLENGE_ID = cm.CHALLENGE_ID "
+				+ "where c.CREATED_AT >= to_date(?, 'YYYY-MM-DD') "
+				+ "and c.CREATED_AT < to_date(?, 'YYYY-MM-DD') + 1 "
+				+ "group by c.CATEGORY order by c.CATEGORY";
 
 		return jdbcTemplate.query(sql, (rs, rowNum) -> {
 

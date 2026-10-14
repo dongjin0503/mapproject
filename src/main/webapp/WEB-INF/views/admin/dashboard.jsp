@@ -155,12 +155,12 @@
 			</div>
 
 			<div class="chart-box">
-				<h3>챌린지 카테고리별 생성 / 실제 진행 수</h3>
-				<p class="chart-desc">조회기간 내 생성된 챌린지 중 실제 진행된 챌린지를 비교합니다.</p>
+				<h3>챌린지 카테고리별 생성 / 그룹 챌린지 수</h3>
+				<p class="chart-desc">조회 기간 내 생성된 챌린지 대비 그룹 챌린지(2명 이상 참여) 수를 비교합니다</p>
 				<canvas id="challengeCategoryChart"></canvas>
 				<div class="success-rate">
 					<c:forEach var="item" items="${challengeCategoryStats}">
-						<span> ${item.category} 성사율 : <fmt:formatNumber
+						<span> ${item.category} 그룹 챌린지 비율 : <fmt:formatNumber
 								value="${item.successRate}" maxFractionDigits="1" />%
 						</span>
 					</c:forEach>
@@ -242,7 +242,7 @@
 					data : challengeCreateCounts
 				},
 				{
-					label : "실제 진행 수",
+					label : "그룹 챌린지 수",
 					data : challengeProgressCounts
 				}
 			]
