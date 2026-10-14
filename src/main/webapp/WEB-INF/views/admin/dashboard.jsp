@@ -182,6 +182,7 @@
 		</div>
 
 	</div>
+
 	<script>
 	let partyCategoryLabels = [];
 	let partyCreateCounts = [];
