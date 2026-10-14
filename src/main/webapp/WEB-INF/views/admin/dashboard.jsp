@@ -24,6 +24,54 @@
 .container h2 {
 	margin-bottom: 25px;
 }
+.admin-wrap {
+	display: flex;
+	max-width: 1300px;
+	margin: 30px auto;
+	gap: 30px;
+}
+
+.admin-sidebar {
+	width: 180px;
+	min-height: 500px;
+	border-right: 1px solid #ddd;
+	padding-right: 20px;
+}
+
+.admin-sidebar h3 {
+	margin: 0 0 20px;
+	font-size: 18px;
+}
+
+.admin-sidebar a {
+	display: block;
+	padding: 12px 14px;
+	margin-bottom: 8px;
+	border-radius: 6px;
+	color: #333;
+	text-decoration: none;
+	font-size: 14px;
+}
+
+.admin-sidebar a:hover {
+	background-color: #f3f3f3;
+}
+
+.admin-sidebar a.active {
+	background-color: black;
+	color: white;
+	font-weight: bold;
+}
+
+.admin-content {
+	flex: 1;
+}
+
+.admin-content .container {
+	max-width: none;
+	margin: 0;
+	padding: 0;
+}
 
 .date-filter {
 	display: flex;
@@ -124,6 +172,17 @@
 <body>
 
 	<jsp:include page="/WEB-INF/views/common/header.jsp" />
+	
+	<div class="admin-wrap">
+
+	<div class="admin-sidebar">
+		<h3>관리자</h3>
+
+		<a href="/admin/dashboard" class="active">대시보드</a>
+		<a href="/admin/member">회원관리</a>
+	</div>
+
+	<div class="admin-content">
 
 	<div class="container">
 
@@ -181,6 +240,8 @@
 
 		</div>
 
+	</div>
+	</div>
 	</div>
 	<script>
 	let partyCategoryLabels = [];
