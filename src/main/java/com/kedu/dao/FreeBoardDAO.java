@@ -18,7 +18,8 @@ public class FreeBoardDAO {
    public List<FreeBoardDTO> boardList(int start, int end, String search, String category) {
 		String sql = "select * from (select f.*, m.username, " // member 테이블의 username 추가
 	            + "(select count(*) from freeboard_reply r where r.post_id = f.post_id) reply_count, "
-	            + "row_number() over(order by f.post_id desc) rn "
+	            // 공지는 0점, 나머지는 1점으로 정렬해 공지를 맨 위에 고정하고 같은 점수끼리는 최신순
+	            + "row_number() over(order by case when f.content_category = '공지' then 0 else 1 end, f.post_id desc) rn "
 	            + "from freeboard f "
 	            + "left join member m on f.member_id = m.member_id " // member 테이블과 조인 (freeboard에 member테이블 조인)
 	            + "where (f.title like ? or f.content like ?) and f.content_category like ?) " // 검색어가 제목이나 내용에 있고, 카테고리도 맞는 글만 남

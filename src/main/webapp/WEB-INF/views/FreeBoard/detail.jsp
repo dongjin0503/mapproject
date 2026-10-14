@@ -621,6 +621,11 @@ hr {
 				<input type="radio" name="contentCategory" id="cat-question"
 					value="질문" ${post.contentCategory == '질문' ? 'checked' : ''}>
 				<label for="cat-question">질문</label>
+				
+				<%-- 공지 글을 수정할 때 선택된 라디오가 없어 카테고리가 null 이 되는 걸 막음 --%>
+				<c:if test ="${post.contentCategory == '공지' }">
+				<input type ="radio" name ="contentCategory" id ="cat-notice" value ="공지" checked><label for = "cat-notice">공지</label> 
+				</c:if>								
 
 				<input type="radio" name="contentCategory" id="cat-info" value="정보"
 					${post.contentCategory == '정보' ? 'checked' : ''}>

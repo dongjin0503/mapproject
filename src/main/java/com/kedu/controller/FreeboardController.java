@@ -92,6 +92,11 @@ public class FreeboardController {
 		
 		dto.setMemberId(loginId);
 		
+		// 비관리자가 개발자도구로 "공지"를 보내도 서버에서 "자유"로 바꿔 막음
+		if ("공지".equals(dto.getContentCategory()) && !"admin".equals(loginId)) {
+			dto.setContentCategory("자유");
+		}
+		
 		int thisSeq = dao.getNextSeq();		//다음 글번호 미리 뽑는다
 		dao.writeUp(thisSeq, dto);			//뽑은 글번호로 글을 저장(seq.nextval사용안함)
 		
@@ -136,7 +141,12 @@ public class FreeboardController {
 	        return "redirect:/FreeBoard/detail?postId=" + dto.getPostId() + "&cpage=" + cpage;
 	    }
 		
-		dao.updateContent(dto);
+	    // 수정으로도 공지로 바꾸는 걸 막음 (쓰기만 막으면 반쪽이라 똑같이 한 번 더)
+	    if ("공지".equals(dto.getContentCategory()) && !"admin".equals(loginId)) {
+	        dto.setContentCategory("자유");
+	    }
+	    
+	    dao.updateContent(dto);
 
 		// 삭제 체크한 파일 (다른 글의 파일은 못 지우게 postId 확인)
 		if (deleteFileId != null) {
