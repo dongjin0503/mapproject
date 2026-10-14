@@ -20,7 +20,7 @@
       <property name="driverClassName"
          value="oracle.jdbc.OracleDriver" />
       <property name="url"
-         value="jdbc:oracle:thin:@localhost:1521:xe" />
+         value="jdbc:oracle:thin:@10.10.54.203:1521:xe" />
       <property name="username" value="tester" />
       <property name="password" value="tester" />
       <property name="initialSize" value="5"></property>
