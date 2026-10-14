@@ -381,6 +381,11 @@
     			<input id="allbtn" type="button" value="전체보기">
 			</div>
 		</div>
+<<<<<<< HEAD
+=======
+	
+		<script>
+>>>>>>> e09e9cadc9b89fed104a9db642ee69b307c0e035
 		
 		<script>
 		$("#hamburgerbtn").on("click", function() {	// 햄버거버튼 눌렀을때 active로 보이게한다
@@ -651,7 +656,7 @@
 			$("#message").val("");
 		});
 	</script>
-
+	<jsp:include page="/WEB-INF/views/common/footer.jsp" />
 
 </body>
 </html>

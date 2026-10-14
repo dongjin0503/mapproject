@@ -307,8 +307,14 @@
 				<input type="radio" name="contentCategory" id="cat-free" value="자유" checked><label for="cat-free">자유</label>
 				<input type="radio" name="contentCategory" id="cat-question" value="질문"><label for="cat-question">질문</label>
 				<input type="radio" name="contentCategory" id="cat-info" value="정보"> <label for="cat-info">정보</label>
+				
+			<%-- 관리자에게만 "공지" 라디오를 보여 줌 (실제 차단은 1번) --%>
+			<c:if test = "${sessionScope.loginId == 'admin'}">
+			<input type ="radio" name ="contentCategory" id ="cat-notice" value ="공지"><label for ="cat-notice"> 공지</label>
+			</c:if>
 				<!-- type radio는 name이 같은것들이 여러가지면 체크한것만 들어감(나머지는 해제) -->
 			</div>
+			
 			<div class="content">
 				<textarea name="content" id="content" placeholder="내용을 입력하세요 (최대 4000바이트)"></textarea>
 			</div>
@@ -359,5 +365,6 @@
 			</div>
 		</div>
 	</form>
+	<jsp:include page="/WEB-INF/views/common/footer.jsp" />
 </body>
 </html>

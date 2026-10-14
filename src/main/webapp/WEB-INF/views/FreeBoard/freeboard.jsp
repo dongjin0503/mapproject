@@ -134,9 +134,11 @@
 	box-shadow: 0 2px 10px rgba(28, 37, 53, 0.05);
 }
 
+/* [수정] 공지 줄의 둥근 모서리를 위해 collapse -> separate (칸 사이 간격 0) */
 .board-list table {
 	width: 100%;
-	border-collapse: collapse;
+	border-collapse: separate;
+	border-spacing: 0;
 	table-layout: fixed;
 	font-size: 13px;
 }
@@ -171,6 +173,60 @@
 
 .board-list tr:hover td {
 	background: #f9fafc;
+}
+
+/* =========================
+   공지 줄 (카드형) [새로 추가]
+   - 줄 높이는 일반 줄과 같은 46px (box-sizing: border-box 라서 테두리 포함)
+   - 위아래 4px 흰 테두리 + background-clip 으로 카드처럼 떠 보이게
+   - 반드시 위의 tr:hover 규칙 아래에 둘 것 (우선순위)
+========================= */
+.board-list tr.notice td {
+	background: #eef4ff;
+	background-clip: padding-box;
+	border-top: 4px solid #fff;
+	border-bottom: 4px solid #fff;
+	height: 46px;
+	color: #5a6678;
+}
+
+.board-list tr.notice:hover td {
+	background: #e2ecff;
+	background-clip: padding-box;
+}
+
+.board-list tr.notice td:first-child {
+	border-radius: 24px 0 0 24px;
+	border-left: 6px solid #fff;
+	color: #2457d6;
+	font-weight: bold;
+}
+
+.board-list tr.notice td:last-child {
+	border-radius: 0 24px 24px 0;
+	border-right: 6px solid #fff;
+	padding: 0 2px 0 10px;
+	white-space: nowrap;
+}
+
+.board-list tr.notice td.title a {
+	font-weight: bold;
+}
+
+.board-list tr.notice td:nth-child(2) {
+	padding: 0;
+}
+
+.notice-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	padding: 4px 10px;
+	border-radius: 999px;
+	background: #2457d6;
+	color: #fff;
+	font-size: 12px;
+	font-weight: bold;
 }
 
 .board-list td:nth-child(2) {
@@ -355,9 +411,15 @@
 						</c:when>
 						<c:otherwise>
 							<c:forEach var="i" items="${list}">
-								<tr>
+							
+							<%-- 카테고리가 "공지"인 글이면 tr 에 notice 클래스를 붙여서 위 CSS(.notice)가 카드형으로 꾸밈 --%>
+								<tr class="${i.contentCategory == '공지' ? 'notice' : ''}">
 									<td>${i.postId}</td>
-									<td>${i.contentCategory}</td>
+									
+									
+									<%-- 공지면 파란 알약 배지(확성기 아이콘 포함), 아니면 기존처럼 카테고리 글자만 출력 --%>
+									<td><c:choose><c:when test="${i.contentCategory == '공지'}"><span class="notice-chip"><i class="fa-solid fa-bullhorn"></i> 공지</span></c:when><c:otherwise>${i.contentCategory}</c:otherwise></c:choose></td>
+									
 									<td class="title"><c:if test="${i.isHot == 1}"><i class="fa-solid fa-burst" style="color: rgb(233, 23, 23);"></i></c:if>
 									<a href="/FreeBoard/detail?postId=${i.postId}&cpage=${cpage}"><c:out value="${i.title}"/></a>
 										<c:if test="${i.replyCount > 0}"><span class="reply-count">[${i.replyCount}]</span></c:if></td>
@@ -379,6 +441,7 @@
 				</a>
 			<!-- 페이지네이션 -->
 			<div class="pagination" id="navigation" data-search="<c:out value='${search}'/>" data-category="<c:out value='${category}'/>"></div>
+			
 			<script>
 				let recordTotalCount = ${recordTotalCount};
 				let recordCountPerPage = ${recordCountPerPage};
@@ -427,6 +490,6 @@
 			</div>
 		<span>총 게시물 수: ${recordTotalCount }</span>
 		</div>
-
+<jsp:include page="/WEB-INF/views/common/footer.jsp" />
 </body>
 </html>

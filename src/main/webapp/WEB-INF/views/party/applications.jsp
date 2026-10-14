@@ -143,5 +143,6 @@
 			onclick="location.href='/party/detail?partyId=${party.partyId}'">
 			모임으로 돌아가기</button>
 	</div>
+	<jsp:include page="/WEB-INF/views/common/footer.jsp" />
 </body>
 </html>

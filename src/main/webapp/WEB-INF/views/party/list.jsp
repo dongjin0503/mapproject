@@ -18,6 +18,7 @@
 	max-width: 1090px;
 	margin: 0 auto;
 	min-height: 100vh; /*브라우저 화면 높이의 100%*/
+	padding-bottom: 50px;
 }
 
 .party-top {
@@ -351,5 +352,6 @@
       });
    });
    </script>
+   <jsp:include page="/WEB-INF/views/common/footer.jsp" />
 </body>
 </html>

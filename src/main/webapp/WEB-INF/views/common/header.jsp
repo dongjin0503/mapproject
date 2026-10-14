@@ -118,6 +118,60 @@
 	text-decoration: none;
 }
 
+.admin-nav {
+	position: relative;
+}
+
+.admin-nav-title {
+	display: block;
+	font-size: 13.5px;
+	font-weight: 600;
+	color: var(--text);
+	padding-bottom: 16px;
+	border-bottom: 2px solid transparent;
+	cursor: default;
+}
+
+.admin-nav:hover .admin-nav-title {
+	color: var(--accent);
+	border-bottom-color: var(--accent);
+}
+
+.admin-dropdown {
+	display: none;
+	position: absolute;
+	top: 100%;
+	left: 50%;
+	transform: translateX(-50%);
+	width: 120px;
+	padding: 6px 0;
+	background-color: white;
+	border: 1px solid #ddd;
+	border-radius: 6px;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+	z-index: 2000;
+}
+
+.admin-dropdown a {
+	display: block;
+	padding: 10px 14px;
+	border-bottom: none;
+	color: var(--text);
+	font-size: 13px;
+	font-weight: 500;
+	text-align: center;
+	white-space: nowrap;
+}
+
+.admin-dropdown a:hover {
+	background-color: var(--fill);
+	border-bottom-color: transparent;
+}
+
+.admin-nav:hover .admin-dropdown {
+	display: block;
+}
+
 #notification-count {
 	position: absolute;
 	top: -3px;
@@ -151,12 +205,21 @@
 		<nav class="sh-nav">
 			<a href="/map/main">지도</a> <a href="/party/list">파티원모집</a> <a
 				href="/challenge/list">챌린지</a> <a href="/ledger/list">가계부</a> <a
-				href="/FreeBoard/freeboard">자유게시판</a> <a href="#">Q&amp;A게시판</a>
+				href="/FreeBoard/freeboard">자유게시판</a> <a href="/qna/list">Q&amp;A게시판</a>
 
 			<%-- ★ 관리자 버튼: admin 계정일 때만 --%>
-			<c:if test="${sessionScope.loginId == 'admin'}">
-				<a href="/admin/dashboard">관리자</a>
-			</c:if>
+		<c:if test="${sessionScope.loginId == 'admin'}">
+	<div class="admin-nav">
+
+	<span class="admin-nav-title">관리자</span>
+
+	<div class="admin-dropdown">
+		<a href="/admin/dashboard">대시보드</a>
+		<a href="/admin/members">회원관리</a>
+	</div>
+
+</div>
+</c:if>
 		</nav>
 	</div>
 
