@@ -70,7 +70,7 @@ public class ChattingRoomController {
     }
 	
 	@MessageMapping("/chat")		//JS가 STOMP로 메시지를 보낼 때 (WebSocket) -- DB 저장 후 같은 파티 사람들에게 방송
-	public ChattingRoomDTO chatting(ChattingRoomDTO dto) throws Exception{	//// JS가 JSON.stringify로 보낸 JSON을 스프링이 자동으로 DTO 객체로 바꿔서 넣어줌
+	public ChattingRoomDTO chatting(ChattingRoomDTO dto) throws Exception{	// JS가 JSON.stringify로 보낸 JSON을 스프링이 자동으로 DTO 객체로 바꿔서 넣어줌
 		// 실제 주소는 Config의 /app/chat
 		dto.setCreatedAt(new java.sql.Timestamp(System.currentTimeMillis())); //createdAt 오류날수있어서 추가함
 		dao.insert(dto);	//메시지를 DB에 저장. 입장/퇴장/일반 메시지 모두 이 한 줄로 저장

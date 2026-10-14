@@ -465,7 +465,7 @@
                   </div>
                </c:when>
                
-               <!-- 내 채팅 -->
+               <%-- 내 채팅 --%>
                <c:when test="${chat.memberId == loginId}">
                   <div class="myMessage">
                      <div>
@@ -476,7 +476,7 @@
                      </div>
                   </div>
                </c:when>
-               <!-- 다른 사람 채팅 -->
+                <%-- 다른 사람 채팅 --%>
                <c:otherwise>
                   <div class="otherMessage">
                      <div>
@@ -586,9 +586,7 @@
                    );
                }
                
-               $(window).on("load", function(){   // load는 페이지 로딩이 끝날 때 한 번만 일어나는 이벤트      
-                  $("#chat").scrollTop($("#chat")[0].scrollHeight);   // 전체 채팅의 높이를 가져와서 스크롤위치 변경
-               });
+               $("#chat").scrollTop($("#chat")[0].scrollHeight);   // 새 메시지를 붙인 직후 맨 아래로 스크롤
                
          });   
          
