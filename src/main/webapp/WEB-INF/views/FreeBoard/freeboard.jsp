@@ -318,22 +318,20 @@
 				<input type="button" class="${category == '자유' ? 'active' : ''}" value="자유" onclick="goCategory('자유')">
 				<input type="button" class="${category == '질문' ? 'active' : ''}" value="질문" onclick="goCategory('질문')">
 				<input type="button" class="${category == '정보' ? 'active' : ''}" value="정보" onclick="goCategory('정보')">
+				<!-- 선택한 카테고리만 삼항연산자로 class에 active들어감 -->
 			</div>
 			<!-- 3. 검색 및 글쓰기 -->
 			<div class="board-tools">
 
 				<div class="search-box">
-				
 					<form action="/FreeBoard/freeboard">
-					<input type="hidden" name="category" value="<c:out value='${category}'/>">
+						<input type="hidden" name="category" value="<c:out value='${category}'/>">
 						<input type="text" name="search" value="<c:out value='${search}'/>" placeholder="제목이나 내용으로 게시글 검색">
 						<input type="submit" value="검색">
 					</form>
 				</div>
-				
 				<div class="write-box">
-					<input type="button" class="write-btn" value="글쓰기"
-						onclick="location.href='/FreeBoard/write'">
+					<input type="button" class="write-btn" value="글쓰기" onclick="location.href='/FreeBoard/write'">
 				</div>
 			</div>
 
@@ -363,6 +361,7 @@
 									<td class="title"><c:if test="${i.isHot == 1}"><i class="fa-solid fa-burst" style="color: rgb(233, 23, 23);"></i></c:if>
 									<a href="/FreeBoard/detail?postId=${i.postId}&cpage=${cpage}"><c:out value="${i.title}"/></a>
 										<c:if test="${i.replyCount > 0}"><span class="reply-count">[${i.replyCount}]</span></c:if></td>
+										<!-- 추천수(5이상이면 아이콘추가)/제목/댓글개수 -->
 									<td><c:out value="${i.username}"/>
 										<c:if test="${i.memberId == loginId}"><span class="meBadge">나</span></c:if>
 									</td>
@@ -385,7 +384,8 @@
 				let recordCountPerPage = ${recordCountPerPage};
 				let naviCountPerPage = ${naviCountPerPage};
 				let currentPage = ${cpage};
-
+				
+				
 				let pageTotalCount = Math.ceil(recordTotalCount / recordCountPerPage);
 
 				let startNavi = Math.floor((currentPage - 1)/ naviCountPerPage) * naviCountPerPage + 1;
@@ -424,9 +424,9 @@
 					addLink(">", endNavi + 1, false);
 			</script>
 		
-		</div>
+			</div>
 		<span>총 게시물 수: ${recordTotalCount }</span>
-	</div>
+		</div>
 
 </body>
 </html>

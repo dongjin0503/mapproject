@@ -292,9 +292,7 @@
 </head>
 <body>
 <%@ include file="/WEB-INF/views/common/header.jsp" %>
-	<form action="/FreeBoard/writeup" method="post"
-		enctype="multipart/form-data">
-		<!-- <input type="hidden" id="categoryType" name="contentCategory" value="자유"> -->
+	<form action="/FreeBoard/writeup" method="post" enctype="multipart/form-data">
 		<div class="container">
 			<div class="header">
 				<h2>게시글 작성</h2>
@@ -309,6 +307,7 @@
 				<input type="radio" name="contentCategory" id="cat-free" value="자유" checked><label for="cat-free">자유</label>
 				<input type="radio" name="contentCategory" id="cat-question" value="질문"><label for="cat-question">질문</label>
 				<input type="radio" name="contentCategory" id="cat-info" value="정보"> <label for="cat-info">정보</label>
+				<!-- type radio는 name이 같은것들이 여러가지면 체크한것만 들어감(나머지는 해제) -->
 			</div>
 			<div class="content">
 				<textarea name="content" id="content" placeholder="내용을 입력하세요 (최대 4000바이트)"></textarea>
@@ -329,7 +328,6 @@
 				<div class="fileUploadRow">
         			<input id="selectFile" type="file" name="files" class="fileInput">
 					<label for="selectFile" class="fileBtn">파일 선택</label>
-
         			<span id="firstFileName" class="fileName">선택된 파일 없음</span>
         			<input id="add" type="button" value="+">
     			</div>
@@ -337,15 +335,15 @@
 			</fieldset>
 
 			<script>
-			$("#selectFile").on("change", function() {
-			    const file = this.files[0];
+			$("#selectFile").on("change", function() {	//"change": 입력값이 바뀌었을 때 발생하는 이벤트("파일을 골랐을 때")
+			    const file = this.files[0];				
 
-			    $("#firstFileName").text(
+			    $("#firstFileName").text(		//파일 존재여부로 텍스트변경
 			        file ? file.name : "선택된 파일 없음"
 			    );
 			});
 			
-			$("#add").on("click", function() {
+			$("#add").on("click", function() {	//추가파일 업로드 버튼 클릭시
 			    $("#additionalFiles").append(
 			        $('<input>', {
 			            type: 'file',
@@ -356,8 +354,8 @@
 			});
 			</script>
 			<div class="footer">
-				<a href="/FreeBoard/freeboard?cpage=1"><input type="button"
-					value="취소"></a> <input id="listup" type="submit" value="작성완료">
+				<a href="/FreeBoard/freeboard?cpage=1"><input type="button" value="취소"></a>
+				<input id="listup" type="submit" value="작성완료">
 			</div>
 		</div>
 	</form>
