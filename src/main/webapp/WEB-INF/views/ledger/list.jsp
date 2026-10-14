@@ -2,6 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -32,6 +33,22 @@
 .fc-toolbar-title {
 	font-size: 28px !important;
 	line-height: 1.3;
+}
+
+/* 날짜와 빨간 점이 줄바꿈되지 않도록 */
+.fc-daygrid-day-number {
+	white-space: nowrap;
+}
+
+/* 상세내역이 있는 날짜 표시 */
+.ledger-dot {
+	display: inline-block;
+	width: 7px;
+	height: 7px;
+	background-color: red;
+	border-radius: 50%;
+	margin-left: 5px;
+	vertical-align: middle;
 }
 
 .ledger-wrap {
@@ -71,7 +88,9 @@
 	width: auto;
 }
 
-#category, input[name='amount'], textarea[name='memo'] {
+#category,
+input[name='amount'],
+textarea[name='memo'] {
 	width: 100%;
 	padding: 10px;
 	margin-bottom: 12px;
@@ -253,98 +272,187 @@ textarea[name='memo'] {
 
 		<div class="ledger-wrap">
 
-			<form class="ledger-form" action="/ledger/insert" method="post">
+			<form class="ledger-form"
+				action="/ledger/insert"
+				method="post">
 
 				<div id="calendar"></div>
 
-				<input type="hidden" name="ledgerDateText" id="ledgerDate">
+				<input type="hidden"
+					name="ledgerDateText"
+					id="ledgerDate">
 
 				<div class="type-area">
 
-					<label class="type-label"> <input type="radio" name="type"
-						value="INCOME" required> 수입
-					</label> <label class="type-label"> <input type="radio" name="type"
-						value="EXPENSE"> 지출
+					<label class="type-label">
+						<input type="radio"
+							name="type"
+							value="INCOME"
+							required>
+						수입
+					</label>
+
+					<label class="type-label">
+						<input type="radio"
+							name="type"
+							value="EXPENSE">
+						지출
 					</label>
 
 				</div>
 
-				<select name="category" id="category" required>
+				<select name="category"
+					id="category"
+					required>
+
 					<option value="">항목 선택</option>
-				</select> <input type="number" name="amount" placeholder="금액" required>
 
-				<textarea name="memo" placeholder="메모"></textarea>
+				</select>
 
-				<button type="submit" class="save-btn">저장</button>
+				<input type="number"
+					name="amount"
+					placeholder="금액"
+					required>
+
+				<textarea name="memo"
+					placeholder="메모"></textarea>
+
+				<button type="submit"
+					class="save-btn">
+					저장
+				</button>
 
 			</form>
+
 
 			<div class="right-area">
 
 				<div class="summary">
+
 					<div class="start-area">
 
 						<div class="summary-box">
+
 							<div>기초금액</div>
-							<strong><fmt:formatNumber value="${budget}" pattern="#,###" />원</strong>
+
+							<strong>
+								<fmt:formatNumber
+									value="${budget}"
+									pattern="#,###" />원
+							</strong>
+
 						</div>
-						<form class="budget-form" action="/ledger/budget" method="post">
+
+						<form class="budget-form"
+							action="/ledger/budget"
+							method="post">
 
 							<div class="start-type">
 
-								<label> <input type="radio" name="startType"
-									value="carry" required> 전월 이월
-								</label> <label> <input type="radio" name="startType"
-									value="budget" checked> 예산 설정
+								<label>
+									<input type="radio"
+										name="startType"
+										value="carry"
+										required>
+									전월 이월
+								</label>
+
+								<label>
+									<input type="radio"
+										name="startType"
+										value="budget"
+										checked>
+									예산 설정
 								</label>
 
 							</div>
 
-							<input type="number" name="budgetAmount" class="budgetAmount"
+							<input type="number"
+								name="budgetAmount"
+								class="budgetAmount"
 								placeholder="금액">
 
-							<button type="submit" class="budget-btn">설정</button>
+							<button type="submit"
+								class="budget-btn">
+								설정
+							</button>
 
 						</form>
 
 					</div>
 
+
 					<div class="summary-box">
+
 						<div>총수입</div>
-						<strong><fmt:formatNumber value="${totalIncome}" pattern="#,###" />원</strong>
+
+						<strong>
+							<fmt:formatNumber
+								value="${totalIncome}"
+								pattern="#,###" />원
+						</strong>
+
 					</div>
 
+
 					<div class="summary-box">
+
 						<div>총지출</div>
-						<strong><fmt:formatNumber value="${totalExpense}" pattern="#,###"/>원</strong>
+
+						<strong>
+							<fmt:formatNumber
+								value="${totalExpense}"
+								pattern="#,###" />원
+						</strong>
+
 					</div>
 
+
 					<div class="summary-box">
+
 						<div>잔액</div>
-						<strong><fmt:formatNumber value="${remainAmount}" pattern="#,###"/>원</strong>
+
+						<strong>
+							<fmt:formatNumber
+								value="${remainAmount}"
+								pattern="#,###" />원
+						</strong>
+
 					</div>
 
 				</div>
+
 
 				<div class="chart-area">
 
 					<div class="chart-box">
-					<div>카테고리별 지출</div>
-					<canvas id="categoryChart"></canvas>
+
+						<div>카테고리별 지출</div>
+
+						<canvas id="categoryChart"></canvas>
+
 					</div>
 
 					<div class="chart-box">
-					<div>월별 지출 추이</div>
-					<canvas id="monthlyChart"></canvas>
+
+						<div>월별 지출 추이</div>
+
+						<canvas id="monthlyChart"></canvas>
+
 					</div>
 
 				</div>
 
+
 				<div class="day-detail">
 
-					<h3 id="selected-date">날짜를 선택해주세요.</h3>
+					<h3 id="selected-date">
+						날짜를 선택해주세요.
+					</h3>
 
-					<div id="day-list">달력에서 날짜를 선택하면 상세 내역이 표시됩니다.</div>
+					<div id="day-list">
+						달력에서 날짜를 선택하면 상세 내역이 표시됩니다.
+					</div>
 
 				</div>
 
@@ -354,282 +462,577 @@ textarea[name='memo'] {
 
 	</div>
 
-	<script>
 
-		let ledgerList = [
+<script>
 
-			<c:forEach var="ledger" items="${ledgers}" varStatus="status">
+/* =========================================================
+   가계부 데이터
+   ========================================================= */
 
-				{
-					ledgerId : ${ledger.ledgerId},
-					date : "${ledger.ledgerDate}",
-					type : "${ledger.type}",
-					category : "${ledger.category}",
-					amount : ${ledger.amount},
-					memo : "${ledger.memo}"
-				}
+let ledgerList = [
 
-				<c:if test="${!status.last}">
-					,
-				</c:if>
+	<c:forEach var="ledger"
+		items="${ledgers}"
+		varStatus="status">
 
-			</c:forEach>
+		{
+			ledgerId : ${ledger.ledgerId},
+			date : "${ledger.ledgerDate}",
+			type : "${ledger.type}",
+			category : "${ledger.category}",
+			amount : ${ledger.amount},
+			memo : "${ledger.memo}"
+		}
 
-		];
+		<c:if test="${!status.last}">
+			,
+		</c:if>
 
-		document.addEventListener("DOMContentLoaded", function() {
+	</c:forEach>
 
-			let calendarEl =
-				document.getElementById("calendar");
-
-			let calendar =
-				new FullCalendar.Calendar(calendarEl, {
-
-					initialView : "dayGridMonth",
-					
-					locale : "ko",
-					headerToolbar : {
-						left : "title",
-						center : "",
-						right : "today prev,next"
-					},
-					
-					
-					datesSet : function(info) {
-
-						let months = [
-							"January", "February", "March", "April",
-							"May", "June", "July", "August",
-							"September", "October", "November", "December"
-						];
-						
-						let date = info.view.currentStart;
-
-						let year = date.getFullYear();
-						let monthName = months[date.getMonth()];
-
-						$(".fc-toolbar-title").html(
-							year + "<br>" + monthName
-						);
-					},
+];
 
 
-					dateClick : function(info) {
-						
-						$("#ledgerDate").val(info.dateStr);
+/* =========================================================
+   상세내역 있는 날짜에 빨간 점 표시
+   ========================================================= */
 
-						$("#selected-date")
-							.text(info.dateStr + " 상세 내역");
+function markLedgerDates() {
 
-						let html = "";
+	for (let ledger of ledgerList) {
 
-						for (let ledger of ledgerList) {
+		let date =
+			ledger.date.substring(0, 10);
 
-							if (ledger.date === info.dateStr) {
-
-								let typeText =
-									ledger.type === "INCOME"
-									? "수입"
-									: "지출";
-
-								html +=
-									"<div class='day-item'>" +
-									"<span>" +
-									"<b>" + ledger.category + "</b>" +
-									" / " + typeText +
-									" / " + ledger.amount.toLocaleString() + "원" +
-									" / " + ledger.memo +
-									"</span>"+
-									
-									"<div class='day-btns'>" +
-									"<a href='/ledger/edit?ledgerId="
-											+ ledger.ledgerId + 
-											"' class='edit-btn'>수정</a>" +
-											
-											
-			"<form action='/ledger/delete' method='post'>" +
-				"<input type='hidden' name='ledgerId' value='"
-				+ ledger.ledgerId +
-				"'>" +
-				"<button type='submit' class='delete-btn'>삭제</button>" +
-			"</form>" +
-
-		"</div>" +
-									"</div>";
-							}
-						}
-
-						if (html === "") {
-							html = "등록된 내역이 없습니다.";
-						}
-
-						$("#day-list").html(html);
-					}
-
-				});
-
-			calendar.render();
-		});
-
-		$("input[name='type']").on("change", function() {
-
-			let type = $(this).val();
-
-			let category = $("#category");
-
-			category.empty();
-
-			category.append(
-				"<option value=''>항목 선택</option>"
+		let dayNumber =
+			document.querySelector(
+				'[data-date="' + date + '"] .fc-daygrid-day-number'
 			);
 
-			if (type === "INCOME") {
+		if (
+			dayNumber
+			&&
+			!dayNumber.querySelector(".ledger-dot")
+		) {
 
-				category.append(
-					"<option value='급여'>급여</option>"
-				);
+			dayNumber.insertAdjacentHTML(
+				"beforeend",
+				'<span class="ledger-dot"></span>'
+			);
 
-				category.append(
-					"<option value='용돈'>용돈</option>"
-				);
-
-				category.append(
-					"<option value='기타수입'>기타수입</option>"
-				);
-
-			} else if (type === "EXPENSE") {
-
-				category.append(
-					"<option value='식비'>식비</option>"
-				);
-
-				category.append(
-					"<option value='교통'>교통</option>"
-				);
-
-				category.append(
-					"<option value='쇼핑'>쇼핑</option>"
-				);
-
-				category.append(
-					"<option value='생활'>생활</option>"
-				);
-
-				category.append(
-					"<option value='의료'>의료</option>"
-				);
-
-				category.append(
-					"<option value='여가'>여가</option>"
-				);
-
-				category.append(
-					"<option value='저축'>저축</option>"
-				);
-
-				category.append(
-					"<option value='기타'>기타</option>"
-				);
-			}
-
-		});
-
-		$(".ledger-form").on("submit", function(e) {
-
-			if ($("#ledgerDate").val() === "") {
-
-				alert("날짜를 선택해주세요.");
-
-				e.preventDefault();
-			}
-
-		});
-		let categoryData = {};
-
-		let currentMonth = "2026-10";
-
-		for (let ledger of ledgerList) {
-
-			if (
-				ledger.type === "EXPENSE"
-				&& ledger.date.startsWith(currentMonth)
-			) {
-
-				if (categoryData[ledger.category] == null) {
-					categoryData[ledger.category] = 0;
-				}
-
-				categoryData[ledger.category] += ledger.amount;
-			}
 		}
 
-		new Chart(
-			document.getElementById("categoryChart"),
-			{
-				type : "doughnut",
+	}
 
-				data : {
-					labels : Object.keys(categoryData),
+}
 
-					datasets : [{
-						data : Object.values(categoryData)
-					}]
-				},
-				
 
-				options : {
-					responsive : true,
-					maintainAspectRatio : false
+/* =========================================================
+   FullCalendar
+   ========================================================= */
+
+document.addEventListener(
+	"DOMContentLoaded",
+	function() {
+
+		let calendarEl =
+			document.getElementById("calendar");
+
+
+		let calendar =
+			new FullCalendar.Calendar(
+				calendarEl,
+				{
+
+					initialView : "dayGridMonth",
+
+					locale : "ko",
+
+					headerToolbar : {
+
+						left : "title",
+
+						center : "",
+
+						right : "today prev,next"
+
+					},
+
+					datesSet :
+						function(info) {
+
+							let months = [
+								"January",
+								"February",
+								"March",
+								"April",
+								"May",
+								"June",
+								"July",
+								"August",
+								"September",
+								"October",
+								"November",
+								"December"
+							];
+
+							let date =
+								info.view.currentStart;
+
+							let year =
+								date.getFullYear();
+
+							let monthName =
+								months[
+									date.getMonth()
+								];
+
+							$(".fc-toolbar-title")
+								.html(
+									year
+									+ "<br>"
+									+ monthName
+								);
+
+
+							setTimeout(
+								function() {
+
+									markLedgerDates();
+
+								},
+								500
+							);
+
+						},
+
+
+					dateClick :
+						function(info) {
+
+							$("#ledgerDate")
+								.val(
+									info.dateStr
+								);
+
+							$("#selected-date")
+								.text(
+									info.dateStr
+									+ " 상세 내역"
+								);
+
+							let html = "";
+
+
+							for (
+								let ledger
+								of ledgerList
+							) {
+
+								if (
+									ledger.date
+									===
+									info.dateStr
+								) {
+
+									let typeText =
+										ledger.type
+										=== "INCOME"
+										? "수입"
+										: "지출";
+
+
+									html +=
+
+										"<div class='day-item'>" +
+
+											"<span>" +
+
+												"<b>"
+												+ ledger.category
+												+ "</b>" +
+
+												" / "
+												+ typeText +
+
+												" / "
+												+ ledger.amount.toLocaleString()
+												+ "원" +
+
+												" / "
+												+ ledger.memo +
+
+											"</span>" +
+
+											"<div class='day-btns'>" +
+
+												"<a href='/ledger/edit?ledgerId="
+												+ ledger.ledgerId
+												+ "' class='edit-btn'>수정</a>" +
+
+												"<form action='/ledger/delete' method='post'>" +
+
+													"<input type='hidden' "
+													+ "name='ledgerId' "
+													+ "value='"
+													+ ledger.ledgerId
+													+ "'>" +
+
+													"<button type='submit' "
+													+ "class='delete-btn'>"
+													+ "삭제"
+													+ "</button>" +
+
+												"</form>" +
+
+											"</div>" +
+
+										"</div>";
+
+								}
+
+							}
+
+
+							if (html === "") {
+
+								html =
+									"등록된 내역이 없습니다.";
+
+							}
+
+
+							$("#day-list")
+								.html(html);
+
+						}
+
 				}
-			}
+			);
+
+
+		calendar.render();
+
+
+		setTimeout(
+			function() {
+
+				markLedgerDates();
+
+			},
+			500
 		);
-		
-		let monthlyData = {};
 
-		for (let ledger of ledgerList) {
+	}
+);
 
-			if (ledger.type === "EXPENSE") {
 
-				let month = ledger.date.substring(0, 7);
+/* =========================================================
+   수입 / 지출 선택 시 카테고리 변경
+   ========================================================= */
 
-				if (monthlyData[month] == null) {
-					monthlyData[month] = 0;
-				}
+$("input[name='type']").on(
+	"change",
+	function() {
 
-				monthlyData[month] += ledger.amount;
-			}
-		}
+		let type =
+			$(this).val();
 
-		let months = Object.keys(monthlyData).sort();
+		let category =
+			$("#category");
 
-		let monthlyAmounts = [];
+		category.empty();
 
-		for (let month of months) {
-			monthlyAmounts.push(monthlyData[month]);
-		}
-
-		new Chart(
-			document.getElementById("monthlyChart"),
-			{
-				type : "line",
-
-				data : {
-					labels : months,
-
-					datasets : [{
-						label : "월별 지출",
-						data : monthlyAmounts,
-						tension : 0.3
-					}]
-				},
-
-				options : {
-					responsive : true,
-					maintainAspectRatio : false
-				}
-			}
+		category.append(
+			"<option value=''>항목 선택</option>"
 		);
-	</script>
+
+
+		if (type === "INCOME") {
+
+			category.append(
+				"<option value='급여'>급여</option>"
+			);
+
+			category.append(
+				"<option value='용돈'>용돈</option>"
+			);
+
+			category.append(
+				"<option value='기타수입'>기타수입</option>"
+			);
+
+		}
+
+		else if (type === "EXPENSE") {
+
+			category.append(
+				"<option value='식비'>식비</option>"
+			);
+
+			category.append(
+				"<option value='교통'>교통</option>"
+			);
+
+			category.append(
+				"<option value='쇼핑'>쇼핑</option>"
+			);
+
+			category.append(
+				"<option value='생활'>생활</option>"
+			);
+
+			category.append(
+				"<option value='의료'>의료</option>"
+			);
+
+			category.append(
+				"<option value='여가'>여가</option>"
+			);
+
+			category.append(
+				"<option value='저축'>저축</option>"
+			);
+
+			category.append(
+				"<option value='기타'>기타</option>"
+			);
+
+		}
+
+	}
+);
+
+
+/* =========================================================
+   날짜 선택 안 하고 저장 방지
+   ========================================================= */
+
+$(".ledger-form").on(
+	"submit",
+	function(e) {
+
+		if (
+			$("#ledgerDate").val()
+			=== ""
+		) {
+
+			alert(
+				"날짜를 선택해주세요."
+			);
+
+			e.preventDefault();
+
+		}
+
+	}
+);
+
+
+/* =========================================================
+   카테고리별 지출 차트
+   ========================================================= */
+
+let categoryData = {};
+
+let currentMonth =
+	"2026-10";
+
+
+for (let ledger of ledgerList) {
+
+	if (
+		ledger.type === "EXPENSE"
+		&&
+		ledger.date.startsWith(
+			currentMonth
+		)
+	) {
+
+		if (
+			categoryData[
+				ledger.category
+			]
+			== null
+		) {
+
+			categoryData[
+				ledger.category
+			]
+				= 0;
+
+		}
+
+		categoryData[
+			ledger.category
+		]
+			+= ledger.amount;
+
+	}
+
+}
+
+
+new Chart(
+
+	document.getElementById(
+		"categoryChart"
+	),
+
+	{
+
+		type : "doughnut",
+
+		data : {
+
+			labels :
+				Object.keys(
+					categoryData
+				),
+
+			datasets : [
+
+				{
+
+					data :
+						Object.values(
+							categoryData
+						)
+
+				}
+
+			]
+
+		},
+
+		options : {
+
+			responsive : true,
+
+			maintainAspectRatio : false
+
+		}
+
+	}
+
+);
+
+
+/* =========================================================
+   월별 지출 추이
+   ========================================================= */
+
+let monthlyData = {};
+
+
+for (let ledger of ledgerList) {
+
+	if (
+		ledger.type
+		=== "EXPENSE"
+	) {
+
+		let month =
+			ledger.date.substring(
+				0,
+				7
+			);
+
+		if (
+			monthlyData[
+				month
+			]
+			== null
+		) {
+
+			monthlyData[
+				month
+			]
+				= 0;
+
+		}
+
+		monthlyData[
+			month
+		]
+			+= ledger.amount;
+
+	}
+
+}
+
+
+let months =
+	Object.keys(
+		monthlyData
+	).sort();
+
+
+let monthlyAmounts = [];
+
+
+for (let month of months) {
+
+	monthlyAmounts.push(
+		monthlyData[
+			month
+		]
+	);
+
+}
+
+
+new Chart(
+
+	document.getElementById(
+		"monthlyChart"
+	),
+
+	{
+
+		type : "line",
+
+		data : {
+
+			labels :
+				months,
+
+			datasets : [
+
+				{
+
+					label :
+						"월별 지출",
+
+					data :
+						monthlyAmounts,
+
+					tension :
+						0.3
+
+				}
+
+			]
+
+		},
+
+		options : {
+
+			responsive : true,
+
+			maintainAspectRatio : false
+
+		}
+
+	}
+
+);
+
+</script>
+
+
 <jsp:include page="/WEB-INF/views/common/footer.jsp" />
+
+
 </body>
 </html>
