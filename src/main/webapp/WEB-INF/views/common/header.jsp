@@ -215,7 +215,7 @@
 
 	<div class="admin-dropdown">
 		<a href="/admin/dashboard">대시보드</a>
-		<a href="/admin/member">회원관리</a>
+		<a href="/admin/members">회원관리</a>
 	</div>
 
 </div>
