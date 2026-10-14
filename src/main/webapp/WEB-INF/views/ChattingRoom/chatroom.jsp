@@ -383,16 +383,17 @@
 		</div>
 	
 		<script>
-		
-		$("#hamburgerbtn").on("click", function() {
+		$("#hamburgerbtn").on("click", function() {	// 햄버거버튼 눌렀을때 active로 보이게한다
 			$("#memberList").toggleClass("active");
 		    $(".searchMessage").toggleClass("active");
 		});
 		
-		$("#exitbtn").on("click", async function(){		// 채팅나가기 버튼 클릭	(async) -> await사용
-			await stompClient.publish({				// await는 publish작업 끝날때까지 기다리기
-		        destination : "/app/chat",
-		        body : JSON.stringify({
+		// 채팅 나가기 버튼
+		$("#exitbtn").on("click", async function(){		// async >> 함수 안에서 await 쓰기 위함
+			// await는 publish작업 끝날때까지 기다리기
+			await stompClient.publish({		// STOMP 메시지를 서버에 보냄
+		        destination : "/app/chat",	// Config의 /app 창구로 Controller에 들어감
+		        body : JSON.stringify({		// 보낼 내용을 JSON 문자열로 바꿈
 		            partyId : partyId,
 		            memberId : "${loginId}",
 		            content : loginNickname+"님이 퇴장했습니다.",
@@ -403,42 +404,55 @@
 			await stompClient.deactivate();				//stomp/websocket 연결 종료
 			location.href="/party/detail?partyId=" + partyId;	//파티페이지로 이동
 		});
+		
+		
+		
+		// 검색창의 Enter키로 검색 기능
 		$("#searchText").on("keydown", function (e) {		// enter키로 검색가능
 		    if (e.key === "Enter") {
-		        e.preventDefault();
+		        e.preventDefault();		// Enter의 기본 동작(폼 제출 등)을 막음
 		        $("#searchbtn").click();
 		    }
 		});
 		
 		
+		// 검색버튼 클릭시 함수 실행
 		$("#searchbtn").on("click", function(){
-			let searchText = $("#searchText").val().trim();		// 검색버튼 눌렀을때 검색내용공백 제거하고
+			let searchText = $("#searchText").val().trim();		// 검색버튼 눌렀을때 검색내용 공백 제거
+			
 			if(searchText == ""){
-				$("#allbtn").click();// 공백제거한 문자가 빈칸이면 전체보기	
+				$("#allbtn").click();// 공백제거한 검색 내용이 빈칸이면 전체보기 버튼 클릭
 				return;
 			}
 			$("#chat .enterMessage, #chat .leaveMessage").hide();	// 입퇴장 메세지는 검색 중 숨김
-			$("#chat .myMessage, #chat .otherMessage").each(function() {	// 모든 메세지 각각 검사하면서
-																			// 검색내용이랑 비교
-		        let content = $(this).text();
+			// 모든 메세지 각각 검사하면서 검색내용이랑 비교
+			$("#chat .myMessage, #chat .otherMessage").each(function() {												
+		        let content = $(this).text();		// 돌고있는 메시지를 변수에 저장
 		        if(content.includes(searchText)) {
-		            $(this).show();											// 찾으면 show
+		            $(this).show();					// 찾으면 show
 		        } else {
-		            $(this).hide();											// 못찾으면 hide
+		            $(this).hide();					// 못찾으면 hide
 		        }
 		    });
 		});
 		
+		// 전체보기 버튼 클릭시 함수 실행
 		$("#allbtn").on("click", function(){
-			$("#chat .myMessage, #chat .otherMessage, #chat .enterMessage, #chat .leaveMessage").show();	// 입퇴장 포함 전체 다시 보기
+			// 입퇴장 포함 전체 다시 보기
+			$("#chat .myMessage, #chat .otherMessage, #chat .enterMessage, #chat .leaveMessage").show();
 			$("#searchText").val("");		// 검색창 비우기
 			$("#chat").scrollTop($("#chat")[0].scrollHeight);
+			// $("#chat")[0]은 jQuery 객체에서 순수 HTML 요소를 꺼냄.
+			// scrollHeight는 내용 전체 높이, 이 값을 scrollTop에 넣으면 맨 아래로 이동.
 		})
 		</script>
 
+
+
 		<!-- 채팅 내용 -->
 		<div class="chatBody" id="chat">
-			<c:forEach var="chat" items="${chatList}">
+		<!-- 채팅내역 반복문 돌면서 타입별로 보여줌 -->
+			<c:forEach var="chat" items="${chatList}"> 
 				<c:choose>
 					<c:when test="${chat.messageType == 'ENTER'}">
 						<div class="enterMessage">
@@ -450,9 +464,9 @@
 							<c:out value="${chat.content}" />
 						</div>
 					</c:when>
-
+					
+					<!-- 내 채팅 -->
 					<c:when test="${chat.memberId == loginId}">
-						<!-- 내 채팅 -->
 						<div class="myMessage">
 							<div>
 								<c:out value="${chat.content}" />
@@ -461,12 +475,10 @@
 								<fmt:formatDate value="${chat.createdAt}" pattern="a h:mm" />
 							</div>
 						</div>
-						<!-- fmt:formatDate >> Timestamp를 원하는 모양의 문자열로 변경 a(오전/오후) h(12시간제 시) mm(분) -->
 					</c:when>
-
+					<!-- 다른 사람 채팅 -->
 					<c:otherwise>
 						<div class="otherMessage">
-							<!-- 다른 사람 채팅 -->
 							<div>
 								<c:out value="${chat.username}" />
 							</div>
@@ -481,6 +493,8 @@
 				</c:choose>
 			</c:forEach>
 		</div>
+		
+		
 		<!-- 메시지 입력 -->
 		<div class="chatBottom">
 			<textarea id="message" placeholder="메시지 입력"></textarea>
@@ -489,35 +503,67 @@
 	</div>
 	<script>
 	
-	$("#message").on("keydown",function(e){		//메시지 두번전송문제 해결
-		if(e.key == "Enter" && !e.shiftKey && !e.isComposing){		// 엔터키 누르면 전송버튼 클릭됨
-			e.preventDefault();				// 폼 안에 있을 경우 폼이 멋대로 제출되는 것을 방지
+	// 메세지 입력창에서 키를 눌렀을 때 실행
+	$("#message").on("keydown",function(e){		// 메시지 두번전송문제 해결
+		if(e.key == "Enter" && !e.shiftKey && !e.isComposing){
+			// Enter를 눌렀으면서 shift를 누르지 않았고 한글 조합중이 아닐 경우
+			// isComposing이 true인 첫 번째를 걸러서 한 번만 보냄
+			
+			e.preventDefault();				// textarea에 줄바꿈이 들어가는 걸 막음								
 			$("#sendbtn").click();
 		}
 	})
 	
 	</script>
 
+
+
+
+
 	<script>
 	
 		/* const partyId = 1; // 임시 테스트용 (나중에 DB에서 가져옴) */
 		$("#chat").scrollTop($("#chat")[0].scrollHeight);
-		const partyId = ${partyId};
-		const loginId = "${loginId}";
-		const loginNickname = "${loginNickname}";
-		const needEnter = ${needEnter};
 		
-		const stompClient = new StompJs.Client({
+		const partyId = ${partyId};					// int - 따옴표 없음
+		const loginId = "${loginId}";				// String - 따옴표 필요
+		const loginNickname = "${loginNickname}";	// String
+		
+		const needEnter = ${needEnter};				// true/false (따옴표 필요 없음)
+		// 입장 메시지를 보내야 하는지" 여부.
+		// 처음 들어왔거나 나갔다가 다시 들어온 경우만 true이고, 새로고침이면 false라서 입장 메시지가 중복으로 안 나감
+		
+		
+		// 연결: /ws  
+		// 아직 접속하지 않음
+		const stompClient = new StompJs.Client({	// 연결 담당 객체 생성
 			brokerURL : "ws://" + location.host + "/ws"
+			//           ws://localhost:8080/ws
 		});
+		// 연결 시작
+		stompClient.activate(); // 연결 성공시 onConnect함수 실행
 		
-		// WebSocket 연결 성공
-		stompClient.onConnect = function() {
-			console.log("WebSocket 연결 성공!");
+		
+		// WebSocket 연결 성공시 실행
+		stompClient.onConnect = function() {	// 함수 안에 구독과 입장 메시지 전송이 있는 이유
+			console.log("WebSocket 연결 성공!");	// -> 연결이 돼야 구독과 전송도 가능하기 때문
 			
 			// 채팅방 구독
 				stompClient.subscribe("/topic/chat/" + partyId, function(message) { //message는 STOMP 메시지 객체
-					let data = JSON.parse(message.body);				//message.body는 실제 데이터내용(body)
+					
+					let data = JSON.parse(message.body);	//message.body는 실제 데이터내용(body)
+					// 문자열을 객체로 바꾸면 data.content, data.memberId처럼 쓸 수 있음
+					
+					
+					// esc대신 c:out을 쓰면 안되는 이유
+					// 실행되는 곳과 시점이 달라서
+					//[서버]  JSP가 실행됨  →  HTML 완성  →  브라우저로 전송  →  끝 (JSP는 여기서 종료)
+					//[브라우저]  HTML 표시  →  이후 WebSocket으로 새 메시지가 올 때마다 JS가 실행됨
+					
+					// <c:out>, ${...}는 서버가 페이지를 만드는 그 한 순간에만 처리
+					
+					// WebSocket 메시지는 페이지가 뜬 뒤에 브라우저에 도착해서
+					// 이 시점에는 서버의 JSP가 이미 끝났으니 c:out이 실행될 수가 없다
 					
 					if(data.messageType == "ENTER") {		// 메세지타입 입장일때
 					    $("#chat").append(
@@ -539,16 +585,25 @@
 					            "<div>" + formatTime(data.createdAt) + "</div>" + "</div>"
 					    );
 					}
-					$(window).on("load", function(){			// 전체 채팅의 높이를 가져와서 스크롤위치 변경
-						$("#chat").scrollTop($("#chat")[0].scrollHeight);
+					
+					$(window).on("load", function(){	// load는 페이지 로딩이 끝날 때 한 번만 일어나는 이벤트		
+						$("#chat").scrollTop($("#chat")[0].scrollHeight);	// 전체 채팅의 높이를 가져와서 스크롤위치 변경
 					});
 					
 			});	
+			
 				function esc(s) { return $("<div>").text(s).html(); }
+				// 메시지 안의 <, > 같은 문자를 안전한 글자로 바꿈.
+				// <div>를 임시로 만들어서 .text(s)로 글자로 넣고 .html()로 꺼내면 <script>가 &lt;script&gt;로 변환
+				// <c:out>을 쓰는 것과 같은 역할
+				
+				
+				
 				function formatTime(t) {		// 실시간 메시지 시간표시
-				    const d = new Date(t);
-				    if (isNaN(d)) return t;		// 변환 실패시 거르기
+				    const d = new Date(t);		// 시간 값 변수에 저장
+				    if (isNaN(d)) return t;		// 변환에 실패했는지 검사해서, 실패하면 원래 값을 그대로 돌려줌
 				    return d.toLocaleTimeString("ko-KR", { hour: "numeric", minute: "2-digit" });
+				    // toLocaleTimeString은 그 객체의 시간 부분만 사용자 지역 형식의 문자열로 만들어주는 메서드
 				}
 			
 			
@@ -566,28 +621,11 @@
 				}
 		};
 		
-	//	퇴장시 Websocket 연결 끊기기 전에 퇴장메세지
-		/* stompClient.onDisconnect = function() {
-		    console.log("채팅방 나감!");
-		    stompClient.publish({
-		        destination : "/app/chat",
-		        body : JSON.stringify({
-		            partyId : partyId,
-		            memberId : "tester",
-		            content : "tester님이 퇴장했습니다.",
-		            messageType : "LEAVE"
-		        })
-		    });
-
-		}; */
-		
 		// WebSocket 오류
 		stompClient.onWebSocketError = function(error) {
 			console.log("WebSocket 연결 실패:", error);
 		};
 		
-		// 연결 시작
-		stompClient.activate();
 		// 전송 버튼 클릭
 		$("#sendbtn").on("click", function() {
 			
@@ -596,12 +634,10 @@
 				return;
 			}
 			
-/* 			console.log("전송 데이터:", {		테스트용
-			    partyId : partyId,
-			    memberId : "tester",
-			    content : message,
-			    messageType : "TEXT"
-			}); */
+			
+			
+			// 일반 메시지를 /app/chat으로 보내고, 입력창을 비운다
+			// 보낸 뒤 내 화면에 바로 말풍선을 붙이지 않고, 서버가 방송해서 돌아온 메시지가 subscribe 함수에서 그려진다.
 			
 			stompClient.publish({			//채팅 전송시 dto로 저장되면서 @MessageMapping매핑
 				destination : "/app/chat",
