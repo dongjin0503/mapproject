@@ -191,6 +191,6 @@ width: 160px;
 		</div>
 		<p class="error-message">${message}</p>
 	</form>
-
+<jsp:include page="/WEB-INF/views/common/footer.jsp" />
 </body>
 </html>

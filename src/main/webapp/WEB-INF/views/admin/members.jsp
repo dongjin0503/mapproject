@@ -124,6 +124,6 @@ a { text-decoration:none; color:inherit; }
 			alert("관리자 계정은 탈퇴시킬 수 없습니다.");
 		}
 	</script>
-
+<jsp:include page="/WEB-INF/views/common/footer.jsp" />
 </body>
 </html>

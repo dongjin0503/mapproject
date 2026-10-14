@@ -292,5 +292,6 @@ margin-bottom : 10px;
       row.remove();
    });
 </script>
+<jsp:include page="/WEB-INF/views/common/footer.jsp" />
 </body>
 </html>
