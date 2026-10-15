@@ -112,12 +112,48 @@
 }
 
 .member {
-	display: inline-block;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
 	padding: 10px 15px;
 	margin: 0 8px 8px 0;
 	background-color: #f2f2f2;
 	border-radius: 20px;
 	font-size: 14px;
+}
+
+/* 모임장 표시 왕관 */
+.host-crown {
+	font-size: 12px;
+	color: #D97706;      /* 진한 금색 */
+}
+
+/* 멤버 내보내기: 헤더의 로그아웃과 같은 아이콘 */
+.kick-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 22px;
+	height: 22px;
+	padding: 0;
+	border: none;
+	border-radius: 50%;
+	background: transparent;
+	cursor: pointer;
+}
+
+.kick-btn i {
+	font-size: 13px;
+	color: #4b5563;      /* 헤더 아이콘과 같은 회색 */
+}
+
+.kick-btn:hover i {
+	color: #111827;      /* 헤더 아이콘과 같은 hover 색 */
+}
+
+.kick-btn:focus-visible {
+	outline: 2px solid #111827;
+	outline-offset: 1px;
 }
 
 .party-conditions {
@@ -292,6 +328,11 @@
 
 				<div class="member">
 
+					<%-- 모임장이면 이름 앞에 작은 왕관 --%>
+					<C:if test="${member.memberId == party.hostId}">
+						<i class="fa-solid fa-crown host-crown" title="모임장" aria-label="모임장"></i>
+					</C:if>
+
 					${member.memberName}
 
 					<C:if
@@ -303,8 +344,12 @@
 							<input type="hidden" name="partyId" value="${party.partyId}">
 							<input type="hidden" name="memberId" value="${member.memberId}">
 
-							<button type="submit"
-								onclick="return confirm('이 멤버를 내보내시겠습니까?');">내보내기</button>
+							<button type="submit" class="kick-btn"
+								title="내보내기"
+								aria-label="${member.memberName} 내보내기"
+								onclick="return confirm('${member.memberName}님을 모임에서 내보내시겠습니까?');">
+								<i class="fa-solid fa-right-from-bracket"></i>
+							</button>
 
 						</form>
 
