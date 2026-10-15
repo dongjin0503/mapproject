@@ -35,30 +35,123 @@
 	line-height: 1.3;
 }
 
-/* 날짜와 빨간 점이 줄바꿈되지 않도록 */
-.fc-daygrid-day-number {
+/* =========================================================
+   달력 날짜 칸
+   (가운데 정렬 + 수입/지출 금액 + 선택한 날짜 표시)
+   ========================================================= */
+
+/* 날짜 칸 높이 (모든 줄 같은 높이) */
+.fc .fc-daygrid-day-frame {
+	min-height: 72px;
+}
+
+/* 이 프로젝트는 달력 일정(event) 기능을 안 쓰므로,
+   FullCalendar가 일정용으로 비워 두는 빈자리를 없앤다.
+   (그대로 두면 금액이 두 줄인 날이 있는 줄만 길어짐) */
+.fc .fc-daygrid-day-events {
+	min-height: 0 !important;
+	margin: 0 !important;
+}
+
+/* 날짜 숫자 가운데 정렬 (FullCalendar 기본값은 오른쪽 정렬) */
+.fc .fc-daygrid-day-top {
+	justify-content: center;
+	flex-direction: row;
+}
+
+.fc .fc-daygrid-day-number {
+	white-space: nowrap;
+	color: #1F2937;
+	text-decoration: none;
+	font-size: 13px;
+	padding: 4px 6px 2px;
+	border-radius: 4px;
+}
+
+/* 오늘: 기본 노란 배경 대신 회색 배지 */
+.fc .fc-daygrid-day.fc-day-today {
+	background: transparent;
+}
+
+.fc .fc-day-today .fc-daygrid-day-number {
+	margin-top: 3px;
+	padding: 1px 6px;
+	background-color: #6B7280;
+	color: white;
+	font-weight: bold;
+}
+
+/* 날짜 칸을 누를 수 있다는 표시 */
+.fc .fc-daygrid-day {
+	cursor: pointer;
+}
+
+.fc .fc-daygrid-day:hover {
+	background-color: #F9FAFB;
+}
+
+/* 선택한 날짜: 연한 배경 + 진한 테두리 */
+.fc .fc-daygrid-day.selected-day {
+	background-color: #F9FAFB;
+	box-shadow: inset 0 0 0 2px #111827;
+}
+
+.fc .fc-daygrid-day.selected-day .fc-daygrid-day-number {
+	font-weight: bold;
+	color: #111827;
+}
+
+.fc .fc-daygrid-day.fc-day-today.selected-day .fc-daygrid-day-number {
+	color: white;
+}
+
+/* 날짜 칸 안의 수입/지출 금액 */
+.ledger-amounts {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1px;
+	font-size: 10.5px;
+	line-height: 1.3;
+	font-weight: bold;
+	font-variant-numeric: tabular-nums;
+}
+
+.amount-income {
+	color: #1D4ED8;
+}
+
+.amount-expense {
+	color: #C2410C;
+}
+
+/* 달력 아래 범례 */
+.calendar-legend {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px 14px;
+	justify-content: center;
+	font-size: 12px;
+	color: #6B7280;
+	margin: -5px 0 15px;
+}
+
+.calendar-legend span {
 	white-space: nowrap;
 }
 
-/* 상세내역이 있는 날짜 표시 */
-.ledger-dot {
-	display: inline-block;
-	width: 7px;
-	height: 7px;
-	background-color: red;
-	border-radius: 50%;
-	margin-left: 5px;
-	vertical-align: middle;
+.calendar-legend b {
+	font-weight: bold;
 }
 
 .ledger-wrap {
 	display: flex;
 	gap: 20px;
-	align-items: flex-start;
+	align-items: stretch;   /* 왼쪽·오른쪽 높이를 같게 */
 }
 
 .ledger-form {
-	width: 400px;
+	width: 460px;
 	padding: 15px;
 	border: 1px solid #ccc;
 	border-radius: 8px;
@@ -119,6 +212,8 @@ textarea[name='memo'] {
 .right-area {
 	flex: 1;
 	min-width: 0;
+	display: flex;
+	flex-direction: column;
 }
 
 .summary {
@@ -213,6 +308,7 @@ textarea[name='memo'] {
 }
 
 .day-detail {
+	flex: 1;                /* 남는 높이를 채워서 왼쪽 박스 아래 끝과 맞춤 */
 	margin-top: 15px;
 	min-height: 244px;
 	padding: 20px;
@@ -277,6 +373,12 @@ textarea[name='memo'] {
 				method="post">
 
 				<div id="calendar"></div>
+
+				<div class="calendar-legend">
+					<span><b class="amount-income">+ 파란 금액</b> 수입</span>
+					<span><b class="amount-expense">− 주황 금액</b> 지출</span>
+					<span>1천 = 1,000원 · 1만 = 10,000원</span>
+				</div>
 
 				<input type="hidden"
 					name="ledgerDateText"
@@ -494,37 +596,68 @@ let ledgerList = [
 
 
 /* =========================================================
-   상세내역 있는 날짜에 빨간 점 표시
+   날짜별 수입 / 지출 합계 만들기
+   예) dailyTotals["2026-10-14"] = { income: 30000, expense: 15500 }
    ========================================================= */
 
-function markLedgerDates() {
+let dailyTotals = {};
 
-	for (let ledger of ledgerList) {
+for (let ledger of ledgerList) {
 
-		let date =
-			ledger.date.substring(0, 10);
+	let date = ledger.date.substring(0, 10);
 
-		let dayNumber =
-			document.querySelector(
-				'[data-date="' + date + '"] .fc-daygrid-day-number'
-			);
-
-		if (
-			dayNumber
-			&&
-			!dayNumber.querySelector(".ledger-dot")
-		) {
-
-			dayNumber.insertAdjacentHTML(
-				"beforeend",
-				'<span class="ledger-dot"></span>'
-			);
-
-		}
-
+	if (dailyTotals[date] == null) {
+		dailyTotals[date] = { income : 0, expense : 0 };
 	}
 
+	if (ledger.type === "INCOME") {
+		dailyTotals[date].income += ledger.amount;
+	} else {
+		dailyTotals[date].expense += ledger.amount;
+	}
 }
+
+
+/* 달력 칸이 좁아서 금액을 한글 단위로 짧게 표시
+   예) 500 → "500",  7000 → "7천",  1500 → "1.5천",
+       15500 → "1.6만",  2500000 → "250만" */
+function shortAmount(amount) {
+
+	// 1만 원 이상: 만 단위 (소수점 첫째 자리까지)
+	if (amount >= 10000) {
+		let man = Math.round(amount / 1000) / 10;
+		return man.toLocaleString() + "만";
+	}
+
+	// 1천 원 이상: 천 단위 (소수점 첫째 자리까지)
+	if (amount >= 1000) {
+		let cheon = Math.round(amount / 100) / 10;
+
+		// 9,960원처럼 반올림하면 10천이 되는 경우는 1만으로
+		if (cheon >= 10) {
+			return "1만";
+		}
+
+		return cheon + "천";
+	}
+
+	// 1천 원 미만: 그대로
+	return String(amount);
+}
+
+
+/* 날짜 → "2026-10-14" 모양의 글자 */
+function toDateKey(date) {
+
+	let month = String(date.getMonth() + 1).padStart(2, "0");
+	let day = String(date.getDate()).padStart(2, "0");
+
+	return date.getFullYear() + "-" + month + "-" + day;
+}
+
+
+/* 지금 선택한 날짜 (달을 넘겼다 돌아와도 표시를 유지하려고 기억) */
+let selectedDate = null;
 
 
 /* =========================================================
@@ -594,21 +727,73 @@ document.addEventListener(
 									+ monthName
 								);
 
+						},
 
-							setTimeout(
-								function() {
 
-									markLedgerDates();
+					/* 날짜를 "14일" 대신 "14"로 표시 */
+					dayCellContent :
+						function(arg) {
+							return String(arg.date.getDate());
+						},
 
-								},
-								500
-							);
 
+					/* 날짜 칸이 화면에 그려질 때마다 실행:
+					   그날의 수입/지출 금액을 칸 안에 넣는다 */
+					dayCellDidMount :
+						function(arg) {
+
+							// 이전 달 / 다음 달 날짜 칸은 건너뜀
+							if (arg.isOther) {
+								return;
+							}
+
+							let key = toDateKey(arg.date);
+
+							// 선택해 둔 날짜면 다시 표시
+							if (key === selectedDate) {
+								arg.el.classList.add("selected-day");
+							}
+
+							let totals = dailyTotals[key];
+
+							if (totals == null) {
+								return;
+							}
+
+							let html = "";
+
+							if (totals.income > 0) {
+								html += "<span class='amount-income' title='수입 "
+									+ totals.income.toLocaleString() + "원'>+"
+									+ shortAmount(totals.income) + "</span>";
+							}
+
+							if (totals.expense > 0) {
+								html += "<span class='amount-expense' title='지출 "
+									+ totals.expense.toLocaleString() + "원'>−"
+									+ shortAmount(totals.expense) + "</span>";
+							}
+
+							arg.el
+								.querySelector(".fc-daygrid-day-top")
+								.insertAdjacentHTML(
+									"afterend",
+									"<div class='ledger-amounts'>" + html + "</div>"
+								);
 						},
 
 
 					dateClick :
 						function(info) {
+
+							// 선택한 날짜 칸 표시: 전에 선택한 칸은 지우고 새 칸에 표시
+							selectedDate = info.dateStr;
+
+							$(".fc-daygrid-day.selected-day")
+								.removeClass("selected-day");
+
+							$(info.dayEl)
+								.addClass("selected-day");
 
 							$("#ledgerDate")
 								.val(
@@ -712,16 +897,6 @@ document.addEventListener(
 
 
 		calendar.render();
-
-
-		setTimeout(
-			function() {
-
-				markLedgerDates();
-
-			},
-			500
-		);
 
 	}
 );
