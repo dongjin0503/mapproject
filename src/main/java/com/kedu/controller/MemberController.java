@@ -155,13 +155,13 @@ public class MemberController {
 	}
 	
 	
-	// 1단계: 정보 확인 → 가입 이메일로 인증번호 발송
+	// 1단계: 아이디 + 가입한 이메일 확인 → 그 이메일로 인증번호 발송
 	@ResponseBody
 	@RequestMapping("/ajax/sendcode")
-	public String sendCode(String id, String name, String phone, HttpSession session) {
+	public String sendCode(String id, String email, HttpSession session) {
 
-		// 1) 정보가 맞는지
-		if (!dao.matchmember(id, name, phone)) {
+		// 1) 아이디와 가입한 이메일이 맞는지
+		if (id == null || email == null || !dao.matchemail(id.trim(), email.trim())) {
 			return "nomatch";
 		}
 
@@ -175,8 +175,9 @@ public class MemberController {
 		int num = (int) (Math.random() * 900000) + 100000;
 		String code = String.valueOf(num);
 
-		// 4) 가입할 때 저장한 이메일로 발송
-		String email = dao.selectEmail(id);
+		// 4) 가입할 때 저장한 이메일(DB 값)로 발송 - 화면에서 받은 값은 쓰지 않음
+		id = id.trim();
+		email = dao.selectEmail(id);
 		try {
 			MailUtil.send(email, "[짠내맵] 비밀번호 찾기 인증번호", "인증번호는 [" + code + "] 입니다. 3분 안에 입력해주세요.");
 		} catch (Exception e) {

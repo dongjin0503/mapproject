@@ -174,18 +174,14 @@ button:disabled {
 	<div class = "container">
 	<div id ="step1"> 
 	<div class ="title">  비밀번호 찾기 </div>
-	<div class ="desc"> 비밀번호 찾기를 위한 정보를 입력해주세요 </div>
+	<div class ="desc"> 아이디와 가입한 이메일을 입력하면 인증번호를 보내드려요 </div>
 	<fieldset>
 	<legend> ID </legend>
 	<input id ="id" type = "text" placeholder ="아이디를 입력해주세요">
 	</fieldset>
 	<fieldset>
-	<legend> 이름 </legend>
-	<input id ="name" type = "text" placeholder = "이름을 입력해주세요">
-	</fieldset>
-	<fieldset>
-	<legend> 연락처</legend>
-	<input id = "phone" type ="text" placeholder ="연락처를 입력해주세요 ">
+	<legend> 가입한 이메일 </legend>
+	<input id ="email" type = "text" placeholder = "가입할 때 등록한 이메일을 입력해주세요">
 	</fieldset>
 	<div class ="msg" id ="msg1"></div>
 	<button id="btncheck" type = "button"> 비밀번호 찾기 </button>
@@ -273,11 +269,14 @@ button:disabled {
 	// 인증번호 발송 (처음 + 다시 받기 공용)
 	function sendCode() {
 		let id = $("#id").val().trim();
-		let name = $("#name").val().trim();
-		let phone = $("#phone").val().trim();
+		let email = $("#email").val().trim();
 		
-		if (id == "" || name == "" || phone == "") {
-			$("#msg1").addClass("error").text("모든 항목을 입력해주세요.");
+		if (id == "" || email == "") {
+			$("#msg1").addClass("error").text("아이디와 이메일을 모두 입력해주세요.");
+			return;
+		}
+		if (!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)) {
+			$("#msg1").addClass("error").text("이메일 형식이 올바르지 않습니다.");
 			return;
 		}
 		$("#msg1").removeClass("error").text("인증번호를 보내는 중입니다...");
@@ -285,11 +284,11 @@ button:disabled {
 		$.ajax({
 			url : "/member/ajax/sendcode",
 			type : "post",
-			data : {id : id, name : name, phone : phone},
+			data : {id : id, email : email},
 			dataType : "text"
 		}).done(function(resp) {
 			if (resp == "nomatch") {
-				showError("일치하는 회원 정보가 없습니다");
+				showError("아이디와 가입한 이메일이 일치하지 않습니다");
 			} else if (resp == "wait") {
 				showError("30초 후에 다시 시도해주세요.");
 			} else if (resp == "fail") {

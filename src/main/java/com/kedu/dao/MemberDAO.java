@@ -84,6 +84,14 @@ public class MemberDAO {
 		
 	}
 	
+	// 아이디 + 가입한 이메일이 일치하는지 (이메일은 대소문자 구분 없이 비교)
+	public boolean matchemail(String id, String email) {
+		String sql = "select count(*) from member where member_id = ? and lower(email) = lower(?)";
+		int result = jdbc.queryForObject(sql, Integer.class, id, email);
+
+		return result > 0;
+	}
+
 	public int updatepw(String id , String pw) {
 		String sql = "update member set password = ? where member_id = ?";
 		return jdbc.update(sql  ,pw , id);
