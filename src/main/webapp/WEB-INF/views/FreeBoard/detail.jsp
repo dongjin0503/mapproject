@@ -568,7 +568,7 @@ hr {
 <body>
 <%@ include file="/WEB-INF/views/common/header.jsp" %>
 	<div class="container">
-		<form action="/FreeBoard/updateContent" method="post" enctype="multipart/form-data">
+		<form id="updateForm" action="/FreeBoard/updateContent" method="post" enctype="multipart/form-data">
 			<input type="hidden" name="postId" value="${post.postId}">
 			<input type="hidden" name="cpage" value="${cpage}">
 			<div class="header">
@@ -638,6 +638,10 @@ hr {
 			<!-- 로그인 아이디랑 작성자 아이디 같으면 수정할때 dto에 저장되게 name 추가 -->
 				<c:if test="${post.memberId == loginId}">
 					<textarea id="textArea" name="content" style="display: none;"><c:out value="${post.content}" /></textarea>
+					<div id="updateContentByteCount"
+     style="display: none; text-align: right; margin-top: 8px; font-size: 13px; color: #8995a9;">
+    0 / 4000 bytes
+</div>
 				</c:if>
 			</div>
 			<c:if test="${not empty fileList or post.memberId == loginId}">
@@ -704,64 +708,139 @@ hr {
 						<input id="deletebtn" type="button" value="삭제">
 					</div>
 					<script>
-					// 원래 값 저장. 수정 중 취소했을때 되돌리기 위해 백업용(const 4가지)
-						const originTitle = document.getElementById("titleText").value;
-						const originContent = document.getElementById("textArea").value;
-						// 현재 선택된 카테고리 (세 가지 외의 값이면 null)
-						const checkedCategory = document.querySelector('input[name="contentCategory"]:checked');
-						const originCategory = checkedCategory ? checkedCategory.value: null;
+					
+					// 원래 값 저장. 수정 중 취소했을 때 되돌리기 위한 백업
+					let originTitle = document.getElementById("titleText").value;
+					let originContent = document.getElementById("textArea").value;
+					let originCategory = document.querySelector(
+					    'input[name="contentCategory"]:checked'
+					)?.value;
 
-						//수정버튼
-						document.getElementById("updatebtn").onclick = function() {
-							document.getElementById("titleText").readOnly = false;
-							document.getElementById("viewContent").style.display = "none";
-							$('#textArea').summernote({ height: 400, lang: 'ko-KR' });
-							document.getElementById("updateCategory").style.display = "flex";
-							document.getElementById("deletebtn").style.display = "none";
-							document.getElementById("updatebtn").style.display = "none";
-							document.getElementById("updateOkbtn").style.display = "inline-block";
-							document.getElementById("updateCancelbtn").style.display = "inline-block";
-							document.getElementById("fileBox").style.display = "block";
-							document.getElementById("updateFile").style.display = "block";
-							//클래스가 fileDelChk인 요소가 여러 개일 수 있어서 하나씩 돌면서 보이게 하는 반복문
-							document.querySelectorAll(".fileDelChk").forEach(function(e) { e.style.display = "inline"; });
-						};
+					let isEditing = false;
 
-						document.getElementById("updateCancelbtn").onclick = function() {
-							document.getElementById("titleText").readOnly = true;
-							document.getElementById("updateCategory").style.display = "none";
-							document.getElementById("deletebtn").style.display = "inline-block";
-							document.getElementById("updatebtn").style.display = "inline-block";
-							document.getElementById("updateOkbtn").style.display = "none";
-							document.getElementById("updateCancelbtn").style.display = "none";
-							document.getElementById("titleText").value = originTitle;
-							$('#textArea').summernote('destroy');
-							$('#textArea').val(originContent).hide();
-							document.getElementById("viewContent").style.display = "block";
-							document.getElementById("updateFile").style.display = "none";
-							resetFileInputs();	//새로 고른 파일 칸 비우기
-							if (!hasFiles) document.getElementById("fileBox").style.display = "none";
-							//기존 첨부파일이 없던 글이면 파일 영역 전체를 다시 숨김
-							document.querySelectorAll(".fileDelChk").forEach(function(e) {
-							    e.style.display = "none";	//삭제 체크박스를 숨기면서 체크도 해제
-							    e.querySelector("input").checked = false;
-							});
-							
-							// 바꿨던 카테고리도 원래대로
-							if (originCategory !== null) {
-								document.querySelector('input[name="contentCategory"][value="'
-												+ originCategory + '"]').checked = true;
-							}
-						};
-						
-						//게시글 삭제 버튼
-						document.getElementById("deletebtn").onclick = function() {
-							if (confirm("정말 삭제하시겠습니까?")) {	//확인 누르면true
-							    const f = document.getElementById("deleteForm");
-							    f.action = "/FreeBoard/deleteContent";	//삭제 주소로 지정하고 submit으로 직접 전송
-							    f.submit();
-							}
-						};
+					const maxContentBytes = 4000;
+					const $textArea = $('#textArea');
+					const $byteCount = $('#updateContentByteCount');
+
+					// 본문 HTML의 UTF-8 바이트 수 계산
+					function getUpdateContentBytes() {
+					    const content = $textArea.summernote('code');
+					    return new TextEncoder().encode(content).length;
+					}
+
+					// 바이트 수 표시
+					function updateContentByteCount(content) {
+					    const bytes = new TextEncoder().encode(content).length;
+
+					    $byteCount.text(bytes + ' / ' + maxContentBytes + ' bytes');
+					    $byteCount.css('color', bytes > maxContentBytes ? 'red' : '#8995a9');
+					}
+
+					// 수정 버튼
+					document.getElementById("updatebtn").onclick = function() {
+					    isEditing = true;
+
+					    document.getElementById("titleText").readOnly = false;
+					    document.getElementById("viewContent").style.display = "none";
+
+					    $textArea.summernote({
+					        height: 400,
+					        lang: 'ko-KR',
+					        callbacks: {
+					            onChange: function(contents) {
+					                updateContentByteCount(contents);
+					            }
+					        }
+					    });
+
+					    $byteCount.show();
+					    updateContentByteCount($textArea.summernote('code'));
+
+					    document.getElementById("updateCategory").style.display = "flex";
+					    document.getElementById("deletebtn").style.display = "none";
+					    document.getElementById("updatebtn").style.display = "none";
+					    document.getElementById("updateOkbtn").style.display = "inline-block";
+					    document.getElementById("updateCancelbtn").style.display = "inline-block";
+
+					    const fileBox = document.getElementById("fileBox");
+					    if (fileBox) {
+					        fileBox.style.display = "block";
+					    }
+
+					    document.getElementById("updateFile").style.display = "block";
+
+					    document.querySelectorAll(".fileDelChk").forEach(function(e) {
+					        e.style.display = "inline";
+					    });
+					};
+
+					// 수정완료 전 검사
+					document.getElementById("updateForm").addEventListener("submit", function(e) {
+					    if (!isEditing) {
+					        e.preventDefault();
+					        return;
+					    }
+
+					    const bytes = getUpdateContentBytes();
+
+					    if (bytes > maxContentBytes) {
+					        e.preventDefault();
+					        alert('본문은 HTML을 포함하여 4000바이트까지만 수정할 수 있습니다.\n현재: ' + bytes + '바이트');
+					        return;
+					    }
+					});
+
+					// 수정 중 취소
+					document.getElementById("updateCancelbtn").onclick = function() {
+					    isEditing = false;
+
+					    document.getElementById("titleText").readOnly = true;
+					    document.getElementById("updateCategory").style.display = "none";
+					    document.getElementById("deletebtn").style.display = "inline-block";
+					    document.getElementById("updatebtn").style.display = "inline-block";
+					    document.getElementById("updateOkbtn").style.display = "none";
+					    document.getElementById("updateCancelbtn").style.display = "none";
+
+					    document.getElementById("titleText").value = originTitle;
+
+					    $('#textArea').summernote('destroy');
+					    $('#textArea').val(originContent).hide();
+
+					    $byteCount.hide();
+					    document.getElementById("viewContent").style.display = "block";
+					    document.getElementById("updateFile").style.display = "none";
+
+					    resetFileInputs();
+
+					    // 기존 첨부파일이 없으면 파일 영역도 다시 숨김
+					    const fileBox = document.getElementById("fileBox");
+					    if (fileBox && !hasFiles) {
+					        fileBox.style.display = "none";
+					    }
+
+					    // 파일 삭제 체크박스 숨기기 및 체크 해제
+					    document.querySelectorAll(".fileDelChk").forEach(function(e) {
+					        e.style.display = "none";
+					        e.querySelector("input").checked = false;
+					    });
+
+					    // 카테고리를 원래대로 복원
+					    if (originCategory != null) {
+					        document.querySelector(
+					            'input[name="contentCategory"][value="' + originCategory + '"]'
+					        ).checked = true;
+					    }
+					};
+
+					// 게시글 삭제 버튼
+					document.getElementById("deletebtn").onclick = function() {
+					    if (confirm("정말 삭제하시겠습니까?")) {
+					        const f = document.getElementById("deleteForm");
+					        f.action = "/FreeBoard/deleteContent";
+					        f.submit();
+					    }
+					};
+					
 					</script>
 				</c:otherwise>
 			</c:choose>
@@ -776,10 +855,44 @@ hr {
 		<div class="commentHeader">댓글 ${commentCount}</div>
 		<br>
 		<div class="commentPlace">
-			<textarea name="content" placeholder="댓글을 입력하세요 (최대 1000바이트)"></textarea>
+			
+		<textarea id="replyContent" name="content"
+		    placeholder="댓글을 입력하세요 (최대 1000바이트)"></textarea>
+		<div id="replyByteCount"
+		    style="width: 100%; text-align: right; font-size: 13px; color: #8995a9;">
+		    0 / 1000 bytes
+		</div>
 			<input type="text" name="memberId" readonly value="<c:out value='${loginUsername}'/>">
 			<input type="submit" value="댓글 등록">
 		</div>
+		<script>
+		const replyContent = document.getElementById("replyContent");
+		const replyByteCount = document.getElementById("replyByteCount");
+		const maxReplyBytes = 1000;
+
+		function getBytes(text) {
+		    return new TextEncoder().encode(text.replace(/\r?\n/g, "\r\n")).length;
+		}
+
+		function updateReplyByteCount() {
+		    const bytes = getBytes(replyContent.value);
+
+		    replyByteCount.textContent = bytes + " / " + maxReplyBytes + " bytes";
+		    replyByteCount.style.color =
+		        bytes > maxReplyBytes ? "red" : "#8995a9";
+		}
+
+		replyContent.addEventListener("input", updateReplyByteCount);
+
+		replyContent.closest("form").addEventListener("submit", function(e) {
+		    const bytes = getBytes(replyContent.value);
+
+		    if (bytes > maxReplyBytes) {
+		        e.preventDefault();
+		        alert("댓글은 1000바이트까지만 작성할 수 있습니다.\n현재: " + bytes + "바이트");
+		    }
+		});
+		</script>
 	</form>
 	<c:forEach var="reply" items="${replyList}">
 		<form action="/reply/updateReply" method="post">
@@ -807,6 +920,10 @@ hr {
 						</c:if>
 					</div>
 					<textarea id="comment${reply.replyId}" name="content" class="replyContents" readonly><c:out value="${reply.content}" /></textarea>
+					<div id="replyEditByteCount${reply.replyId}"
+					    style="display: none; text-align: right; font-size: 13px; color: #8995a9;">
+					    0 / 1000 bytes
+					</div>
 					<!-- 부모댓글 없을때(대댓글의 대댓글추가를 방지하기 위함) -->
 					<c:if test="${(empty reply.parentReplyId or reply.parentReplyId == 0) && not empty loginId}">
     					<input type="button" value="답글" style="margin-top: 8px;" onclick="openRecomment(this, ${reply.replyId})">
@@ -828,7 +945,30 @@ hr {
 								const ok = document.getElementById("replyUpOkbtn" + id);
 								const cancel = document.getElementById("replyUpCancelbtn" + id);
 								const del = document.getElementById("replyDelbtn" + id);
+								
+								const byteCount = document.getElementById("replyEditByteCount" + id);
+								const maxReplyBytes = 1000;
 
+								// 댓글 내용의 UTF-8 바이트 수 계산 및 표시
+								function updateEditByteCount() {
+									const bytes = getBytes(box.value);
+
+								    byteCount.textContent = bytes + " / " + maxReplyBytes + " bytes";
+								    byteCount.style.color = bytes > maxReplyBytes ? "red" : "#8995a9";
+								}
+
+								// 댓글 입력 시 바이트 수 갱신
+								box.addEventListener("input", updateEditByteCount);
+
+								// 댓글 수정 완료 전 검사
+								box.closest("form").addEventListener("submit", function(e) {
+									const bytes = getBytes(box.value);
+
+								    if (bytes > maxReplyBytes) {
+								        e.preventDefault();
+								        alert("댓글은 1000바이트까지만 수정할 수 있습니다.\n현재: " + bytes + "바이트");
+								    }
+								});
 								// 수정 버튼
 								up.onclick = function() {
 									up.style.display = "none";
@@ -837,6 +977,8 @@ hr {
 									cancel.style.display = "inline-block";
 									box.readOnly = false;
 									fitReply(box);	//textarea 높이를 글 길이에 맞추는 함수
+									byteCount.style.display = "block";
+									updateEditByteCount();
 								};
 								// 수정 취소 버튼
 								cancel.onclick = function() {
@@ -847,6 +989,7 @@ hr {
 									box.readOnly = true;
 									box.value = origin;	//백업한 origin을 value값에 넣음
 									fitReply(box);
+									byteCount.style.display = "none";
 								};
 								del.onclick = function() {
 									if (confirm("댓글을 삭제하시겠습니까?")) {
@@ -858,6 +1001,7 @@ hr {
 									}
 								};
 							})();
+							
 						</script>
 					</c:if>
 				</div>
@@ -865,6 +1009,13 @@ hr {
 		</form>
 	</c:forEach>
 		<!-- 삭제 전용 공용 폼 -->
+		<script>
+		    const params = new URLSearchParams(location.search);
+		
+		    if (params.get('error') === 'contentTooLong') {
+		        alert('본문이 4000바이트를 초과했습니다. 수정 내용을 줄여 주세요.');
+		    }
+		</script>
 		<form id="deleteForm" method="post" style="display: none;">
 			<input type="hidden" name="postId" value="${post.postId}">
 			<input type="hidden" name="cpage" value="${cpage}">
@@ -880,7 +1031,12 @@ hr {
    			<!-- value값 존재시에 대댓글로 저장 -->
    			<input type="hidden" name="memberId" value="<c:out value='${loginId}'/>">
     		<div class="commentPlace" style="margin-left: 40px;">
-        		<textarea name="content" placeholder="답글을 입력하세요"></textarea>
+        		<textarea id="recommentContent" name="content"
+				    placeholder="답글을 입력하세요 (최대 1000바이트)"></textarea>
+				<div id="recommentByteCount"
+				    style="width: 100%; text-align: right; font-size: 13px; color: #8995a9;">
+				    0 / 1000 bytes
+				</div>
        			<input type="submit" value="답글 등록">
        			<input type="button" id="recommentCancel" value="취소">
     		</div>
@@ -892,6 +1048,7 @@ hr {
         		const f = document.getElementById("recommentForm");
         		f.elements["parentReplyId"].value = parentId;
         		f.elements["content"].value = "";	// 다른 댓글에서 쓰다 만 내용이 남아 있지 않게 하기 위함
+        		updateRecommentByteCount();	// 비운 뒤 숫자도 0으로 되돌림
         		btn.closest("form").after(f);	// 가장 가까운 form 찾음
         		// 답글 버튼은 그 댓글의 수정 폼 안에 있으니, 결과는 그 댓글의 폼 전체
         		// after(f): 댓글 폼 바로 다음 위치로 f를 옮김. 새로 복사하는 게 아니라 원래 있던 폼을 이동
@@ -915,10 +1072,30 @@ hr {
         		// 글자를 입력할 때마다 높이를 다시 맞춘다. input은 글자가 바뀔 때마다 발생하는 이벤트
     		});
     		//답글 취소 버튼
-    		document.getElementById("recommentCancel").onclick = function() {
+    		    		document.getElementById("recommentCancel").onclick = function() {
         		document.getElementById("recommentForm").style.display = "none";	// 답글 폼 숨김
     		};
+
+    		// ===== 답글 바이트 검사 =====
+    		const recommentContent = document.getElementById("recommentContent");
+    		const recommentByteCount = document.getElementById("recommentByteCount");
+
+    		function updateRecommentByteCount() {
+    			const bytes = getBytes(recommentContent.value);
+    			recommentByteCount.textContent = bytes + " / 1000 bytes";
+    			recommentByteCount.style.color = bytes > 1000 ? "red" : "#8995a9";
+    		}
+    		recommentContent.addEventListener("input", updateRecommentByteCount);
+
+    		recommentContent.closest("form").addEventListener("submit", function(e) {
+    			const bytes = getBytes(recommentContent.value);
+    			if (bytes > 1000) {
+    				e.preventDefault();
+    				alert("답글은 1000바이트까지만 작성할 수 있습니다.\n현재: " + bytes + "바이트");
+    			}
+    		});
 		</script>
+
 		<jsp:include page="/WEB-INF/views/common/footer.jsp" />
 	</div>
 </body>
