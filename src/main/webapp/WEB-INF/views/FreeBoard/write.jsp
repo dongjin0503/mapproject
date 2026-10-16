@@ -292,7 +292,7 @@
 </head>
 <body>
 <%@ include file="/WEB-INF/views/common/header.jsp" %>
-	<form action="/FreeBoard/writeup" method="post" enctype="multipart/form-data">
+	<form id="writeForm" action="/FreeBoard/writeup" method="post" enctype="multipart/form-data">
 		<div class="container">
 			<div class="header">
 				<h2>게시글 작성</h2>
@@ -318,17 +318,56 @@
 			<div class="content">
 				<textarea name="content" id="content" placeholder="내용을 입력하세요 (최대 4000바이트)"></textarea>
 			</div>
-			
+			<div id="contentByteCount" style="text-align: right; margin-top: 8px; font-size: 13px; color: #8995a9;">0 / 4000 bytes</div>
 			<!-- 본문 textarea를 summernote-lite 에디터로 바꾸기 -->
-			<script>
-			$(function () {
-			    $('#content').summernote({
-			        height: 400,
-			        lang: 'ko-KR',
-			        placeholder: '내용을 입력하세요'
-			    });
-			});
-			</script>
+			
+<script>
+$(function () {
+    const maxBytes = 4000;
+    const $editor = $('#content');
+    const $count = $('#contentByteCount');
+
+    $editor.summernote({
+        height: 400,
+        lang: 'ko-KR',
+        placeholder: '내용을 입력하세요',
+        callbacks: {
+            onChange: function (contents) {
+                updateByteCount(contents);
+            }
+        }
+    });
+
+    // 본문 HTML의 UTF-8 바이트 수 계산
+    function getContentBytes() {
+        const content = $editor.summernote('code');
+        return new TextEncoder().encode(content).length;
+    }
+
+    // 바이트 수 표시
+    function updateByteCount(content) {
+        const byteCount = new TextEncoder().encode(content).length;
+
+        $count.text(byteCount + ' / ' + maxBytes + ' bytes');
+        $count.css('color', byteCount > maxBytes ? 'red' : '#8995a9');
+    }
+
+    // 작성완료 전 검사
+    $('#writeForm').on('submit', function (e) {
+        const byteCount = getContentBytes();
+
+        if (byteCount > maxBytes) {
+            e.preventDefault();
+            alert('본문은 HTML을 포함하여 4000바이트까지만 작성할 수 있습니다.');
+            return false;
+        }
+    });
+
+    // 최초 바이트 수 표시
+    updateByteCount($editor.summernote('code'));
+});
+</script>
+
 			<fieldset id="fileBox">
     			<legend>파일 업로드</legend>
 				<div class="fileUploadRow">
