@@ -12,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.kedu.dto.PartyApplicationDTO;
 import com.kedu.dto.PartyDTO;
 import com.kedu.dto.SettlementDTO;
+import java.util.ArrayList;
+import com.kedu.dto.Good_StoreDTO;
 
 @Repository
 public class PartyDAO {
@@ -41,7 +43,7 @@ public class PartyDAO {
     			}
 
     			sql +=
-    					"order by p.PARTY_ID desc "
+    					"order by p.MEET_DATE desc, p.PARTY_ID desc "
     					+ ") a "
     					+ "where rownum <= ? "
     					+ ") "
@@ -59,6 +61,30 @@ public class PartyDAO {
       }, offset + 9, offset);
    }
 
+   
+   public List<Good_StoreDTO> searchStores(String keyword, String[] category) {
+
+	      List<Object> args = new ArrayList<>();
+	      args.add(keyword);
+	      args.add(keyword);
+
+	      String sql = "select * from GOOD_STORE "
+	            + "where (STORE_NAME like '%' || ? || '%' or ADDRESS like '%' || ? || '%')";
+
+	      if (category != null && category.length > 0) {
+	         sql += " and CATEGORY in (";
+	         for (int i = 0; i < category.length; i++) {
+	            sql += (i > 0 ? ", ?" : "?");
+	            args.add(category[i]);
+	         }
+	         sql += ")";
+	      }
+
+	      sql = "select * from (" + sql + " order by STORE_NAME) where rownum <= 30";
+
+	      return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Good_StoreDTO.class), args.toArray());
+	   }
+   
    public PartyDTO findById(int partyId) {
       String sql = "select p.*, s.STORE_NAME, s.ADDRESS " + "from PARTY p "
             + "left join GOOD_STORE s on p.STORE_ID = s.STORE_ID " + "where p.PARTY_ID = ?";
@@ -204,9 +230,13 @@ public class PartyDAO {
    }
 
    public List<PartyApplicationDTO> findPendingApplications(int partyId) {
-      String sql = "select * from PARTY_APPLICATION " + "where PARTY_ID = ? and STATUS = 'PENDING' "
-            + "order by APPLY_DATE, APPLICATION_ID";
-
+	      // MEMBER와 left join: 탈퇴해서 회원 정보가 없으면 WITHDRAWN = 1
+	      String sql = "select pa.*, case when m.MEMBER_ID is null then 1 else 0 end WITHDRAWN "
+	            + "from PARTY_APPLICATION pa "
+	            + "left join MEMBER m on pa.APPLICANT_ID = m.MEMBER_ID "
+	            + "where pa.PARTY_ID = ? and pa.STATUS = 'PENDING' "
+	            + "order by pa.APPLY_DATE, pa.APPLICATION_ID";
+	      
       return jdbcTemplate.query(sql, (rs, rowNum) -> {
          PartyApplicationDTO padto = new PartyApplicationDTO();
 
@@ -216,11 +246,20 @@ public class PartyDAO {
          padto.setAnswer(rs.getString("ANSWER"));
          padto.setStatus(rs.getString("STATUS"));
          padto.setApplyDate(rs.getTimestamp("APPLY_DATE"));
+         padto.setApplyDate(rs.getTimestamp("APPLY_DATE"));
+         padto.setWithdrawn(rs.getInt("WITHDRAWN") == 1);
 
          return padto;
       }, partyId);
    }
 
+   // 회원 정보가 아직 있는지 (탈퇴하면 MEMBER 표에서 지워짐)
+   public boolean memberExists(String memberId) {
+      String sql = "select count(*) from MEMBER where MEMBER_ID = ?";
+      int count = jdbcTemplate.queryForObject(sql, Integer.class, memberId);
+      return count > 0; }
+   
+   
    public PartyApplicationDTO findApplicationById(int applicationId) {
       String sql = "select * from PARTY_APPLICATION where APPLICATION_ID = ?";
 
@@ -256,7 +295,7 @@ public class PartyDAO {
    }
 
    @Transactional
-   public void approve(int partyId, int applicationId, String hostId) {
+   public boolean approve(int partyId, int applicationId, String hostId) {
       lockParty(partyId);
 
       PartyDTO dto = findById(partyId);
@@ -285,10 +324,18 @@ public class PartyDAO {
       if (count != 1) {
          throw new IllegalArgumentException("이미 처리한 신청입니다.");
       }
+      
+      // 신청 후 탈퇴한 회원: 멤버로 넣지 않고, 신청서는 취소 상태로 바꿔 목록에서 정리
+      if (!memberExists(padto.getApplicantId())) {
+         updateApplicationStatus(applicationId, "CANCLED");
+         return false;
+      }
       insertMember(partyId, padto.getApplicantId());
 
       notificationDAO.insert(padto.getApplicantId(), "PARTY_APPROVED", "PARTY", partyId,
             dto.getTitle() + " 모임 참여 신청이 승인되었습니다.");
+      
+      return true;
    }
 
    @Transactional
@@ -312,9 +359,43 @@ public class PartyDAO {
          throw new IllegalArgumentException("이미 처리한 신청입니다.");
       }
 
-      notificationDAO.insert(padto.getApplicantId(), "PARTY_REJECTED", "PARTY", partyId,
-            dto.getTitle() + " 모임 참여 신청이 거절되었습니다.");
+      // 탈퇴한 회원에게는 받을 사람이 없으므로 알림을 보내지 않음
+      if (memberExists(padto.getApplicantId())) {
+         notificationDAO.insert(padto.getApplicantId(), "PARTY_REJECTED", "PARTY", partyId,
+               dto.getTitle() + " 모임 참여 신청이 거절되었습니다.");
+      }
    }
+   
+   // 모임장이 탈퇴하기 직전에 호출: 아직 열리지 않은 모임의 멤버들에게 '모임 취소' 알림
+   // (회원 탈퇴 처리와 같은 트랜잭션 안에서 실행됨 → 탈퇴가 실패하면 알림도 함께 취소)
+   public int notifyPartiesCanceledByHost(String hostId) {
+
+      String sql = "select PARTY_ID, TITLE from PARTY "
+            + "where HOST_ID = ? and MEET_DATE > CURRENT_TIMESTAMP";
+
+      List<PartyDTO> parties = jdbcTemplate.query(sql, (rs, rowNum) -> {
+         PartyDTO party = new PartyDTO();
+         party.setPartyId(rs.getInt("PARTY_ID"));
+         party.setTitle(rs.getString("TITLE"));
+         return party;
+      }, hostId);
+
+      int sent = 0;
+
+      for (PartyDTO party : parties) {
+         for (String memberId : findMemberIds(party.getPartyId())) {   // 승인(확정)된 멤버
+            if (memberId.equals(hostId)) {
+               continue;                                               // 모임장 본인 제외
+            }
+            // TARGET_TYPE을 'PARTY'가 아닌 값으로 저장 → 알림 목록에 '보기' 버튼이 생기지 않음
+            notificationDAO.insert(memberId, "PARTY_CANCELED", "PARTY_CANCELED", party.getPartyId(),
+                  party.getTitle() + " 모임이 모임장의 탈퇴로 취소되었습니다.");
+            sent++;
+         }
+      }
+      return sent;
+   }
+   
 
    public List<String> findMemberNames(int partyId) {
       String sql = "select m.USERNAME " + "from PARTY_MEMBER pm " + "join MEMBER m on pm.MEMBER_ID = m.MEMBER_ID "

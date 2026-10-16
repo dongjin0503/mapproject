@@ -449,6 +449,22 @@
 						</form>
 					</C:when>
 
+	<C:when test="${isEnded}">
+
+						<button type="button" class="apply-btn"
+							onclick="alert('이미 시작했거나 지난 모임에는 신청할 수 없습니다.');">
+							종료된 모임</button>
+
+					</C:when>
+
+					<C:when test="${isFull}">
+
+						<button type="button" class="apply-btn"
+							onclick="alert('모집 인원이 마감되었습니다.');">
+							모집 마감</button>
+
+					</C:when>
+
 
 					<C:otherwise>
 
@@ -474,6 +490,10 @@
 		</div>
 	</div>
 	<script>
+	<C:if test="${not empty alertMessage}">
+	alert("${alertMessage}");
+	</C:if>
+	
 		let currentImage = 0;
 
 		const detailImages = document.querySelectorAll(".detail-image");

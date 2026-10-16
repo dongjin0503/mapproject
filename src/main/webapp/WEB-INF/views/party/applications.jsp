@@ -103,6 +103,15 @@
     color: #777;
     font-size: 15px;
 }
+.withdrawn-tag {
+	margin-left: 6px;
+	padding: 2px 8px;
+	border-radius: 999px;
+	background-color: #FDECEC;
+	color: #B42318;
+	font-size: 12px;
+	font-weight: bold;
+}
 </style>
 </head>
 <body>
@@ -113,7 +122,10 @@
 
 		<C:forEach var="application" items="${applications}">
 			<div class="application-card">
-				<p>신청자 : ${application.applicantId}</p>
+				<p>신청자 : ${application.applicantId}
+				<%-- 신청 후 탈퇴한 회원 표시 --%>
+					<C:if test="${application.withdrawn}"><span class="withdrawn-tag">탈퇴한 회원</span></C:if>
+				</p>
 				<p>답변 : ${application.answer}</p>
 				<div class="application-btns">
 					<form action="/party/approve" method="post">
@@ -143,6 +155,10 @@
 			onclick="location.href='/party/detail?partyId=${party.partyId}'">
 			모임으로 돌아가기</button>
 	</div>
+		<%-- 탈퇴한 회원을 승인하려 한 경우 알림창 --%>
+	<C:if test="${not empty alertMessage}">
+		<script>alert("${alertMessage}");</script>
+	</C:if>
 	<jsp:include page="/WEB-INF/views/common/footer.jsp" />
 </body>
 </html>
