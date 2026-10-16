@@ -92,8 +92,19 @@ public class FreeboardController {
 
 		dto.setMemberId(loginId);
 
+		// 제목 비어있음 검사
+		if (dto.getTitle() == null || dto.getTitle().trim().isEmpty()) {
+			return "redirect:/FreeBoard/write?error=titleEmpty";
+		}
+
+		// 제목 300바이트 초과 검사
+		if (dto.getTitle() == null
+				|| dto.getTitle().getBytes(java.nio.charset.StandardCharsets.UTF_8).length > 300) {
+			return "redirect:/FreeBoard/write?error=titleTooLong";
+		}
+
 		if (dto.getContent() != null
-				&& dto.getContent().getBytes(java.nio.charset.StandardCharsets.UTF_8).length > 4000) {
+				&& dto.getContent().getBytes(java.nio.charset.StandardCharsets.UTF_8).length > 2000000) {
 			return "redirect:/FreeBoard/write?error=contentTooLong";
 		}
 
@@ -148,9 +159,20 @@ public class FreeboardController {
 			return "redirect:/FreeBoard/detail?postId=" + dto.getPostId() + "&cpage=" + cpage;
 		}
 
-		// 본문 4000바이트 초과 검사
+		// 제목 비어있음 검사
+		if (dto.getTitle() == null || dto.getTitle().trim().isEmpty()) {
+			return "redirect:/FreeBoard/detail?postId=" + dto.getPostId() + "&cpage=" + cpage + "&error=titleEmpty";
+		}
+
+		// 제목 300바이트 초과 검사
+		if (dto.getTitle() == null
+				|| dto.getTitle().getBytes(java.nio.charset.StandardCharsets.UTF_8).length > 300) {
+			return "redirect:/FreeBoard/detail?postId=" + dto.getPostId() + "&cpage=" + cpage + "&error=titleTooLong";
+		}
+
+		// 본문 2000000바이트(약 2MB) 초과 검사
 		if (dto.getContent() != null
-				&& dto.getContent().getBytes(java.nio.charset.StandardCharsets.UTF_8).length > 4000) {
+				&& dto.getContent().getBytes(java.nio.charset.StandardCharsets.UTF_8).length > 2000000) {
 			return "redirect:/FreeBoard/detail?postId=" + dto.getPostId() + "&cpage=" + cpage + "&error=contentTooLong";
 		}
 

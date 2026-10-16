@@ -640,7 +640,7 @@ hr {
 					<textarea id="textArea" name="content" style="display: none;"><c:out value="${post.content}" /></textarea>
 					<div id="updateContentByteCount"
      style="display: none; text-align: right; margin-top: 8px; font-size: 13px; color: #8995a9;">
-    0 / 4000 bytes
+    0 / 2000000 bytes
 </div>
 				</c:if>
 			</div>
@@ -718,7 +718,7 @@ hr {
 
 					let isEditing = false;
 
-					const maxContentBytes = 4000;
+					const maxContentBytes = 2000000;
 					const $textArea = $('#textArea');
 					const $byteCount = $('#updateContentByteCount');
 
@@ -747,6 +747,10 @@ hr {
 					        height: 400,
 					        lang: 'ko-KR',
 					        callbacks: {
+					            onInit: function() {
+					                // Summernote 이미지 창의 파일 input(name="files")이 첨부파일로 같이 전송되는 것을 막음
+					                $('.note-image-input').removeAttr('name');
+					            },
 					            onChange: function(contents) {
 					                updateContentByteCount(contents);
 					            }
@@ -781,11 +785,28 @@ hr {
 					        return;
 					    }
 
+					    // 제목 비어있음 검사
+					    if (document.getElementById("titleText").value.trim() === '') {
+					        e.preventDefault();
+					        alert('제목을 입력해 주세요.');
+					        document.getElementById("titleText").focus();
+					        return;
+					    }
+
+					    // 제목 300바이트 검사
+					    const titleBytes = new TextEncoder().encode(document.getElementById("titleText").value).length;
+
+					    if (titleBytes > 300) {
+					        e.preventDefault();
+					        alert('제목은 300바이트까지만 입력할 수 있습니다.\n현재: ' + titleBytes + '바이트');
+					        return;
+					    }
+
 					    const bytes = getUpdateContentBytes();
 
 					    if (bytes > maxContentBytes) {
 					        e.preventDefault();
-					        alert('본문은 HTML을 포함하여 4000바이트까지만 수정할 수 있습니다.\n현재: ' + bytes + '바이트');
+					        alert('본문은 이미지를 포함하여 2000000바이트(약 2MB)까지만 수정할 수 있습니다.\n현재: ' + bytes + '바이트');
 					        return;
 					    }
 					});
@@ -1013,7 +1034,13 @@ hr {
 		    const params = new URLSearchParams(location.search);
 		
 		    if (params.get('error') === 'contentTooLong') {
-		        alert('본문이 4000바이트를 초과했습니다. 수정 내용을 줄여 주세요.');
+		        alert('본문이 2000000바이트(약 2MB)를 초과했습니다. 수정 내용을 줄여 주세요.');
+		    }
+		    if (params.get('error') === 'titleEmpty') {
+		        alert('제목을 입력해 주세요.');
+		    }
+		    if (params.get('error') === 'titleTooLong') {
+		        alert('제목은 300바이트까지만 입력할 수 있습니다.');
 		    }
 		</script>
 		<form id="deleteForm" method="post" style="display: none;">
