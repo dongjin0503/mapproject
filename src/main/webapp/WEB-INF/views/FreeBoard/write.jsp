@@ -316,14 +316,14 @@
 			</div>
 			
 			<div class="content">
-				<textarea name="content" id="content" placeholder="내용을 입력하세요 (최대 4000바이트)"></textarea>
+				<textarea name="content" id="content" placeholder="내용을 입력하세요 (최대 약 2MB)"></textarea>
 			</div>
-			<div id="contentByteCount" style="text-align: right; margin-top: 8px; font-size: 13px; color: #8995a9;">0 / 4000 bytes</div>
+			<div id="contentByteCount" style="text-align: right; margin-top: 8px; font-size: 13px; color: #8995a9;">0 / 2000000 bytes</div>
 			<!-- 본문 textarea를 summernote-lite 에디터로 바꾸기 -->
 			
 <script>
 $(function () {
-    const maxBytes = 4000;
+    const maxBytes = 2000000;
     const $editor = $('#content');
     const $count = $('#contentByteCount');
 
@@ -332,6 +332,10 @@ $(function () {
         lang: 'ko-KR',
         placeholder: '내용을 입력하세요',
         callbacks: {
+            onInit: function () {
+                // Summernote 이미지 창의 파일 input(name="files")이 첨부파일로 같이 전송되는 것을 막음
+                $('.note-image-input').removeAttr('name');
+            },
             onChange: function (contents) {
                 updateByteCount(contents);
             }
@@ -354,17 +358,44 @@ $(function () {
 
     // 작성완료 전 검사
     $('#writeForm').on('submit', function (e) {
+        // 제목 비어있음 검사
+        if ($('input[name="title"]').val().trim() === '') {
+            e.preventDefault();
+            alert('제목을 입력해 주세요.');
+            $('input[name="title"]').focus();
+            return false;
+        }
+
+        // 제목 300바이트 검사
+        const titleBytes = new TextEncoder().encode($('input[name="title"]').val()).length;
+
+        if (titleBytes > 300) {
+            e.preventDefault();
+            alert('제목은 300바이트까지만 입력할 수 있습니다.\n현재: ' + titleBytes + '바이트');
+            return false;
+        }
+
         const byteCount = getContentBytes();
 
         if (byteCount > maxBytes) {
             e.preventDefault();
-            alert('본문은 HTML을 포함하여 4000바이트까지만 작성할 수 있습니다.');
+            alert('본문은 이미지를 포함하여 2000000바이트(약 2MB)까지만 작성할 수 있습니다.');
             return false;
         }
     });
 
     // 최초 바이트 수 표시
     updateByteCount($editor.summernote('code'));
+
+    // 서버에서 되돌려보낸 경우 안내
+    const params = new URLSearchParams(location.search);
+    if (params.get('error') === 'titleEmpty') {
+        alert('제목을 입력해 주세요.');
+    } else if (params.get('error') === 'titleTooLong') {
+        alert('제목은 300바이트까지만 입력할 수 있습니다.');
+    } else if (params.get('error') === 'contentTooLong') {
+        alert('본문이 2000000바이트(약 2MB)를 초과했습니다. 내용을 줄여 주세요.');
+    }
 });
 </script>
 
