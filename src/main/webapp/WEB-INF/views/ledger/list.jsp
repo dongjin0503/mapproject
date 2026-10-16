@@ -411,13 +411,18 @@ textarea[name='memo'] {
 
 				</select>
 
+			<%-- 1원 ~ 1억 원, 정수만 (마이너스·0 입력 불가) --%>
 				<input type="number"
 					name="amount"
 					placeholder="금액"
+					min="1"
+					max="100000000"
+					step="1"
 					required>
 
 				<textarea name="memo"
-					placeholder="메모"></textarea>
+					maxlength="100"
+					placeholder="메모 (100자 이내)"></textarea>
 
 				<button type="submit"
 					class="save-btn">
@@ -469,11 +474,13 @@ textarea[name='memo'] {
 
 							</div>
 
-							<input type="number"
+												<input type="number"
 								name="budgetAmount"
 								class="budgetAmount"
+								min="0"
+								max="100000000"
+								step="1"
 								placeholder="금액">
-
 							<button type="submit"
 								class="budget-btn">
 								설정
@@ -566,6 +573,11 @@ textarea[name='memo'] {
 
 
 <script>
+
+/* 서버가 저장을 거절한 경우 이유를 알림창으로 */
+<c:if test="${not empty ledgerMessage}">
+alert("${ledgerMessage}");
+</c:if>
 
 /* =========================================================
    가계부 데이터

@@ -136,12 +136,16 @@ textarea {
 					required>
 				</select>
 
+				<%-- 1원 ~ 1억 원, 정수만 --%>
 				<input type="number"
 					name="amount"
 					value="${ledger.amount}"
+					min="1"
+					max="100000000"
+					step="1"
 					required>
 
-				<textarea name="memo">${ledger.memo}</textarea>
+								<textarea name="memo" maxlength="100" placeholder="메모 (100자 이내)">${ledger.memo}</textarea>
 
 				<div class="btn-area">
 
@@ -165,6 +169,11 @@ textarea {
 	</div>
 
 	<script>
+	
+	// 서버가 수정을 거절한 경우 이유를 알림창으로
+	if ("${ledgerMessage}" !== "") {
+		alert("${ledgerMessage}");
+	}
 
 		function setCategory() {
 

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.kedu.dto.MemberDTO;
 
@@ -14,6 +15,9 @@ public class MemberDAO {
 
 	@Autowired
 	private JdbcTemplate jdbc;
+	
+	@Autowired
+	private PartyDAO partyDAO;
 
 	public int signup(MemberDTO dto) {
 		String sql = "INSERT INTO MEMBER "
@@ -47,8 +51,12 @@ public class MemberDAO {
 	}
 	
 	// 회원 탈퇴 : 이 회원의 데이터를 모두 지우고, 마지막에 회원 본인을 지운다
+	
+	@Transactional 
 	public void delete(MemberDTO dto) {
 		String id = dto.getId();
+		
+		 partyDAO.notifyPartiesCanceledByHost(id);  
 
 		// ---- 1. 내가 만든 파티(모임)와 거기 딸린 것들 ----
 		String myParty = "(select party_id from party where host_id = ?)";

@@ -10,11 +10,12 @@ public class PartyApplicationDTO {
 	private String answer;
 	private String status;
 	private Timestamp applyDate;
+	private boolean withdrawn; 
 	
 	public PartyApplicationDTO(){}
 	
 	public PartyApplicationDTO(int applicationId, int partyId, String applicantId, String answer, String status,
-			Timestamp applyDate) {
+			Timestamp applyDate,  boolean withdrawn) {
 		super();
 		this.applicationId = applicationId;
 		this.partyId = partyId;
@@ -22,6 +23,7 @@ public class PartyApplicationDTO {
 		this.answer = answer;
 		this.status = status;
 		this.applyDate = applyDate;
+		this.withdrawn = withdrawn;
 	}
 
 	public int getApplicationId() {
@@ -70,6 +72,13 @@ public class PartyApplicationDTO {
 
 	public void setApplyDate(Timestamp applyDate) {
 		this.applyDate = applyDate;
+	}
+	public boolean isWithdrawn() {
+		return withdrawn;
+	}
+
+	public void setWithdrawn(boolean withdrawn) {
+		this.withdrawn = withdrawn;
 	}
 	
 }

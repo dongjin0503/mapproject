@@ -83,6 +83,23 @@ public class PartyController {
 		return gson.toJson(parties);
 	}
 
+	@RequestMapping(value = "/searchStore", produces = "application/json; charset=UTF-8")
+	@ResponseBody
+	public String searchStore(@RequestParam(value = "keyword", required = false) String keyword,
+			@RequestParam(value = "category", required = false) String[] category) {
+
+		if (keyword == null || keyword.trim().isEmpty()) {
+			return "[]";
+		}
+
+		String word = keyword.trim();
+		if (word.length() > 50) {
+			word = word.substring(0, 50);   // 너무 긴 검색어는 잘라서 사용
+		}
+
+		return gson.toJson(partyDAO.searchStores(word, category));
+	}
+	
 	@RequestMapping("/detail")
 	public String derail(int partyId, HttpSession session, Model model) {
 		PartyDTO party = partyDAO.findById(partyId);
@@ -100,11 +117,19 @@ public class PartyController {
 
 		int memberCount = partyDAO.countMembers(partyId);
 		model.addAttribute("memberCount", memberCount);
+		
+		model.addAttribute("isFull", memberCount >= party.getMaxPeople());
+		model.addAttribute("isEnded", !party.getMeetDate().toLocalDateTime().isAfter(LocalDateTime.now()));
 
 		model.addAttribute("members", partyDAO.findSettlementMembers(partyId));
 
-		MemberDTO host = memberDAO.selectMember(party.getHostId());
-		model.addAttribute("hostName", host.getUsername());
+		// 모임장이 탈퇴해 회원 정보가 없어도 화면이 오류 없이 열리도록
+		if (partyDAO.memberExists(party.getHostId())) {
+			MemberDTO host = memberDAO.selectMember(party.getHostId());
+			model.addAttribute("hostName", host.getUsername());
+		} else {
+			model.addAttribute("hostName", "탈퇴한 회원");
+		}
 
 		String loginId = (String) session.getAttribute("loginId");
 
@@ -127,7 +152,7 @@ public class PartyController {
 	}
 
 	@RequestMapping("/apply")
-	public String apply(int partyId, HttpSession session, Model model) {
+	public String apply(int partyId, HttpSession session, Model model, RedirectAttributes redirectAttributes) {
 
 		PartyDTO party = partyDAO.findById(partyId);
 
@@ -140,6 +165,22 @@ public class PartyController {
 		if (party == null) {
 			return "redirect:/party/list";
 		}
+		
+		String blockMessage = null;
+
+		if (!party.getMeetDate().toLocalDateTime().isAfter(LocalDateTime.now())) {
+			blockMessage = "이미 시작했거나 지난 모임에는 신청할 수 없습니다.";
+		} else if (partyDAO.isMember(partyId, loginId) || partyDAO.hasPendingApplication(partyId, loginId)) {
+			blockMessage = "이미 참여했거나 신청 대기 중인 모임입니다.";
+		} else if (partyDAO.countMembers(partyId) >= party.getMaxPeople()) {
+			blockMessage = "모집 인원이 마감되었습니다.";
+		}
+
+		if (blockMessage != null) {
+			redirectAttributes.addFlashAttribute("alertMessage", blockMessage);
+			return "redirect:/party/detail?partyId=" + partyId;
+		}
+
 
 		String imageSysName = partyDAO.findFirstImage(partyId);
 
@@ -182,6 +223,10 @@ public class PartyController {
 
 		if (!meetDate.isAfter(LocalDateTime.now())) {
 			message += "모임 날짜는 현재 시간 이후로 선택해 주세요.\n";
+		}
+		
+		if (dto.getStoreId() <= 0) {
+			message += "모임 장소를 지도나 검색에서 선택해 주세요.\n";
 		}
 
 		if (!message.isEmpty()) {
@@ -317,8 +362,16 @@ public class PartyController {
 		}
 
 		try {
-			partyDAO.approve(partyId, applicationId, loginId);
-			redirectAttributes.addFlashAttribute("message", "승인했습니다.");
+			boolean approved = partyDAO.approve(partyId, applicationId, loginId);
+
+			if (approved) {
+				redirectAttributes.addFlashAttribute("message", "승인했습니다.");
+			} else {
+				// 신청 후 탈퇴한 회원 → 승인하지 않고 알림창으로 안내
+				String text = "탈퇴한 회원의 신청이라 승인할 수 없습니다. 신청 목록에서 제외했습니다.";
+				redirectAttributes.addFlashAttribute("message", text);
+				redirectAttributes.addFlashAttribute("alertMessage", text);
+			}
 		} catch (IllegalArgumentException e) {
 			redirectAttributes.addFlashAttribute("message", e.getMessage());
 		}
@@ -488,6 +541,17 @@ public class PartyController {
 			return "party/edit";
 		}
 
+		if (dto.getStoreId() <= 0) {
+
+			model.addAttribute("message", "모임 장소를 지도나 검색에서 선택해 주세요.");
+
+			model.addAttribute("party", dto);
+			model.addAttribute("meetDateText", meetDateText);
+
+			return "party/edit";
+		}
+		
+		
 		if (!meetDate.isAfter(LocalDateTime.now())) {
 
 			model.addAttribute("message", "모임 날짜는 현재 시간 이후로 선택해 주세요.");

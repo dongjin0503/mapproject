@@ -479,7 +479,7 @@
 					<div id="menu-list">
 						<div class="menu-row">
 							<div class="menu-inputs">
-								<input type="text" class="menu-name" placeholder="메뉴명">
+								<input maxlength="30" type="text" class="menu-name" placeholder="메뉴명">
 								<input type="number" class="menu-amount" placeholder="금액" min="1">
 								<button type="button" class="delete-menu-btn">삭제</button>
 							</div>
