@@ -22,6 +22,7 @@
   --text: #374151;
   --text-dim: #9ca3af;
   --accent: #111827;
+  --soft: #e5e7eb;          /* ★ 추가: 카드 안쪽 연한 선 */
 }
 
 * { box-sizing: border-box; }
@@ -33,19 +34,11 @@ body {
   background: #fff;
 }
 
-/* ---------- 상단 로고 바 ---------- */
-.logo-bar {
-  padding: 4px 24px;
-  border-bottom: 1.5px solid var(--line);
-}
-.logo { display: inline-block; text-decoration: none; }
-.logo img { display: block; height: 80px; }
-
 /* ---------- 전체 영역 ---------- */
 .wrap { width: 1100px; margin: 24px auto 40px; }
 .layout { display: flex; align-items: flex-start; gap: 20px; }
 
-/* ---------- 왼쪽 ---------- */
+/* ---------- 왼쪽 (변경 없음) ---------- */
 .left {
   flex: none;
   width: 200px;
@@ -98,44 +91,66 @@ body {
   color: var(--accent);
 }
 
-/* ---------- 오른쪽 ---------- */
+/* ---------- 오른쪽 (★ 새 디자인: 섹션 카드) ---------- */
 .right {
   flex: 1;
   min-width: 0;
-  min-height: 320px;
-  padding: 24px;
+  padding: 16px 20px;
+  background: #fafafa;
   display: flex;
   flex-direction: column;
+  gap: 12px;
 }
 
-.section-label {
-  margin-bottom: 16px;
-  font-size: 11px;
-  letter-spacing: .4px;
-  color: var(--text-dim);
+/* 섹션 카드 */
+.sec {
+  padding: 14px 16px;
+  border: 1.5px solid var(--soft);
+  border-radius: 8px;
+  background: #fff;
 }
+.st {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.st b { font-size: 12.5px; color: var(--accent); }
+.st span { font-size: 11px; color: var(--text-dim); }
 
-/* 내 정보 항목 (4열) */
-.fields {
+/* 입력 항목 (4열) */
+.sb {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 22px 24px;
+  gap: 14px 20px;
 }
-.span2 { grid-column: span 2; }                       /* ★ 추가 */
+.s2 { grid-column: span 2; }
 
 .label {
   margin-bottom: 4px;
   font-size: 11px;
   color: var(--text-dim);
 }
+.label .dim { color: var(--text-dim); }
+
+/* 아이콘 + 입력칸 */
+.ipt { position: relative; }
+.ipt > i {
+  position: absolute;
+  left: 11px;
+  top: 0;
+  line-height: 36px;
+  font-size: 13px;
+  color: var(--text-dim);
+  pointer-events: none;
+}
 
 /* 수정 불가 칸 (회색) */
-.value,
 input[readonly] {
   display: block;
   width: 100%;
   height: 36px;
-  padding: 8px 10px;
+  padding: 8px 10px 8px 32px;
   border: 1.5px solid var(--line);
   border-radius: 4px;
   background: var(--fill);
@@ -150,12 +165,12 @@ input[readonly] {
   overflow: hidden;
 }
 
-/* ★ 추가: 수정 가능 칸 (흰색) */
+/* 수정 가능 칸 (흰색) */
 input:not([readonly]) {
   display: block;
   width: 100%;
   height: 36px;
-  padding: 8px 10px;
+  padding: 8px 10px 8px 32px;
   border: 1.5px solid var(--line-strong);
   border-radius: 4px;
   background: #fff;
@@ -166,12 +181,14 @@ input:not([readonly]) {
   outline: none;
 }
 input:not([readonly]):focus { border-color: var(--accent); }
+input::placeholder { color: var(--text-dim); }
 
-/* ★ 추가: input + 버튼 한 줄 */
-.row { display: flex; gap: 6px; margin-bottom: 6px; }
-.row input { flex: 1; min-width: 0; width: auto; }
+/* input + 버튼 한 줄 */
+.row { display: flex; gap: 6px; }
+.row + .row { margin-top: 6px; }
+.row .ipt { flex: 1; min-width: 0; }
 
-/* ★ 추가: 버튼 */
+/* 버튼 */
 .btn {
   height: 36px;
   padding: 0 14px;
@@ -184,33 +201,23 @@ input:not([readonly]):focus { border-color: var(--accent); }
   cursor: pointer;
   white-space: nowrap;
 }
+.btn:hover { background: var(--fill); }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.primary:hover { opacity: .88; }
 
-/* ★ 추가: 안내 메시지 */
+/* 안내 메시지 */
 .msg { margin-top: 4px; font-size: 11px; color: #2563eb; min-height: 14px; }
 .msg.error { color: #b91c1c; }
 
-/* ★ 추가: 저장/취소 버튼 줄 */
+/* 하단 안내 + 저장/취소 */
 .btn-row {
-  margin-top: auto;
-  padding-top: 24px;
+  padding-top: 2px;
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   gap: 8px;
 }
-
-/* 회원 탈퇴 (이 화면에서는 안 쓰지만 둬도 됨) */
-.bottom {
-  margin-top: auto;
-  padding-top: 24px;
-  text-align: right;
-}
-.leave {
-  font-size: 11px;
-  color: #b91c1c;
-  text-decoration: underline;
-  cursor: pointer;
-}
+.hint { margin-right: auto; font-size: 11px; color: var(--text-dim); }
 </Style>
 
 
@@ -234,79 +241,100 @@ input:not([readonly]):focus { border-color: var(--accent); }
 	<a href ="/member/participationHistory" > 참여 기록 </a>
 	</div>
 	 </div> 
-	<div class="box right"> 
-	<div class= "section-label"> 내 정보 </div>
-	<div class = "fields">
-	<div class ="field">
-	<div class ="label"> 아이디 </div>
-	<input type ="text" value = "${member.id}" readonly>
-	</div>
-	<div class ="field">
-	<div class ="label"> 이름 </div>
-	<input id ="name" name ="name" type ="text" value = "${member.name}" >
-	</div>
-	<div class ="field">
-	<div class ="label"> 휴대전화</div>
-	<input id="phone" name = "phone" type ="text" value = "${member.phone}" >
-	</div>
-	<div class ="field">
-	<div class ="label"> 이메일 </div>
-	<input id="email" name ="email" type ="text" value = "${member.email}" >
-	</div>
 	
-	<div class="field span2">
-   	<div class="label"> 주소 </div>
+	<div class="box right"> 
+
+	<%-- ★ 1. 기본 정보 --%>
+	<div class="sec">
+	<div class="st"><b>기본 정보</b><span>이름과 연락처를 수정할 수 있어요</span></div>
+	<div class="sb">
+	<div class="field">
+	<div class="label"> 이름 </div>
+	<div class="ipt"><i class="fa-regular fa-user"></i>
+	<input id ="name" name ="name" type ="text" value = "${member.name}" ></div>
+	</div>
+	<div class="field">
+	<div class="label"> 휴대전화 </div>
+	<div class="ipt"><i class="fa-solid fa-mobile-screen"></i>
+	<input id="phone" name = "phone" type ="text" value = "${member.phone}" ></div>
+	</div>
+	<div class="field">
+	<div class="label"> 생년월일 </div>
+	<fmt:formatDate value="${member.birth_date}" pattern="yyyy-MM-dd" var="bd"/>
+	<div class="ipt"><i class="fa-regular fa-calendar"></i>
+	<input id="birth" name="birth_date" type="text" value="${bd}" placeholder="YYYY-MM-DD"></div>
+	</div>
+	<div class="field">
+	<div class="label"> 성별 </div>
+	<div class="ipt"><i class="fa-solid fa-venus-mars"></i>
+	<input type ="text" value = "${member.gender}"  readonly></div>
+	</div>
+	</div>
+	</div>
+
+	<%-- ★ 2. 연락처 · 주소 --%>
+	<div class="sec">
+	<div class="st"><b>연락처 · 주소</b><span>우편번호 검색으로 주소를 바꿔요</span></div>
+	<div class="sb">
+	<div class="field s2">
+	<div class="label"> 이메일 </div>
+	<div class="ipt"><i class="fa-regular fa-envelope"></i>
+	<input id="email" name ="email" type ="text" value = "${member.email}" ></div>
+	</div>
+	<div class="field s2">
+	<div class="label"> 우편번호 </div>
 	<div class="row">
-	<input type="text" id="zipcode" name="zipcode" value="${member.zipcode}" readonly>
+	<div class="ipt"><i class="fa-solid fa-location-dot"></i>
+	<input type="text" id="zipcode" name="zipcode" value="${member.zipcode}" readonly></div>
 	<button type="button" class="btn" id="search">우편번호 검색</button>
 	</div>
-	<div class="row">
-	<input type="text" id="address1" name="address1" value="${member.address1}" readonly>
 	</div>
-	<div class="row">
-	<input type="text" id="address2" name="address2" value="${member.address2}" placeholder="상세주소">
+	<div class="field s2">
+	<div class="label"> 주소 </div>
+	<div class="ipt"><i class="fa-regular fa-map"></i>
+	<input type="text" id="address1" name="address1" value="${member.address1}" readonly></div>
+	</div>
+	<div class="field s2">
+	<div class="label"> 상세주소 </div>
+	<div class="ipt"><i class="fa-solid fa-house"></i>
+	<input type="text" id="address2" name="address2" value="${member.address2}" placeholder="상세주소를 입력해주세요"></div>
 	</div>
 	</div>
-	
-	<div class ="field">
-	<div class ="label"> 생년월일</div>
-	<fmt:formatDate value="${member.birth_date}" pattern="yyyy-MM-dd" var="bd"/>
-    <input id="birth" name="birth_date" type="text" value="${bd}" placeholder="YYYY-MM-DD">
 	</div>
-	<div class ="field">
-	<div class ="label"> 성별 </div>
-	<input type ="text" value = "${member.gender}"  readonly>
-	</div>
-	
-	<div class="field span2">
+
+	<%-- ★ 3. 계정 · 보안 --%>
+	<div class="sec">
+	<div class="st"><b>계정 · 보안</b><span>비밀번호는 변경할 때만 입력해요</span></div>
+	<div class="sb">
+	<div class="field s2">
 	<div class="label"> 닉네임 </div>
 	<div class="row">
-	<input type="text" id="username" name="username" value="${member.username}" check="true">
+	<div class="ipt"><i class="fa-solid fa-at"></i>
+	<input type="text" id="username" name="username" value="${member.username}" check="true"></div>
 	<button type="button" class="btn" id="btnnamecheck">중복확인</button>
 	</div>
 	<div class="msg" id="namecheck"></div>
 	</div>
-
 	<div class="field">
-	<div class="label"> 새 비밀번호 <span style="color:var(--text-dim)">(변경 시에만 입력)</span></div>
-	<input type="password" id="newPw" name="newPw" autocomplete="new-password">
+	<div class="label"> 새 비밀번호 <span class="dim">(선택)</span></div>
+	<div class="ipt"><i class="fa-solid fa-lock"></i>
+	<input type="password" id="newPw" name="newPw" autocomplete="new-password"></div>
 	</div>
-
 	<div class="field">
 	<div class="label"> 새 비밀번호 확인 </div>
-	<input type="password" id="newPw2" autocomplete="new-password">
+	<div class="ipt"><i class="fa-solid fa-lock"></i>
+	<input type="password" id="newPw2" autocomplete="new-password"></div>
 	<div class="msg" id="pwmsg"></div>
 	</div>
-	
-	<div class ="field">
-	<div class ="label"> 가입일자</div>
-	<span class="value"><fmt:formatDate value="${member.regdate}" pattern="yyyy.MM.dd"/></span>
 	</div>
 	</div>
+
 	<div class ="btn-row">
+	<span class="hint">변경한 내용은 저장해야 반영돼요.</span>
 	<button type="button" class="btn" onclick="location.href='/member/mypage'">취소</button>
 	<button type="submit" class="btn primary">저장</button>
 	</div>
+
 	</div>		
 	</div>
 	</div>

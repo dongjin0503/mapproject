@@ -125,9 +125,8 @@ input, button { font-family: inherit; }
 
 <body>
 	
-	<div class="logo-bar">
-	<a class="logo" href="/"><img src="/images/logo.png" alt="짠내맵"></a>
-	</div>
+	<jsp:include page="/WEB-INF/views/common/header.jsp" />
+
 	
 	<form action ="/member/login" method="post">
 	<div class="login-wrap">

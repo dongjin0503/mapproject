@@ -54,16 +54,29 @@
 	margin-bottom: 8px;
 }
 
+/* ★ 기간 / 참여자수 : 회색 타일 */
 .info {
 	display: flex;
-	gap: 20px;
+	gap: 10px;
 	font-size: 12px;
 	color: var(--dim);
 	line-height: 1.6;
 	margin-bottom: 14px;
 }
 
+.info > div {
+	flex: 1;
+	padding: 10px 12px;
+	background: var(--fill);
+	border: 1px solid var(--fill-strong);
+	border-radius: 8px;
+}
+
+.info i { margin-right: 4px; font-size: 11px; }
+
 .info b {
+	display: block;
+	margin-top: 2px;
 	font-size: 13px;
 	color: var(--text);
 }
@@ -136,20 +149,61 @@
 	white-space: pre-line;
 }
 
-/* 댓글 한 줄 */
+/* ★ 댓글 : 아이콘 + 말풍선 */
 .reply {
-	padding: 8px 0;
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+	padding: 6px 0;
 	font-size: 13px;
-	border-bottom: 1px solid var(--fill-strong);
 }
-
-.reply b { margin-right: 6px; }
 
 /* 대댓글 들여쓰기 */
 .reply.re { margin-left: 34px; }
 
-.time {
+.reply .av {
+	flex: none;
+	font-size: 26px;
+	line-height: 26px;
+	color: var(--line-strong);
+}
+
+.rbody { flex: 1; min-width: 0; }
+
+.rhead {
+	display: flex;
+	align-items: center;
+	gap: 4px;
 	font-size: 12px;
+	line-height: 22px;
+	color: var(--accent);
+}
+
+.rbtns {
+	margin-left: auto;
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.bubble {
+	display: inline-block;
+	max-width: 100%;
+	padding: 6px 10px;
+	background: var(--fill);
+	border-radius: 4px 12px 12px 12px;
+	font-size: 12.5px;
+	line-height: 1.5;
+	word-break: break-all;
+}
+
+.reply.re .bubble {
+	background: #fff;
+	border: 1px solid var(--fill-strong);
+}
+
+.time {
+	font-size: 11px;
 	color: var(--dim);
 	margin-left: 4px;
 }
@@ -221,8 +275,8 @@
 			<div class="title">${ch.title}</div>
 
 			<div class="info">
-				<div>⏳ 기간<br><b>${ch.start_date} ~ ${ch.end_date}</b></div>
-				<div>👥 참여자수<br><b>${ch.member_count}명</b></div>
+				<div><i class="fa-regular fa-clock"></i>기간<b>${ch.start_date} ~ ${ch.end_date}</b></div>
+				<div><i class="fa-solid fa-user-group"></i>참여자수<b>${ch.member_count}명</b></div>
 			</div>
 
 			<div class="actions">
@@ -260,7 +314,11 @@
 		<c:choose>
 			<c:when test ="${empty r.parent_reply_id }">
 			<div class = "reply">
-			<b>${r.username }</b> ${r.content } <span class ="time"> ${r.created_at }</span>
+			<i class="fa-solid fa-circle-user av"></i>
+			<div class="rbody">
+			<div class="rhead">
+			<b>${r.username }</b>
+			<span class ="rbtns">
 			<button type ="button" class ="replyBtn"> 답글 </button>
 			
 			<c:if test = "${r.member_id == sessionScope.loginId }">
@@ -271,7 +329,12 @@
 			<input type = "hidden" name ="challenge_id" value = "${ch.challenge_id }">
 			<button type ="submit"> 삭제</button>
 			</form>
+			</c:if>
+			</span>
+			</div>
+			<div class="bubble">${r.content }<span class ="time"> ${r.created_at }</span></div>
 			
+			<c:if test = "${r.member_id == sessionScope.loginId }">
 			<form class = "editForm" action = "/challenge/replyUpdate" method = "post">
 			<input type ="hidden" name ="challenge_reply_id" value="${r.challenge_reply_id }">
 			<input type ="hidden" name ="challenge_id" value ="${ch.challenge_id }">
@@ -287,13 +350,17 @@
 			<input type ="text" name = "content" placeholder ="답글을 입력하세요.">
 			<button type ="submit"> 등록</button>
 			</form>
-			
+			</div>
  			</div>
 			</c:when>
 			<c:otherwise>
 			<div class ="reply re">
-			<b>${r.username }</b> ${r.content }<span class ="time"> ${r.created_at }</span>
+			<i class="fa-solid fa-circle-user av"></i>
+			<div class="rbody">
+			<div class="rhead">
+			<b>${r.username }</b>
 			<c:if test = "${r.member_id == sessionScope.loginId }">
+			<span class ="rbtns">
 			<button type ="button" class = "editBtn"> 수정</button>
 			
 			<form class = "delForm" action ="/challenge/replyDelete" method ="post">
@@ -301,7 +368,12 @@
 			<input type = "hidden" name ="challenge_id" value = "${ch.challenge_id }">
 			<button type ="submit"> 삭제</button>
 			</form>
+			</span>
+			</c:if>
+			</div>
+			<div class="bubble">${r.content }<span class ="time"> ${r.created_at }</span></div>
 			
+			<c:if test = "${r.member_id == sessionScope.loginId }">
 			<form class = "editForm" action = "/challenge/replyUpdate" method = "post">
 			<input type ="hidden" name ="challenge_reply_id" value="${r.challenge_reply_id }">
 			<input type ="hidden" name ="challenge_id" value ="${ch.challenge_id }">
@@ -309,7 +381,7 @@
 			<button type ="submit"> 저장 </button>
 			</form>
 			</c:if>
-			
+			</div>
 			</div>
 			</c:otherwise>
 		</c:choose>
