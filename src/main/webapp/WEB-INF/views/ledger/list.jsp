@@ -1010,8 +1010,7 @@ $(".ledger-form").on(
 
 let categoryData = {};
 
-let currentMonth =
-	"2026-10";
+let currentMonth = "${currentMonth}";
 
 
 for (let ledger of ledgerList) {
