@@ -54,6 +54,11 @@ public class ChallengeController {
 			if(dto.getEnd_date().compareTo(dto.getStart_date()) < 0) {
 				return "redirect:/challenge/create";
 			}
+			// 시작일이 오늘보다 이전이면 개설 불가 (yyyy-MM-dd 글자는 그대로 비교해도 날짜 순서와 같다)
+			String today = new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date());
+			if(dto.getStart_date().compareTo(today) < 0) {
+				return "redirect:/challenge/create";
+			}
 			dao.addChallenge(id, dto);
 			return "redirect:/challenge/list";
 		}

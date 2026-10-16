@@ -164,9 +164,26 @@
 
 	<Script>
 	
+	// 오늘 날짜 (yyyy-MM-dd)
+	var now = new Date();
+	var month = now.getMonth() + 1;
+	var day = now.getDate();
+	if (month < 10) { month = "0" + month; }
+	if (day < 10) { day = "0" + day; }
+	var today = now.getFullYear() + "-" + month + "-" + day;
+	
+	// 달력에서 오늘 이전 날짜는 선택할 수 없게
+	$("input[name='start_date']").attr("min", today);
+	$("input[name='end_date']").attr("min", today);
+	
 	$("form").on("submit", function(){
 	    var start = $("input[name='start_date']").val();
 	    var end   = $("input[name='end_date']").val();
+
+	    if(start < today){                              // 직접 입력해도 막기
+	        alert("시작일은 오늘 이후로 선택해주세요.");
+	        return false;
+	    }
 
 	    if(end < start){                                // 1번 빈칸 (종료일이 시작일보다 빠른 조건)
 	        alert("종료일은 시작일보다 빠를 수 없어요.");

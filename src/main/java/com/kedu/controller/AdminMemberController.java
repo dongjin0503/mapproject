@@ -8,6 +8,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.kedu.dao.AdminMemberDAO;
+import com.kedu.dao.MemberDAO;
+import com.kedu.dto.MemberDTO;
 
 @Controller
 @RequestMapping("/admin")
@@ -15,6 +17,9 @@ public class AdminMemberController {
 
 	@Autowired
 	private AdminMemberDAO dao;
+	
+	@Autowired
+	private MemberDAO mdao;
 	
 	@RequestMapping("/members")
 	public String members(String keyword , String msg , Model model , HttpSession session) {
@@ -56,7 +61,9 @@ public class AdminMemberController {
 			return "redirect:/admin/members?msg=admin";
 		}
 		
-		dao.deleteMember(id);
+		MemberDTO dto = new MemberDTO();
+		dto.setId(id);
+		mdao.delete(dto);   // 회원 + 그 회원의 데이터 모두 삭제
 		
 		return "redirect:/admin/members?msg=ok";
 	}

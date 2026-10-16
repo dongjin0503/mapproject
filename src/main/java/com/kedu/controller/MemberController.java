@@ -94,7 +94,14 @@ public class MemberController {
 	    if (id == null) {                                 
 	        return "redirect:/member/login";               
 	    }
-		MemberDTO dto = dao.selectMember(id);
+		MemberDTO dto = null;
+		try {
+			dto = dao.selectMember(id);
+		} catch (Exception e) {
+			// 세션에는 로그인 상태인데 DB에 회원이 없는 경우 (탈퇴·강제 탈퇴)
+			session.invalidate();
+			return "redirect:/member/login";
+		}
 		model.addAttribute("member",dto) ;
 		return "member/mypage";
 	}
@@ -102,8 +109,12 @@ public class MemberController {
 	@RequestMapping("leave") 
 		public String leave(HttpSession session, MemberDTO dto) {
 			String id = (String) session.getAttribute("loginId");
+			if (id == null) {
+				return "redirect:/member/login";
+			}
 			dto.setId(id);
 			dao.delete(dto);
+			session.invalidate();   // 탈퇴하면 로그인 상태도 같이 끊기
 			
 			return "redirect:/map/main";
 		}
