@@ -325,14 +325,23 @@ textarea[name='memo'] {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+	gap: 10px;                  /* 글자와 버튼 사이 간격 */
 	padding: 10px 0;
 	border-bottom: 1px solid #ddd;
+}
+
+/* 긴 메모가 상자 안에서 줄바꿈되도록 */
+.day-item > span {
+	flex: 1;
+	min-width: 0;
+	overflow-wrap: anywhere;
 }
 
 .day-btns {
 	display: flex;
 	gap: 5px;
 	align-items: center;
+	flex-shrink: 0;             /* 버튼 영역이 찌그러지지 않게 */
 }
 
 .edit-btn,
@@ -343,6 +352,7 @@ textarea[name='memo'] {
 	font-size: 13px;
 	cursor: pointer;
 	text-decoration: none;
+	white-space: nowrap;
 }
 
 .edit-btn {
