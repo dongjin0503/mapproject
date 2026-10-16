@@ -1,5 +1,7 @@
 package com.kedu.controller;
 
+import java.nio.charset.StandardCharsets;
+
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,12 @@ public class FreeBoardReplyController {
 	        return "redirect:/member/login";
 	    }
 	    dto.setMemberId(loginId);
+	    if (dto.getContent() != null
+	            && dto.getContent().getBytes(StandardCharsets.UTF_8).length > 1000) {
+	        // 1000바이트 초과 시 DB 저장을 진행하지 않도록 처리
+	    	return "redirect:/FreeBoard/detail?postId=" + dto.getPostId() + "&cpage=" + cpage;
+	    }
+	    
 	    dao.addReply(dto);
 		
 		 return "redirect:/FreeBoard/detail?postId=" + dto.getPostId() + "&cpage=" + cpage;
@@ -34,10 +42,15 @@ public class FreeBoardReplyController {
 	public String updateReply(HttpSession session,FreeBoardReplyDTO dto, @RequestParam(defaultValue = "1") int cpage) throws Exception {
 		 String loginId = (String) session.getAttribute("loginId");
 		    if (loginId != null && dao.isWriter(dto.getReplyId(), loginId)) {
+		    	if (dto.getContent() != null
+		    	        && dto.getContent().getBytes(StandardCharsets.UTF_8).length > 1000) {
+		    	    // 1000바이트 초과 시 DB 저장을 진행하지 않도록 처리
+		    		return "redirect:/FreeBoard/detail?postId=" + dto.getPostId() + "&cpage=" + cpage;
+		    	}
 		        dao.updateReply(dto);
 		    }
+		    return "redirect:/FreeBoard/detail?postId=" + dto.getPostId() + "&cpage=" + cpage;
 		
-		return "redirect:/FreeBoard/detail?postId=" + dto.getPostId() + "&cpage=" + cpage;
 	}
 
 	@RequestMapping(value = "/deleteReply", method = RequestMethod.POST)
