@@ -53,6 +53,7 @@ public class LedgerController {
       model.addAttribute("totalExpense", totalExpense);
       model.addAttribute("budget", budget);
       model.addAttribute("remainAmount", remainAmount);
+      model.addAttribute("currentMonth", month);
 
       return "ledger/list";
    }
